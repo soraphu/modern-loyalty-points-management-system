@@ -1,0 +1,127 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ==========================================
+// ENUM (Matching SQL Tables)
+// ==========================================
+
+enum AdminRoles {
+  STAFF
+  MANAGER
+  OWNER
+
+  @@map("adminRoles")
+}
+
+enum TransactionType {
+  EARN
+  REDEEM
+
+  @@map("transactionType")
+}
+
+enum VoucherStatus {
+  PENDING
+  CLAIMED
+  EXPIRED
+
+  @@map("voucherStatus")
+}
+
+// ==========================================
+// MODELS (Matching SQL Tables)
+// ==========================================
+
+model Admin {
+  id             String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  role           AdminRoles @default(STAFF)
+  username       String     @unique @db.VarChar(100)
+  firstname      String     @db.VarChar(100)
+  lastname       String     @db.VarChar(100)
+  passwordHashed String     @map("password_hashed")
+  createdAt      DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime   @default(now()) @map("updated_at") @db.Timestamptz
+
+  qrCodes QrCode[]
+
+  @@map("admins")
+}
+
+model User {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  lineId          String   @unique @map("line_id") @db.VarChar(255)
+  lineDisplayName String   @map("line_display_name") @db.VarChar(255)
+  linePictureUrl  String?  @map("line_picture_url")
+  totalPoints     Int      @default(0) @map("total_points")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  transactions Transaction[]
+  vouchers     Voucher[]
+
+  @@map("users")
+}
+
+model QrCode {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  adminId    String   @map("admin_id") @db.Uuid
+  codeString String   @unique @map("code_string") @db.VarChar(255)
+  pointValue Int      @map("point_value")
+  used       Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  expiresAt  DateTime @map("expires_at") @db.Timestamptz
+
+  admin Admin @relation(fields: [adminId], references: [id], onDelete: Restrict)
+
+  @@map("qr_codes")
+}
+
+model Reward {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  rewardName String   @map("reward_name") @db.VarChar(255) // 🟢 Matches your updated column name!
+  pointsCost Int      @map("points_cost")
+  imageUrl   String?  @map("image_url")
+  active     Boolean  @default(true)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  vouchers Voucher[]
+
+  @@map("rewards")
+}
+
+model Transaction {
+  id           String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String          @map("user_id") @db.Uuid
+  referenceId  String          @map("reference_id") @db.Uuid
+  pointsAmount Int             @map("points_amount")
+  type         TransactionType
+  createdAt    DateTime        @default(now()) @map("created_at") @db.Timestamptz
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("transactions")
+}
+
+model Voucher {
+  id        String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String        @map("user_id") @db.Uuid
+  rewardId  String        @map("reward_id") @db.Uuid
+  status    VoucherStatus @default(PENDING)
+  createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  expiresAt DateTime?     @map("expires_at") @db.Timestamptz
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reward Reward @relation(fields: [rewardId], references: [id], onDelete: Restrict)
+
+  @@map("vouchers")
+}

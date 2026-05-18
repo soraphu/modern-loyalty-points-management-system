@@ -1,44 +1,19 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
-    // File Layout
-    // "rootDir": "./src",
-    // "outDir": "./dist",
-
-    // Environment Settings
-    // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
-    "target": "esnext",
-    "types": [],
-    // For nodejs:
-    // "lib": ["esnext"],
-    // "types": ["node"],
-    // and npm install -D @types/node
-
-    // Other Outputs
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-
-    // Stricter Typechecking Options
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-
-    // Style Options
-    // "noImplicitReturns": true,
-    // "noImplicitOverride": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "noFallthroughCasesInSwitch": true,
-    // "noPropertyAccessFromIndexSignature": true,
-
-    // Recommended Options
-    "strict": true,
-    "jsx": "react-jsx",
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    "skipLibCheck": true,
-  }
+    "target": "ES2023", /* Output modern JavaScript */
+    "module": "ESNext", /* Standard module resolution for modern Node */
+    "moduleResolution": "bundler",
+    "rootDir": "./src", /* Where you write your TS files */
+    "outDir": "./dist", /* Where the compiled JS code will be saved */
+    "esModuleInterop": true, /* Emits additional JavaScript to ease importing */
+    "forceConsistentCasingInFileNames": true, /* Disallow inconsistently-cased references */
+    "strict": true, /* Enable all strict type-checking options */
+    "skipLibCheck": true, /* Skip type checking of declaration files */
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "src/**/*"
+  ]
 }
