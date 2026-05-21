@@ -3,17 +3,17 @@ import cors from '@fastify/cors';
 import fastifyEnv from '@fastify/env';
 import { PrismaClient } from './generated/prisma/client';
 import { PrismaPg } from "@prisma/adapter-pg";
+import { Logger } from './controller/logger';
+import { ApiResponse } from './controller/api_response';
+
+const serverLog = new Logger('server.ts');
 
 const adapter = new PrismaPg({
     connectionString: process.env.DATABASE_URL,
 });
 
 const fastify = Fastify({
-    logger: {
-        transport: {
-            target: 'pino-pretty', // Makes your terminal logs beautifully readable
-        },
-    },
+    logger: false
 });
 
 export const prisma = new PrismaClient({ adapter });
@@ -29,7 +29,7 @@ const environmentSchema = {
 
 const fastifyOptions = {
     schema: environmentSchema,
-    dotenv: true, // Tells Fastify to read your local .env file
+    dotenv: true, // Tells Fastify to read local .env file
 };
 
 const startServer = async () => {
@@ -43,14 +43,13 @@ const startServer = async () => {
         });
 
         fastify.get('/health', async (request, reply) => {
-            return {
-                success: true,
-                message: "Fastify + TypeScript server is breathing alive!"
-            };
+            const res = ApiResponse.success({ msg: "Fastify + TypeScript server is breathing alive!" });
+
+            return reply.status(res.statusCode).send(res.payload);
         });
 
         await prisma.$connect();
-        fastify.log.info('Database connected successfully via Prisma 🐘');
+        serverLog.info('Database connected successfully via Prisma 🐘');
 
         const port = Number(process.env.PORT) || 8080;
         await fastify.listen({ port: port, host: '0.0.0.0' });
