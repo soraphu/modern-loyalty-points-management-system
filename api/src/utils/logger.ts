@@ -29,8 +29,8 @@ export class Logger {
 
         // 2. Set the threshold: Production hides low-level info, Dev shows everything
         this.minLogLevel = this.isProduction
-            ? Logger.levels.WARN  // 🚀 Prod: Only log WARN and ERROR
-            : Logger.levels.INFO; // 💻 Dev: Log INFO, SUCCESS, WARN, and ERROR
+            ? Logger.levels.WARN  // 🚀 Prod: Only log WARN and ERROR.
+            : Logger.levels.INFO; // 💻 Dev: All.
     }
 
     // 3. Helper to check if we should skip logging this line

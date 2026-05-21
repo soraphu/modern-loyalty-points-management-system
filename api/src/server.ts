@@ -3,8 +3,10 @@ import cors from '@fastify/cors';
 import fastifyEnv from '@fastify/env';
 import { PrismaClient } from './generated/prisma/client';
 import { PrismaPg } from "@prisma/adapter-pg";
-import { Logger } from './controller/logger';
-import { ApiResponse } from './controller/api_response';
+import { Logger } from './utils/logger';
+import { ApiResponse } from './utils/api_response';
+import { customerRoutes } from './routes/customerRoutes';
+import { adminRoutes } from './routes/adminRoutes';
 
 const serverLog = new Logger('server.ts');
 
@@ -23,7 +25,7 @@ const environmentSchema = {
     required: ['DATABASE_URL', 'PORT'],
     properties: {
         DATABASE_URL: { type: 'string' },
-        PORT: { type: 'string', default: '8080' },
+        PORT: { type: 'string', default: 3000 },
     },
 };
 
@@ -37,10 +39,13 @@ const startServer = async () => {
         // Register Environment Variable Validation First
         await fastify.register(fastifyEnv, fastifyOptions);
 
-        // Register CORS (Adjust origin when you deploy your frontend app)
+        // Register CORS (Adjust origin when deploy frontend app)
         await fastify.register(cors, {
             origin: true,
         });
+
+        await fastify.register(adminRoutes, { prefix: '/admin' });
+        await fastify.register(customerRoutes, { prefix: '/customer' });
 
         fastify.get('/health', async (request, reply) => {
             const res = ApiResponse.success({ msg: "Fastify + TypeScript server is breathing alive!" });
@@ -49,10 +54,13 @@ const startServer = async () => {
         });
 
         await prisma.$connect();
-        serverLog.info('Database connected successfully via Prisma 🐘');
+        serverLog.success('Database connected successfully via Prisma 🐘');
 
-        const port = Number(process.env.PORT) || 8080;
-        await fastify.listen({ port: port, host: '0.0.0.0' });
+        const port = Number(process.env.PORT) || 3000;
+        const serverUrl = await fastify.listen({ port: port, host: '0.0.0.0' });
+
+        serverLog.info(`Development Running: http://localhost:${port}`);
+        serverLog.info(`Production Running: ${serverUrl}`);
 
     } catch (err) {
         fastify.log.error(err);
