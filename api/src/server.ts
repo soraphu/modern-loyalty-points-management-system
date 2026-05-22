@@ -8,6 +8,7 @@ import { ApiResponse } from './utils/api_response';
 import { customerRoutes } from './routes/customerRoutes';
 import { adminRoutes } from './routes/adminRoutes';
 import { API_CONFIG } from './config/constants';
+import { apiDocs } from './routes/apiDocs';
 
 const serverLog = new Logger('server.ts');
 
@@ -49,6 +50,7 @@ const startServer = async () => {
 
         await fastify.register(adminRoutes, { prefix: `${apiPrefix}/admin` });
         await fastify.register(customerRoutes, { prefix: `${apiPrefix}/customer` });
+        await fastify.register(apiDocs, { prefix: `/` });
 
         fastify.get('/health', async (request, reply) => {
             const res = ApiResponse.success({ msg: "Fastify + TypeScript server is breathing alive!" });
@@ -66,6 +68,7 @@ const startServer = async () => {
         serverLog.info(`Production Running: ${serverUrl}${apiPrefix}`);
 
     } catch (err) {
+        console.log(err);
         fastify.log.error(err);
         process.exit(1);
     }
