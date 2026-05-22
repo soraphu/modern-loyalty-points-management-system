@@ -55,7 +55,7 @@ export class Validation {
     public static email(email: string, msg = 'The provided email address format is invalid'): void {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (this.isEmpty(email) || !emailRegex.test(email)) {
-            throw ApiResponse.fail({ msg, statusCode: 400 });
+            throw ApiResponse.fail({ msg, statusCode: 400, error_code: "INVALID_EMAIL_FORMAT" });
         }
     }
 
@@ -69,14 +69,17 @@ export class Validation {
         if (constraints.min && len < constraints.min) {
             throw ApiResponse.fail({
                 msg: `${fieldName} must be at least ${constraints.min} characters long.`,
-                statusCode: 400
+                statusCode: 400,
+                error_code: "INVALID_LENGTH"
+
             });
         }
 
         if (constraints.max && len > constraints.max) {
             throw ApiResponse.fail({
                 msg: `${fieldName} cannot exceed ${constraints.max} characters.`,
-                statusCode: 400
+                statusCode: 400,
+                error_code: "FORBIDDEN_CHAR"
             });
         }
     }

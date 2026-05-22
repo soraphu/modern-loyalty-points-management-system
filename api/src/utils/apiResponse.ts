@@ -29,12 +29,13 @@ export class ApiResponse {
     /**
      * Failure Response Wrapper
      */
-    static fail({ msg, statusCode = 400 }: { msg: string; statusCode?: number }) {
+    static fail({ msg, statusCode = 400, error_code }: { msg: string; statusCode?: number, error_code: string }) {
         return {
             statusCode,
             payload: {
                 success: false,
                 msg,
+                error_code,
             }
         };
     }
@@ -44,7 +45,7 @@ export class ApiResponse {
      * Triggered when payload or query parameters fail basic presence checks
      */
     static requiredFieldsMissing(msg = 'Required payload or query parameters are missing') {
-        return this.fail({ msg, statusCode: 400 });
+        return this.fail({ msg, statusCode: 400, error_code: "FIEDS_MISSING" });
     }
 
     /**
@@ -52,7 +53,7 @@ export class ApiResponse {
      * Triggered when the Authorization header is completely absent
      */
     static authTokenMissing(msg = 'Authentication token is required to access this resource') {
-        return this.fail({ msg, statusCode: 401 });
+        return this.fail({ msg, statusCode: 401, error_code: "ACC_TOKEN_MISSING" });
     }
 
     /**
@@ -60,7 +61,7 @@ export class ApiResponse {
      * Triggered when a token is provided but fails cryptographic verification or is expired
      */
     static authTokenInvalid(msg = 'Provided authentication token is invalid or expired') {
-        return this.fail({ msg, statusCode: 401 });
+        return this.fail({ msg, statusCode: 401, error_code: "INVALID_ACC_TOKEN" });
     }
 
     /**
@@ -68,7 +69,7 @@ export class ApiResponse {
      * Triggered when a user is authenticated but lacks the specific permissions or roles required
      */
     static permissionDenied(msg = 'Access denied: Insufficient account permissions') {
-        return this.fail({ msg, statusCode: 403 });
+        return this.fail({ msg, statusCode: 403, error_code: "FORBIDDEN" });
     }
 
     /**
@@ -76,7 +77,7 @@ export class ApiResponse {
      * Triggered when a database record or specific asset does not exist
      */
     static resourceNotFound(msg = 'The requested resource could not be found') {
-        return this.fail({ msg, statusCode: 404 });
+        return this.fail({ msg, statusCode: 404, error_code: "ACC_TOKEN_MISSING" });
     }
 
     /**
@@ -84,7 +85,11 @@ export class ApiResponse {
      * Triggered when an operation violates a unique constraint (e.g., duplicate email registration)
      */
     static resourceConflict(msg = 'Resource already exists with the provided unique identifiers') {
-        return this.fail({ msg, statusCode: 409 });
+        return this.fail({ msg, statusCode: 409, error_code: "DUPLICATE" });
+    }
+
+    static internalServerError(msg = 'Internal server error') {
+        return this.fail({ msg, statusCode: 500, error_code: "SERVER_ERROR" });
     }
 
 }

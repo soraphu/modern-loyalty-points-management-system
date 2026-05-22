@@ -12,7 +12,7 @@ export async function customerRoutes(fastify: FastifyInstance) {
 
     // Sync LINE Account Profile
     // POST -> /api/v1/customer/sync
-    fastify.post('/sync', syncLineController);
+    fastify.get('/sync', syncLineController);
 
     // Fetch Point Transaction Ledger History
     // GET -> /api/v1/customer/transactions

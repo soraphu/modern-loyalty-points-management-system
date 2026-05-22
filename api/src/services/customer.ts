@@ -1,4 +1,7 @@
 import { prisma } from '../config/database';
+import axios from 'axios';
+import { ApiResponse } from '../utils/apiResponse';
+import { CONFIG } from '../config/constants';
 
 export interface LineProfileInput {
     line_id: string;
@@ -8,10 +11,34 @@ export interface LineProfileInput {
 
 export class CustomerService {
 
+    public static async getLineProfile(lineAccessToken: string) {
+        try {
+            const lineProfileResponse = await axios.get(CONFIG.LINE_API, {
+                headers: {
+                    // This is the header line LINE requires to authorize your request
+                    'Authorization': `Bearer ${lineAccessToken}`
+                }
+            });
+
+            return lineProfileResponse;
+        } catch (error: any) {
+            if (error.response) {
+                throw ApiResponse.fail({
+                    statusCode: 401,
+                    msg: `LINE response : ${error.response.data.message}`,
+                    error_code: 'LINE_VALIDATE_FAILED'
+                });
+            }
+
+            throw ApiResponse.internalServerError();
+        }
+    }// end
+
     /**
      * Syncs LINE data with the 'User' model using exact schema naming conventions.
      * Generates a structural record if the account does not exist in the DB yet.
      */
+
     public static async syncLineProfile(data: LineProfileInput) {
         return await prisma.user.upsert({
             where: { lineId: data.line_id },

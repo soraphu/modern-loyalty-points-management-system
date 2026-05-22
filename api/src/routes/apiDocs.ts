@@ -1,11 +1,11 @@
 import { FastifyInstance } from "fastify";
 import { ApiResponse } from "../utils/apiResponse";
-import { API_CONFIG } from "../config/constants";
+import { CONFIG } from "../config/constants";
 import { customerPaths } from "../docs/customerPath.ts";
 import { adminPaths } from "../docs/adminPath";
 
 export async function apiDocs(fastify: FastifyInstance) {
-    const baseUri = API_CONFIG.PREFIX; // e.g., '/api/v1'
+    const baseUri = CONFIG.API_PREFIX; // e.g., '/api/v1'
 
     fastify.get('/', async (request, reply) => {
 

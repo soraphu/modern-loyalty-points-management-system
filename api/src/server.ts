@@ -6,13 +6,13 @@ import { Logger } from './utils/logger';
 import { ApiResponse } from './utils/apiResponse';
 import { customerRoutes } from './routes/customerRoutes';
 import { adminRoutes } from './routes/adminRoutes';
-import { API_CONFIG } from './config/constants';
+import { CONFIG } from './config/constants';
 import { apiDocs } from './routes/apiDocs';
 import { prisma } from './config/database';
 
 const serverLog = new Logger('server.ts');
 
-const fastify = Fastify({
+export const fastify = Fastify({
     logger: false
 });
 
@@ -30,7 +30,7 @@ const fastifyOptions = {
     dotenv: true, // Tells Fastify to read local .env file
 };
 
-const apiPrefix = API_CONFIG.PREFIX;
+const apiPrefix = CONFIG.API_PREFIX;
 
 const startServer = async () => {
     try {
@@ -43,12 +43,8 @@ const startServer = async () => {
         });
 
         fastify.register(fastifyJwt, {
-            secret: process.env.JWT_SECRET || 'super-secret-dee-points-key-xx'
+            secret: CONFIG.JWT_SECRET
         });
-
-        await fastify.register(adminRoutes, { prefix: `${apiPrefix}/admin` });
-        await fastify.register(customerRoutes, { prefix: `${apiPrefix}/customer` });
-        await fastify.register(apiDocs, { prefix: `/` });
 
         await fastify.register(adminRoutes, { prefix: `${apiPrefix}/admin` });
         await fastify.register(customerRoutes, { prefix: `${apiPrefix}/customer` });
