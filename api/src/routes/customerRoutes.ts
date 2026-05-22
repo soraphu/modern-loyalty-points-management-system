@@ -29,5 +29,4 @@ export async function customerRoutes(fastify: FastifyInstance) {
     // Redeem Wallet Point Reserves for a Specific Digital Voucher Block
     // POST -> /api/v1/customer/rewards/:reward_id/redeem
     fastify.post('/rewards/:reward_id/redeem', redeemRewardController);
-
-}
+}//end
