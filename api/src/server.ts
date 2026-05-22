@@ -4,7 +4,7 @@ import fastifyEnv from '@fastify/env';
 import { PrismaClient } from './generated/prisma/client';
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Logger } from './utils/logger';
-import { ApiResponse } from './utils/api_response';
+import { ApiResponse } from './utils/apiResponse';
 import { customerRoutes } from './routes/customerRoutes';
 import { adminRoutes } from './routes/adminRoutes';
 import { API_CONFIG } from './config/constants';

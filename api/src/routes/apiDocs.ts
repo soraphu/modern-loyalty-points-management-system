@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { ApiResponse } from "../utils/api_response";
+import { ApiResponse } from "../utils/apiResponse";
 import { API_CONFIG } from "../config/constants";
 import { customerPaths } from "../docs/customerPath.ts";
 import { adminPaths } from "../docs/adminPath";
