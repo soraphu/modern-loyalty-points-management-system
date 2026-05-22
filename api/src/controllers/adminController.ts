@@ -1,4 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
+import { Logger } from '../utils/logger';
+
+const consoleLog = new Logger('Admin Controller');
 
 export function adminLoginController(request: FastifyRequest, reply: FastifyReply) {
 
@@ -17,7 +20,6 @@ export function settleVoucherController(request: FastifyRequest, reply: FastifyR
 }//end
 
 export function fetchRewardsController(request: FastifyRequest, reply: FastifyReply) {
-
 }//end
 
 export function createRewardController(request: FastifyRequest, reply: FastifyReply) {

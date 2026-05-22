@@ -1,26 +1,20 @@
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import fastifyEnv from '@fastify/env';
-import { PrismaClient } from './generated/prisma/client';
-import { PrismaPg } from "@prisma/adapter-pg";
+import fastifyJwt from '@fastify/jwt';
 import { Logger } from './utils/logger';
 import { ApiResponse } from './utils/apiResponse';
 import { customerRoutes } from './routes/customerRoutes';
 import { adminRoutes } from './routes/adminRoutes';
 import { API_CONFIG } from './config/constants';
 import { apiDocs } from './routes/apiDocs';
+import { prisma } from './config/database';
 
 const serverLog = new Logger('server.ts');
-
-const adapter = new PrismaPg({
-    connectionString: process.env.DATABASE_URL,
-});
 
 const fastify = Fastify({
     logger: false
 });
-
-export const prisma = new PrismaClient({ adapter });
 
 const environmentSchema = {
     type: 'object',
@@ -47,6 +41,14 @@ const startServer = async () => {
         await fastify.register(cors, {
             origin: true,
         });
+
+        fastify.register(fastifyJwt, {
+            secret: process.env.JWT_SECRET || 'super-secret-dee-points-key-xx'
+        });
+
+        await fastify.register(adminRoutes, { prefix: `${apiPrefix}/admin` });
+        await fastify.register(customerRoutes, { prefix: `${apiPrefix}/customer` });
+        await fastify.register(apiDocs, { prefix: `/` });
 
         await fastify.register(adminRoutes, { prefix: `${apiPrefix}/admin` });
         await fastify.register(customerRoutes, { prefix: `${apiPrefix}/customer` });

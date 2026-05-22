@@ -22,8 +22,8 @@ export async function adminRoutes(fastify: FastifyInstance) {
 
     // Administrative Personnel Authentication
     // POST -> /api/v1/admin/login
-    fastify.post('/login', adminLoginController);
 
+    fastify.post('/login', adminLoginController);
     // Generate Secure Points Allocation Token
     // POST -> /api/v1/admin/points-token
     fastify.post('/points-token', generatePointsTokenController);
