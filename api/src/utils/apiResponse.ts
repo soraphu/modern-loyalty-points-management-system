@@ -40,14 +40,6 @@ export class ApiResponse {
     }
 
     /**
-   * Semantic Error: 405 Method Not Allowed
-   * Triggered when an incorrect HTTP verb hits an endpoint (e.g., GET instead of POST)
-   */
-    static invalidMethod(msg = 'HTTP method not allowed for this endpoint') {
-        return this.fail({ msg, statusCode: 405 });
-    }
-
-    /**
      * Semantic Error: 400 Bad Request (Missing Fields)
      * Triggered when payload or query parameters fail basic presence checks
      */
