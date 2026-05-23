@@ -4,23 +4,23 @@ import { ApiResponse } from '../utils/apiResponse';
 import { CONFIG } from '../config/constants';
 
 export interface LineProfileInput {
-    line_id: string;
-    display_name: string;
-    picture_url: string;
+    userId: string;
+    displayName: string;
+    pictureUrl: string;
 }
 
 export class CustomerService {
 
     public static async getLineProfile(lineAccessToken: string) {
         try {
-            const lineProfileResponse = await axios.get(CONFIG.LINE_API, {
+            const lineResponse = await axios.get(CONFIG.LINE_API, {
                 headers: {
                     // This is the header line LINE requires to authorize your request
                     'Authorization': `Bearer ${lineAccessToken}`
                 }
             });
 
-            return lineProfileResponse;
+            return lineResponse.data;
         } catch (error: any) {
             if (error.response) {
                 throw ApiResponse.fail({
@@ -39,20 +39,25 @@ export class CustomerService {
      * Generates a structural record if the account does not exist in the DB yet.
      */
 
-    public static async syncLineProfile(data: LineProfileInput) {
-        return await prisma.user.upsert({
-            where: { lineId: data.line_id },
-            update: {
-                lineDisplayName: data.display_name,
-                linePictureUrl: data.picture_url,
-            },
-            create: {
-                lineId: data.line_id,
-                lineDisplayName: data.display_name,
-                linePictureUrl: data.picture_url,
-                totalPoints: 0, // Starts fresh with zero points
-            },
-        });
+    public static async syncLineProfile(lineProfile: LineProfileInput) {
+        try {
+            return await prisma.user.upsert({
+                where: { lineId: lineProfile.userId },
+                update: {
+                    lineDisplayName: lineProfile.displayName,
+                    linePictureUrl: lineProfile.pictureUrl,
+                },
+                create: {
+                    lineId: lineProfile.userId,
+                    lineDisplayName: lineProfile.displayName,
+                    linePictureUrl: lineProfile.pictureUrl,
+                    totalPoints: 0,
+                },
+            });
+
+        } catch (error: any) {
+            throw ApiResponse.internalServerError(error);
+        }
     }//end
 
     /**
