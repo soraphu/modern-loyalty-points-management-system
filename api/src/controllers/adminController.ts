@@ -56,7 +56,7 @@ export async function generatePointsTokenController(request: FastifyRequest, rep
         const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
-        const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'MANAGER' });
+        const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });
         logs.info('Admin: ', admin);
 
         const codeString = await StaffService.generatePointsToken(admin.id, jsonBody.points);
@@ -84,6 +84,7 @@ export function settleVoucherController(request: FastifyRequest, reply: FastifyR
 }//end
 
 export function fetchRewardsController(request: FastifyRequest, reply: FastifyReply) {
+
 }//end
 
 export function createRewardController(request: FastifyRequest, reply: FastifyReply) {
@@ -133,8 +134,50 @@ export async function createAdminController(request: FastifyRequest, reply: Fast
     }
 }//end
 
-export function modifyAdminRoleController(request: FastifyRequest, reply: FastifyReply) {
+export async function modifyAdminRoleController(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const jsonBody: any = request.body;
+        const { adminId }: any = request.params;
 
+        Validation.requiredFields(jsonBody, ['role']);
+
+        if (jsonBody.role === 'OWNER') {
+            throw ApiResponse.fail({
+                statusCode: 403,
+                msg: 'Changing role to OWNER is not allowed.',
+                error_code: 'FORBIDDEN'
+            });
+        }
+
+        if (jsonBody.role != 'STAFF' && jsonBody.role != 'MANAGER') {
+            throw ApiResponse.fail({
+                statusCode: 400,
+                msg: 'Invalid role type.',
+                error_code: 'BAD_REQUEST'
+            });
+        }
+
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'OWNER' });
+        logs.info('Admin: ', admin);
+
+        const updateAdmin = await OwnerService.adjustAdminRole(adminId, jsonBody.role);
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: `Admin ${admin.username} role changed.`,
+            data: { update_admin: updateAdmin }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
 }//end
 
 export function forcePasswordResetController(request: FastifyRequest, reply: FastifyReply) {

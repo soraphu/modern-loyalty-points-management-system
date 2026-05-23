@@ -69,14 +69,14 @@ export async function adminRoutes(fastify: FastifyInstance) {
     fastify.post('/admins', createAdminController);
 
     // Modify Operations Permission Tier
-    // PATCH -> /api/v1/admin/admins/:admin_id/role-adjustment
-    fastify.patch('/admins/:admin_id/role-adjustment', modifyAdminRoleController);
+    // PATCH -> /api/v1/admin/admins/:adminId/role-adjustment
+    fastify.patch('/admins/:adminId/role-adjustment', modifyAdminRoleController);
 
     // Force Password Credential Replacement
-    // PATCH -> /api/v1/admin/admins/:admin_id/password-reset
-    fastify.patch('/admins/:admin_id/password-reset', forcePasswordResetController);
+    // PATCH -> /api/v1/admin/admins/:adminId/password-reset
+    fastify.patch('/admins/:adminId/password-reset', forcePasswordResetController);
 
     // Revoke/Delete Administrative Console Account
-    // DELETE -> /api/v1/admin/admins/:admin_id
-    fastify.delete('/admins/:admin_id', deleteAdminController);
+    // DELETE -> /api/v1/admin/admins/:adminId
+    fastify.delete('/admins/:adminId', deleteAdminController);
 }//end
