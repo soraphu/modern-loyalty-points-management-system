@@ -41,7 +41,7 @@ export class Validation {
         }
 
         if (!authHeader.startsWith('Bearer ')) {
-            throw ApiResponse.authTokenInvalid('Malformed authorization header format. Expected "Bearer <token>".');
+            throw ApiResponse.authTokenInvalid();
         }
 
         // Returns the clean token string in case the controller needs it

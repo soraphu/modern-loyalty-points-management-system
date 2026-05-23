@@ -7,18 +7,18 @@ import { fastify } from '../server';
 
 export async function syncLineController(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const lineAccessToken: string = await Validation.requireAuthHeader(request);
+        const lineAccessToken: string = Validation.requireAuthHeader(request);
+
         const lineProfile: any = await CustomerService.getLineProfile(lineAccessToken);
 
         const accessToken: string = Auth.generateAccessToken(fastify, lineProfile);
 
-        return ApiResponse.success({ data: accessToken, msg: 'Sync data success.' });
+        return ApiResponse.success({ data: accessToken, msg: 'Sync successfully.' });
 
     } catch (error: any) {
-
         return reply.status(error.statusCode).send(error.payload);
-    }
 
+    }
 } //end
 
 export async function earnPointsController(request: FastifyRequest, reply: FastifyReply) {
