@@ -1,8 +1,8 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { Validation } from '../utils/validation';
 import { ApiResponse } from '../utils/apiResponse';
-import { CustomerService } from '../services/customer';
-import { Auth } from '../services/auth';
+import { CustomerService } from '../services/customerService';
+import { Auth } from '../services/authService';
 import { fastify } from '../server';
 import { Logger } from '../utils/logger';
 
