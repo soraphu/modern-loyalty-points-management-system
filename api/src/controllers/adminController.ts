@@ -3,11 +3,38 @@ import { Logger } from '../utils/logger';
 import { Validation } from '../utils/validation';
 import { OwnerService } from '../services/ownerService';
 import { ApiResponse } from '../utils/apiResponse';
+import { Auth } from '../services/authService';
 
 const logs = new Logger('Admin Controller');
 
-export function adminLoginController(request: FastifyRequest, reply: FastifyReply) {
-    
+export async function adminLoginController(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const reqBody: any = request.body;
+
+        Validation.requiredFields(reqBody, ['username', 'password']);
+
+        const admin: any = await Auth.handleAdminLogin(reqBody.username, reqBody.password);
+        const { id, role, username } = admin;
+        const JwtPayload = { id, role, username }
+
+        const accessToken = Auth.generateAccessToken(JwtPayload);
+
+        logs.info('Admin: ', admin);
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: 'Login successfully.',
+            data: {
+                access_token: accessToken,
+                admin_data: admin,
+            }
+        });
+        ``
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
 }//end
 
 export function generatePointsTokenController(request: FastifyRequest, reply: FastifyReply) {

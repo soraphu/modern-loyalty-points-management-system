@@ -16,7 +16,7 @@ export interface CustomerTokenPayload {
 export class Auth {
     private static readonly TOKEN_EXPIRY = '7d';
 
-    public static async loginAdmin(username: string, passwordRaw: string) {
+    public static async handleAdminLogin(username: string, passwordRaw: string) {
         try {
             // Find the admin by unique username
             const admin = await prisma.admin.findUnique({
@@ -60,6 +60,18 @@ export class Auth {
         return fastify.jwt.sign(payload, {
             expiresIn: this.TOKEN_EXPIRY,
         });
+    }// end
+
+    /**
+     * Decodes and verifies an incoming JWT access token.
+     * Throws an error if the token is invalid, tampered with, or expired.
+     */
+    public static verifyAndDecodeToken<T extends object>(token: string): T {
+        try {
+            return fastify.jwt.verify<T>(token);
+        } catch (error: any) {
+            throw ApiResponse.fail({ statusCode: 401, msg: "Invalid access token or expires.", error_code: "UNAUTH_ACC_TOKEN" });
+        }
     }// end
 
     /**
