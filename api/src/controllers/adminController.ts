@@ -1,7 +1,11 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { Logger } from '../utils/logger';
 
-const consoleLog = new Logger('Admin Controller');
+const logs = new Logger('Admin Controller');
+
+export function createShopOwner(request: FastifyRequest, reply: FastifyReply) {
+
+}//end
 
 export function adminLoginController(request: FastifyRequest, reply: FastifyReply) {
 

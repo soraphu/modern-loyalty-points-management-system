@@ -15,13 +15,16 @@ import {
     createAdminController,
     modifyAdminRoleController,
     forcePasswordResetController,
-    deleteAdminController
+    deleteAdminController,
+    createShopOwner
 } from '../controllers/adminController';
 
 export async function adminRoutes(fastify: FastifyInstance) {
 
     // Administrative Personnel Authentication
     // POST -> /api/v1/admin/login
+
+    fastify.post('/shop-owner', createShopOwner);
 
     fastify.post('/login', adminLoginController);
     // Generate Secure Points Allocation Token
