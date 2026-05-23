@@ -17,13 +17,14 @@ export async function syncLineController(request: FastifyRequest, reply: Fastify
 
         const customer: any = await CustomerService.syncLineProfile(lineProfile);
         logs.success('Customer Data: ', customer);
+
         const { id, lineId, lineDisplayName } = customer;
-        const payload = { id, lineId, lineDisplayName };
-        logs.success("Payload: ", payload);
+        const JwtPayload = { id, lineId, lineDisplayName };
+        logs.success("Payload: ", JwtPayload);
 
-        const accessToken: string = Auth.generateAccessToken(payload);
+        const accessToken: string = Auth.generateAccessToken(JwtPayload);
 
-        return ApiResponse.success({ data: { customer, accessToken }, msg: 'Sync successfully.' });
+        return ApiResponse.success({ data: { user: customer, access_token: accessToken }, msg: 'Sync successfully.' });
 
     } catch (error: any) {
         return reply.status(error.statusCode).send(error.payload);

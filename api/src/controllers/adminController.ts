@@ -4,6 +4,13 @@ import { Validation } from '../utils/validation';
 import { OwnerService } from '../services/ownerService';
 import { ApiResponse } from '../utils/apiResponse';
 import { Auth } from '../services/authService';
+import { AdminRoles } from '../generated/prisma/enums';
+
+export interface AdminTokenPayload {
+    id: string;
+    role: AdminRoles;
+    username: string;
+}
 
 const logs = new Logger('Admin Controller');
 
@@ -15,7 +22,7 @@ export async function adminLoginController(request: FastifyRequest, reply: Fasti
 
         const admin: any = await Auth.handleAdminLogin(reqBody.username, reqBody.password);
         const { id, role, username } = admin;
-        const JwtPayload = { id, role, username }
+        const JwtPayload: AdminTokenPayload = { id, role, username }
 
         const accessToken = Auth.generateAccessToken(JwtPayload);
 
@@ -29,7 +36,7 @@ export async function adminLoginController(request: FastifyRequest, reply: Fasti
                 admin_data: admin,
             }
         });
-        ``
+
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
         return reply.status(error.statusCode).send(error.payload);
@@ -37,8 +44,20 @@ export async function adminLoginController(request: FastifyRequest, reply: Fasti
     }
 }//end
 
-export function generatePointsTokenController(request: FastifyRequest, reply: FastifyReply) {
+export async function generatePointsTokenController(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const accessToken = Validation.requireAuthHeader(request);
 
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: 'Login successfully.',
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
 }//end
 
 export function queryVouchersController(request: FastifyRequest, reply: FastifyReply) {

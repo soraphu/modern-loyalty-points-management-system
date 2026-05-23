@@ -4,6 +4,8 @@ import { CONFIG } from '../config/constants';
 import { fastify } from '../server';
 import { prisma } from '../config/database';
 import { ApiResponse } from '../utils/apiResponse';
+import { AdminRoles } from '../generated/prisma/enums';
+import { AdminTokenPayload } from '../controllers/adminController';
 
 export interface CustomerTokenPayload {
     id: string;
@@ -88,4 +90,61 @@ export class Auth {
         return await bcrypt.compare(password, hash);
     }// end
 
-}
+    /**
+     * Ensures the admin's live role meets or exceeds the required `lowestAllowRole`.
+     */
+    public static async lowestAllowRole({ adminId, lowestAllowRole }: { adminId: string, lowestAllowRole: AdminRoles }): Promise<any> {
+        try {
+            // 1. Query the live row configuration from the database using the pre-decoded adminId
+            const admin = await prisma.admin.findUnique({
+                where: { id: adminId },
+                select: {
+                    id: true,
+                    role: true,
+                    username: true,
+                    firstname: true,
+                    lastname: true
+                }
+            });
+
+            // 2. Ensure the account still exists in the system rows
+            if (!admin) {
+                throw ApiResponse.fail({
+                    statusCode: 404,
+                    msg: "Admin account record not found.",
+                    error_code: "ADMIN_NOT_FOUND"
+                });
+            }
+
+            // 3. Define the hierarchical authority ranks (Higher number = Higher clearance)
+            const roleHierarchy: Record<AdminRoles, number> = {
+                [AdminRoles.STAFF]: 1,
+                [AdminRoles.MANAGER]: 2,
+                [AdminRoles.OWNER]: 3
+            };
+
+            const adminLiveRank = roleHierarchy[admin.role];
+            const requiredRank = roleHierarchy[lowestAllowRole];
+
+            // 4. Check if the current admin's clearance rank meets or exceeds the endpoint minimum
+            if (adminLiveRank < requiredRank) {
+                throw ApiResponse.fail({
+                    statusCode: 403,
+                    msg: "Forbidden: You do not have permission to access this resource.",
+                    error_code: "FORBIDDEN"
+                });
+            }
+
+            // Return the admin record payload if clearance hierarchy check passes
+            return admin;
+
+        } catch (error: any) {
+            // Forward our mapped operational ApiResponse failures cleanly to the outer block execution chain
+            if (error.payload) {
+                throw error;
+            }
+            throw ApiResponse.internalServerError(error.message);
+        }
+    }
+
+}//end class

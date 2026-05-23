@@ -13,13 +13,6 @@ export class Validation {
         return false;
     }
 
-    /**
-     * Validates that an array of required field keys exist and are not empty in the object.
-     * Throws 400 Bad Request if any key is missing.
-     */
-
-    
-
     public static requiredFields(obj: any, fields: string[]): void {
         if (!obj) {
             throw ApiResponse.requiredFieldsMissing('Request payload body or parameters are missing entirely.');
