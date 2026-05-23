@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import bcrypt from 'bcryptjs';
+import { CONFIG } from '../config/constants';
 
 export interface CustomerTokenPayload {
     id: string;
@@ -10,7 +11,6 @@ export interface CustomerTokenPayload {
 }
 
 export class Auth {
-    private static readonly SALT_ROUNDS = 10;
     private static readonly TOKEN_EXPIRY = '7d';
 
     /**
@@ -26,7 +26,7 @@ export class Auth {
      * Hash a plaintext password value securely before storage insertion
      */
     public static async hashPassword(password: string): Promise<string> {
-        return await bcrypt.hash(password, this.SALT_ROUNDS);
+        return await bcrypt.hash(password, CONFIG.SALT_ROUNDS);
     }// end
 
     /**
@@ -36,32 +36,4 @@ export class Auth {
         return await bcrypt.compare(password, hash);
     }// end
 
-    /**
-     * Fastify route middleware helper block using native validation hooks
-     */
-    // public static createRoleGuard(allowedRoles: ('customer' | 'staff' | 'manager' | 'owner')[]) {
-    //     return async (request: FastifyRequest, reply: FastifyReply) => {
-    //         try {
-    //             // Native Fastify verification: automatically parses header 'Bearer <token>',
-    //             // validates signatures against environment keys, checks exp, and assigns request.user
-    //             await request.jwtVerify();
-
-    //             // request.user is now safe, fully populated, and strongly typed!
-    //             const userRole = request.user.role;
-
-    //             if (!allowedRoles.includes(userRole)) {
-    //                 return reply.code(403).send({
-    //                     success: false,
-    //                     msg: 'Access denied. Insufficient security clearances.'
-    //                 });
-    //             }
-    //         } catch (err: any) {
-    //             return reply.code(401).send({
-    //                 success: false,
-    //                 msg: 'Authentication failed: Invalid, missing, or expired token.',
-    //                 error_code: 'INVALID_TOKEN'
-    //             });
-    //         }
-    //     };
-    // }
 }
