@@ -3,7 +3,6 @@ import { Validation } from '../utils/validation';
 import { ApiResponse } from '../utils/apiResponse';
 import { CustomerService } from '../services/customerService';
 import { Auth } from '../services/authService';
-import { fastify } from '../server';
 import { Logger } from '../utils/logger';
 
 const logs = new Logger('CustomerController');
@@ -22,7 +21,7 @@ export async function syncLineController(request: FastifyRequest, reply: Fastify
         const payload = { id, lineId, lineDisplayName };
         logs.success("Payload: ", payload);
 
-        const accessToken: string = Auth.generateAccessToken(fastify, payload);
+        const accessToken: string = Auth.generateAccessToken(payload);
 
         return ApiResponse.success({ data: { customer, accessToken }, msg: 'Sync successfully.' });
 

@@ -7,7 +7,7 @@ import { ApiResponse } from '../utils/apiResponse';
 const logs = new Logger('Admin Controller');
 
 export function adminLoginController(request: FastifyRequest, reply: FastifyReply) {
-
+    
 }//end
 
 export function generatePointsTokenController(request: FastifyRequest, reply: FastifyReply) {
