@@ -24,8 +24,9 @@ export async function syncLineController(request: FastifyRequest, reply: Fastify
 
         const accessToken: string = Auth.generateAccessToken(JwtPayload);
 
-        return ApiResponse.success({ data: { user: customer, access_token: accessToken }, msg: 'Sync successfully.' });
+        const res = ApiResponse.success({ data: { user: customer, access_token: accessToken }, msg: 'Sync successfully.' });
 
+        return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
         return reply.status(error.statusCode).send(error.payload);
 
@@ -41,7 +42,25 @@ export async function fetchTransactionsController(request: FastifyRequest, reply
 } //end
 
 export async function fetchRewardsController(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const accessToken = Validation.requireAuthHeader(request);
 
+        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        const rewards = await CustomerService.fetchAvailableRewards();
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: 'Fetch available rewards success.',
+            data: { rewards: rewards }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
 } //end
 
 export async function redeemRewardController(request: FastifyRequest, reply: FastifyReply) {

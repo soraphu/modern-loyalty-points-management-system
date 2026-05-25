@@ -11,11 +11,13 @@ export interface LineProfileInput {
 
 export class CustomerService {
 
+    /**
+     * Pulls customer's profile attributes directly from LINE services using an access token.
+     */
     public static async getLineProfile(lineAccessToken: string) {
         try {
             const lineResponse = await axios.get(CONFIG.LINE_API, {
                 headers: {
-                    // This is the header line LINE requires to authorize your request
                     'Authorization': `Bearer ${lineAccessToken}`
                 }
             });
@@ -30,15 +32,17 @@ export class CustomerService {
                 });
             }
 
-            throw ApiResponse.internalServerError();
+            if (error.payload) {
+                throw error;
+            }
+            throw ApiResponse.internalServerError(error.message);
         }
-    }// end
+    }
 
     /**
      * Syncs LINE data with the 'User' model using exact schema naming conventions.
      * Generates a structural record if the account does not exist in the DB yet.
      */
-
     public static async syncLineProfile(lineProfile: LineProfileInput) {
         try {
             return await prisma.user.upsert({
@@ -54,140 +58,196 @@ export class CustomerService {
                     totalPoints: 0,
                 },
             });
-
         } catch (error: any) {
-            throw ApiResponse.internalServerError(error);
+            if (error.payload) {
+                throw error;
+            }
+            throw ApiResponse.internalServerError(error.message);
         }
-    }//end
+    }
 
     /**
      * Pulls chronological transaction history details matching your User model UUID.
      */
     public static async fetchCustomerTransactions(userId: string) {
-        return await prisma.transaction.findMany({
-            where: { userId: userId },
-            orderBy: { createdAt: 'desc' },
-        });
-    }// end
+        try {
+            return await prisma.transaction.findMany({
+                where: { userId: userId },
+                orderBy: { createdAt: 'desc' },
+            });
+        } catch (error: any) {
+            if (error.payload) {
+                throw error;
+            }
+            throw ApiResponse.internalServerError(error.message);
+        }
+    }
 
     /**
      * Matches your QrCode model properties. Validates that the token code isn't used or expired,
      * updates customer balances, and commits the ledger transaction.
      */
     public static async earnPoints(userId: string, codeString: string) {
-        return await prisma.$transaction(async (tx) => {
-            // Find the QR code profile
-            const qrCodeRecord = await tx.qrCode.findUnique({
-                where: { codeString: codeString },
-            });
+        try {
+            // Run an isolated interactive database transaction block to guarantee atomic balance handling
+            return await prisma.$transaction(async (tx) => {
+                // Find the QR code profile
+                const qrCodeRecord = await tx.qrCode.findUnique({
+                    where: { codeString: codeString },
+                });
 
-            if (!qrCodeRecord) {
-                throw new Error('QR point token code is invalid or does not exist.');
+                if (!qrCodeRecord) {
+                    throw ApiResponse.fail({
+                        statusCode: 404,
+                        msg: 'QR point token code is invalid or does not exist.',
+                        error_code: 'NOT_FOUND'
+                    });
+                }
+
+                if (qrCodeRecord.used) {
+                    throw ApiResponse.fail({
+                        statusCode: 400,
+                        msg: 'This QR point token code has already been claimed.',
+                        error_code: 'ALREADY_CLAIMED'
+                    });
+                }
+
+                // Ensure current time context has not passed the expiry limit
+                if (new Date() > qrCodeRecord.expiresAt) {
+                    throw ApiResponse.fail({
+                        statusCode: 410,
+                        msg: 'This QR point token code has expired.',
+                        error_code: 'EXPIRED'
+                    });
+                }
+
+                // Update user balance using native model field labels
+                const updatedUser = await tx.user.update({
+                    where: { id: userId },
+                    data: { totalPoints: { increment: qrCodeRecord.pointValue } },
+                });
+
+                // Flag the unique QR row as spent
+                await tx.qrCode.update({
+                    where: { codeString: codeString },
+                    data: { used: true },
+                });
+
+                // Log entry into the transactions ledger using the EARN transaction type string
+                await tx.transaction.create({
+                    data: {
+                        userId: userId,
+                        referenceId: qrCodeRecord.id,
+                        pointsAmount: qrCodeRecord.pointValue,
+                        type: 'EARN',
+                    },
+                });
+
+                return { user: updatedUser, pointsEarned: qrCodeRecord.pointValue };
+            });
+        } catch (error: any) {
+            if (error.payload) {
+                throw error;
             }
-
-            if (qrCodeRecord.used) {
-                throw new Error('This QR point token code has already been claimed.');
-            }
-
-            // Ensure current time context has not passed the expiry limit
-            if (new Date() > qrCodeRecord.expiresAt) {
-                throw new Error('This QR point token code has expired.');
-            }
-
-            // Update user balance using native model field labels
-            const updatedUser = await tx.user.update({
-                where: { id: userId },
-                data: { totalPoints: { increment: qrCodeRecord.pointValue } },
-            });
-
-            // Flag the unique QR row as spent
-            await tx.qrCode.update({
-                where: { codeString: codeString },
-                data: { used: true },
-            });
-
-            // Log entry into the transactions ledger using the EARN transaction enum type
-            await tx.transaction.create({
-                data: {
-                    userId: userId,
-                    referenceId: qrCodeRecord.id,
-                    pointsAmount: qrCodeRecord.pointValue,
-                    type: 'EARN',
-                },
-            });
-
-            return { user: updatedUser, pointsEarned: qrCodeRecord.pointValue };
-        });
+            throw ApiResponse.internalServerError(error.message);
+        }
     }
 
     /**
      * Fetches all rewards filtered by active status configuration values.
      */
     public static async fetchAvailableRewards() {
-        return await prisma.reward.findMany({
-            where: { active: true },
-            orderBy: { createdAt: 'desc' },
-        });
-    }// end
+        try {
+            return await prisma.reward.findMany({
+                where: { active: true },
+                orderBy: { createdAt: 'desc' },
+            });
+        } catch (error: any) {
+            if (error.payload) {
+                throw error;
+            }
+            throw ApiResponse.internalServerError(error.message);
+        }
+    }
 
     /**
      * Uses your structural Reward and Voucher layout models. Validates balance metrics, 
      * decrements total values, and provisions an outstanding pending digital voucher record.
      */
     public static async redeemReward(userId: string, rewardId: string) {
-        return await prisma.$transaction(async (tx) => {
-            // Check reward item profile parameters
-            const reward = await tx.reward.findUnique({
-                where: { id: rewardId },
-            });
+        try {
+            // Run an isolated interactive database transaction block to guarantee atomic balance handling
+            return await prisma.$transaction(async (tx) => {
+                // Check reward item profile parameters
+                const reward = await tx.reward.findUnique({
+                    where: { id: rewardId },
+                });
 
-            if (!reward || !reward.active) {
-                throw new Error('Reward item is unavailable or does not exist.');
+                if (!reward || !reward.active) {
+                    throw ApiResponse.fail({
+                        statusCode: 404,
+                        msg: 'Reward item is unavailable or does not exist.',
+                        error_code: 'NOT_FOUND'
+                    });
+                }
+
+                // Verify user data and points balances
+                const user = await tx.user.findUnique({
+                    where: { id: userId },
+                });
+
+                if (!user) {
+                    throw ApiResponse.fail({
+                        statusCode: 404,
+                        msg: 'User profile record not found.',
+                        error_code: 'USER_NOT_FOUND'
+                    });
+                }
+
+                if (user.totalPoints < reward.pointsCost) {
+                    throw ApiResponse.fail({
+                        statusCode: 400,
+                        msg: 'Insufficient point reserves to complete this redemption.',
+                        error_code: 'INSUFFICIENT_POINTS'
+                    });
+                }
+
+                // Deduct reward costs from user profile totals
+                const updatedUser = await tx.user.update({
+                    where: { id: userId },
+                    data: { totalPoints: { decrement: reward.pointsCost } },
+                });
+
+                // Calculate expiration cutoff limit (exactly 30 days from now)
+                const expirationTimeline = new Date();
+                expirationTimeline.setDate(expirationTimeline.getDate() + 30);
+
+                // Generate an outstanding structural Voucher record
+                const newVoucher = await tx.voucher.create({
+                    data: {
+                        userId: userId,
+                        rewardId: rewardId,
+                        expiresAt: expirationTimeline,
+                    },
+                });
+
+                // Add log context to the system immutable audit ledger via the REDEEM transaction type string
+                await tx.transaction.create({
+                    data: {
+                        userId: userId,
+                        referenceId: newVoucher.id,
+                        pointsAmount: -reward.pointsCost, // Kept as negative value inside ledger history configuration
+                        type: 'REDEEM',
+                    },
+                });
+
+                return { voucher: newVoucher, remainingPoints: updatedUser.totalPoints };
+            });
+        } catch (error: any) {
+            if (error.payload) {
+                throw error;
             }
-
-            // Verify user data and points balances
-            const user = await tx.user.findUnique({
-                where: { id: userId },
-            });
-
-            if (!user) {
-                throw new Error('User profile record not found.');
-            }
-
-            if (user.totalPoints < reward.pointsCost) {
-                throw new Error('Insufficient point reserves to complete this redemption.');
-            }
-
-            // Deduct reward costs from user profile totals
-            const updatedUser = await tx.user.update({
-                where: { id: userId },
-                data: { totalPoints: { decrement: reward.pointsCost } },
-            });
-
-            // Calculate expiration cutoff limit (exactly 30 days from now)
-            const expirationTimeline = new Date();
-            expirationTimeline.setDate(expirationTimeline.getDate() + 30);
-
-            // Generate an outstanding structural Voucher record (defaults to PPENDING via schema configuration)
-            const newVoucher = await tx.voucher.create({
-                data: {
-                    userId: userId,
-                    rewardId: rewardId,
-                    expiresAt: expirationTimeline,
-                },
-            });
-
-            // Add log context to the system immutable audit ledger via the REDEEM transaction type enum
-            await tx.transaction.create({
-                data: {
-                    userId: userId,
-                    referenceId: newVoucher.id,
-                    pointsAmount: reward.pointsCost,
-                    type: 'REDEEM',
-                },
-            });
-
-            return { voucher: newVoucher, remainingPoints: updatedUser.totalPoints };
-        });
+            throw ApiResponse.internalServerError(error.message);
+        }
     }
-}//end
+}
