@@ -187,7 +187,7 @@ export class CustomerService {
                     throw ApiResponse.fail({
                         statusCode: 404,
                         msg: 'Reward item is unavailable or does not exist.',
-                        error_code: 'NOT_FOUND'
+                        error_code: 'REWARD_NOT_FOUND'
                     });
                 }
 

@@ -13,7 +13,7 @@ import { prisma } from './config/database';
 const serverLog = new Logger('server.ts');
 
 export const fastify = Fastify({
-    logger: false
+    logger: false,
 });
 
 const environmentSchema = {
