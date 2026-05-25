@@ -62,25 +62,25 @@ export async function earnPointsController(request: FastifyRequest, reply: Fasti
 } //end
 
 export async function fetchTransactionsController(request: FastifyRequest, reply: FastifyReply) {
-    // try {
-    //     const accessToken = Validation.requireAuthHeader(request);
+    try {
+        const accessToken = Validation.requireAuthHeader(request);
 
-    //     const decodePayload = Auth.verifyAndDecodeToken<customerPayload>(accessToken);
-    //     logs.info('Decode Payload: ', decodePayload);
+        const decodePayload = Auth.verifyAndDecodeToken<CustomerPayload>(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
 
-    //     const customerTransactions = await CustomerService.fetchCustomerTransactions(decodePayload.id);
+        const customerTransactions = await CustomerService.fetchCustomerTransactions(decodePayload.id);
 
-    //     const res = ApiResponse.success({
-    //         statusCode: 200,
-    //         msg: 'Fetch transactions successfully.',
-    //         data: { transactions: customerTransactions }
-    //     });
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: 'Fetch transactions successfully.',
+            data: { transactions: customerTransactions }
+        });
 
-    //     return reply.status(res.statusCode).send(res.payload);
-    // } catch (error: any) {
-    //     return reply.status(error.statusCode).send(error.payload);
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
 
-    // } Can't test yet.
+    }
 } //end
 
 export async function fetchRewardsController(request: FastifyRequest, reply: FastifyReply) {
