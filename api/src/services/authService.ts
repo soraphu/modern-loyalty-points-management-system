@@ -5,7 +5,6 @@ import { fastify } from '../server';
 import { prisma } from '../config/database';
 import { ApiResponse } from '../utils/apiResponse';
 import { AdminRoles } from '../generated/prisma/enums';
-import { AdminTokenPayload } from '../controllers/adminController';
 
 export interface CustomerTokenPayload {
     id: string;

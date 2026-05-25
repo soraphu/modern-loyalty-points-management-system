@@ -40,7 +40,25 @@ export async function syncLineController(request: FastifyRequest, reply: Fastify
 } //end
 
 export async function earnPointsController(request: FastifyRequest, reply: FastifyReply) {
+    const jsonBody: any = request.body;
 
+    try {
+        const accessToken: string = Validation.requireAuthHeader(request);
+        logs.success('AccessToken: ', accessToken);
+
+        const decodePayload = Auth.verifyAndDecodeToken<CustomerPayload>(accessToken);
+
+        Validation.requiredFields(jsonBody, ['code_string']);
+
+        const updatedData = await CustomerService.earnPoints(decodePayload.id, jsonBody.code_string);
+
+        const res = ApiResponse.success({ data: { update_info: updatedData }, msg: 'Earn points successfully.' });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
 } //end
 
 export async function fetchTransactionsController(request: FastifyRequest, reply: FastifyReply) {
@@ -88,25 +106,25 @@ export async function fetchRewardsController(request: FastifyRequest, reply: Fas
 } //end
 
 export async function redeemRewardController(request: FastifyRequest, reply: FastifyReply) {
-    try {
-        const { reward_id: rewardId }: any = request.params;
+    // try {
+    //     const { reward_id: rewardId }: any = request.params;
 
-        const accessToken = Validation.requireAuthHeader(request);
+    //     const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload = Auth.verifyAndDecodeToken<CustomerPayload>(accessToken);
+    //     const decodePayload = Auth.verifyAndDecodeToken<CustomerPayload>(accessToken);
 
-        const voucher = await CustomerService.redeemReward(decodePayload.id, rewardId);
+    //     const voucher = await CustomerService.redeemReward(decodePayload.id, rewardId);
 
-        const res = ApiResponse.success({
-            statusCode: 201,
-            msg: 'Voucher created.',
-            data: { voucher: voucher }
-        });
+    //     const res = ApiResponse.success({
+    //         statusCode: 201,
+    //         msg: 'Voucher created.',
+    //         data: { voucher: voucher }
+    //     });
 
-        return reply.status(res.statusCode).send(res.payload);
-    } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+    //     return reply.status(res.statusCode).send(res.payload);
+    // } catch (error: any) {
+    //     return reply.status(error.statusCode).send(error.payload);
 
-    }
+    // }
 
 } //end
