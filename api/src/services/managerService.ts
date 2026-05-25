@@ -31,7 +31,7 @@ export class ManagerService {
                 }
             });
         } catch (error: any) {
-            throw ApiResponse.internalServerError(error.message);
+            throw ApiResponse.internalServerError('Unable to create reward an unexpected internal server error occurred.');
         }
     }
 
@@ -67,7 +67,7 @@ export class ManagerService {
             });
         } catch (error: any) {
             if (error.payload) throw error;
-            throw ApiResponse.internalServerError(error.message);
+            throw ApiResponse.internalServerError('Unable to delete reward an unexpected internal server error occurred.');
         }
     }
 
@@ -110,7 +110,7 @@ export class ManagerService {
             };
         } catch (error: any) {
             if (error.payload) throw error;
-            throw ApiResponse.internalServerError(error.message);
+            throw ApiResponse.internalServerError('Unable adjust customer points an unexpected internal server error occurred.');
         }
     }
 
@@ -148,7 +148,7 @@ export class ManagerService {
                 });
             }
             if (error.payload) throw error;
-            throw ApiResponse.internalServerError(error.message);
+            throw ApiResponse.internalServerError('Unable to adjust reward state an unexpected internal server error occurred.');
         }
     }
 
@@ -189,7 +189,7 @@ export class ManagerService {
             };
         } catch (error: any) {
             if (error.payload) throw error;
-            throw ApiResponse.internalServerError(error.message);
+            throw ApiResponse.internalServerError('Unable to fetch customers an unexpected internal server error occurred.');
         }
     }
 }

@@ -50,7 +50,7 @@ export class Auth {
             if (error.payload) {
                 throw error;
             }
-            throw ApiResponse.internalServerError(error.message);
+            throw ApiResponse.internalServerError('Unable to login an unexpected internal server error occurred.');
         }
     }
 
@@ -141,7 +141,7 @@ export class Auth {
             if (error.payload) {
                 throw error;
             }
-            throw ApiResponse.internalServerError(error.message);
+            throw ApiResponse.internalServerError('Unable to validation role an unexpected internal server error occurred.');
         }
     }
 

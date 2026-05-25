@@ -2,6 +2,9 @@ import { TransactionType, VoucherStatus } from '../generated/prisma/client';
 import { prisma } from '../config/database';
 import { ApiResponse } from '../utils/apiResponse';
 import crypto from 'crypto';
+import { Logger } from '../utils/logger';
+
+const logs = new Logger('StaffService');
 
 export class StaffService {
 
@@ -32,7 +35,7 @@ export class StaffService {
 
             return qrCode.codeString;
         } catch (error: any) {
-            throw ApiResponse.internalServerError(error.message);
+            throw ApiResponse.internalServerError('Unable to generate points token, an unexpected internal server error occurred.');
         }
     }
 
@@ -66,14 +69,14 @@ export class StaffService {
                 }
             });
         } catch (error: any) {
-            throw ApiResponse.internalServerError(error.message);
+            throw ApiResponse.internalServerError('Unable to fetch vouchers data records, an unexpected internal server error occurred.');
         }
     }
 
     /**
      * Ref: Redeem Voucher.yml (POST {{baseURL}}{{ApiURL}}/admin/vouchers/:voucher_id/settle)
      */
-    public static async settleVoucher(voucherId: string, codeString: string) {
+    public static async settleVoucher(voucherId: string) {
         try {
             // Run an isolated interactive database transaction block to guarantee atomic balance handling
             return await prisma.$transaction(async (tx) => {
@@ -118,10 +121,12 @@ export class StaffService {
                 });
             });
         } catch (error: any) {
+            // Ensure that clean, custom validation responses (404, 400, 410) pass straight through to the user
             if (error.payload) {
                 throw error;
             }
-            throw ApiResponse.internalServerError(error.message);
+
+            throw ApiResponse.internalServerError('Unable to complete voucher settlement, an unexpected internal server error occurred.');
         }
     }
 
@@ -136,7 +141,7 @@ export class StaffService {
                 }
             });
         } catch (error: any) {
-            throw ApiResponse.internalServerError(error.message);
+            throw ApiResponse.internalServerError('Unable to retrieve available store rewards, an unexpected internal server error occurred.');
         }
     }
 }

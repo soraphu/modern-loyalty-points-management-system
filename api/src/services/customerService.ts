@@ -35,7 +35,7 @@ export class CustomerService {
             if (error.payload) {
                 throw error;
             }
-            throw ApiResponse.internalServerError(error.message);
+            throw ApiResponse.internalServerError('Unable to get line profile an unexpected internal server error occurred.');
         }
     }
 
@@ -62,7 +62,7 @@ export class CustomerService {
             if (error.payload) {
                 throw error;
             }
-            throw ApiResponse.internalServerError(error.message);
+            throw ApiResponse.internalServerError('Unable to sync with line profile an unexpected internal server error occurred.');
         }
     }
 
@@ -79,7 +79,7 @@ export class CustomerService {
             if (error.payload) {
                 throw error;
             }
-            throw ApiResponse.internalServerError(error.message);
+            throw ApiResponse.internalServerError('Unable to get transactions an unexpected internal server error occurred.');
         }
     }
 
@@ -149,7 +149,7 @@ export class CustomerService {
             if (error.payload) {
                 throw error;
             }
-            throw ApiResponse.internalServerError(error.message);
+            throw ApiResponse.internalServerError('Unable to earn the points an unexpected internal server error occurred.');
         }
     }
 
@@ -166,7 +166,7 @@ export class CustomerService {
             if (error.payload) {
                 throw error;
             }
-            throw ApiResponse.internalServerError(error.message);
+            throw ApiResponse.internalServerError('Unable to fetch available rewards profile an unexpected internal server error occurred.');
         }
     }
 
@@ -247,7 +247,7 @@ export class CustomerService {
             if (error.payload) {
                 throw error;
             }
-            throw ApiResponse.internalServerError(error.message);
+            throw ApiResponse.internalServerError('Unable to redeem an unexpected internal server error occurred.');
         }
     }
 }
