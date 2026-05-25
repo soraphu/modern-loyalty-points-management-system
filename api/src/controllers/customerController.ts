@@ -125,6 +125,6 @@ export async function redeemRewardController(request: FastifyRequest, reply: Fas
     } catch (error: any) {
         return reply.status(error.statusCode).send(error.payload);
 
-    }
+    }// end
 
 } //end

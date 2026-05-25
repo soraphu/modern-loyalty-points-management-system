@@ -73,7 +73,7 @@ export class StaffService {
     /**
      * Ref: Redeem Voucher.yml (POST {{baseURL}}{{ApiURL}}/admin/vouchers/:voucher_id/settle)
      */
-    public static async redeemVoucher(voucherId: string, codeString: string) {
+    public static async settleVoucher(voucherId: string, codeString: string) {
         try {
             // Run an isolated interactive database transaction block to guarantee atomic balance handling
             return await prisma.$transaction(async (tx) => {

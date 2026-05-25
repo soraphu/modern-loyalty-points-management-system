@@ -82,7 +82,7 @@ export function queryVouchersController(request: FastifyRequest, reply: FastifyR
 
 }//end
 
-export function settleVoucherController(request: FastifyRequest, reply: FastifyReply) {
+export async function settleVoucherController(request: FastifyRequest, reply: FastifyReply) {
 
 }//end
 
@@ -112,8 +112,32 @@ export async function fetchRewardsController(request: FastifyRequest, reply: Fas
 
 //========= MANAGER
 
-export function createRewardController(request: FastifyRequest, reply: FastifyReply) {
+export async function createRewardController(request: FastifyRequest, reply: FastifyReply) {
+    const jsonBody: any = request.body;
 
+    try {
+        Validation.requiredFields(jsonBody, ["reward_name", "points_cost", "active"]);
+
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'MANAGER' });
+
+        const newReward = await ManagerService.createReward(jsonBody);
+
+        const res = ApiResponse.success({
+            statusCode: 201,
+            msg: 'Rewards created.',
+            data: { new_reward: newReward }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
 }//end
 
 export function deleteRewardController(request: FastifyRequest, reply: FastifyReply) {

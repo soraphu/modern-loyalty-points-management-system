@@ -15,9 +15,7 @@ export class OwnerService {
         });
 
         if (existingOwner) {
-
-            // Throwing an operational error that your controller's try-catch block will forward
-            throw new Error("Owner already exist.");
+            throw ApiResponse.fail({ statusCode: 409, msg: 'Owner account already exist.', error_code: "OWNER_ALREADY_EXIST" });
         }
     }
 
@@ -82,6 +80,9 @@ export class OwnerService {
                 }
             });
         } catch (error: any) {
+            if (error.payload) {
+                throw error;
+            }
             throw ApiResponse.internalServerError(error.message);
         }
     }
