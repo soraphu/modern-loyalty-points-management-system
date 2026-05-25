@@ -164,7 +164,7 @@ export async function createAdminController(request: FastifyRequest, reply: Fast
 export async function modifyAdminRoleController(request: FastifyRequest, reply: FastifyReply) {
     try {
         const { new_role: newRole }: any = request.body;
-        const { adminId }: any = request.params;
+        const { admin_id: adminId }: any = request.params;
 
         Validation.requiredFields({ new_role: newRole }, ['new_role']);
 

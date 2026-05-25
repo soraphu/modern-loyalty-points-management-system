@@ -7,6 +7,12 @@ import { Logger } from '../utils/logger';
 
 const logs = new Logger('CustomerController');
 
+interface CustomerPayload {
+    id: string;
+    lineId: string;
+    lineDisplayName: string;
+}
+
 export async function syncLineController(request: FastifyRequest, reply: FastifyReply) {
     try {
         const lineAccessToken: string = Validation.requireAuthHeader(request);
@@ -19,7 +25,7 @@ export async function syncLineController(request: FastifyRequest, reply: Fastify
         logs.success('Customer Data: ', customer);
 
         const { id, lineId, lineDisplayName } = customer;
-        const JwtPayload = { id, lineId, lineDisplayName };
+        const JwtPayload: CustomerPayload = { id, lineId, lineDisplayName };
         logs.success("Payload: ", JwtPayload);
 
         const accessToken: string = Auth.generateAccessToken(JwtPayload);
@@ -38,7 +44,25 @@ export async function earnPointsController(request: FastifyRequest, reply: Fasti
 } //end
 
 export async function fetchTransactionsController(request: FastifyRequest, reply: FastifyReply) {
+    // try {
+    //     const accessToken = Validation.requireAuthHeader(request);
 
+    //     const decodePayload = Auth.verifyAndDecodeToken<customerPayload>(accessToken);
+    //     logs.info('Decode Payload: ', decodePayload);
+
+    //     const customerTransactions = await CustomerService.fetchCustomerTransactions(decodePayload.id);
+
+    //     const res = ApiResponse.success({
+    //         statusCode: 200,
+    //         msg: 'Fetch transactions successfully.',
+    //         data: { transactions: customerTransactions }
+    //     });
+
+    //     return reply.status(res.statusCode).send(res.payload);
+    // } catch (error: any) {
+    //     return reply.status(error.statusCode).send(error.payload);
+
+    // } Can't test yet.
 } //end
 
 export async function fetchRewardsController(request: FastifyRequest, reply: FastifyReply) {
@@ -64,5 +88,25 @@ export async function fetchRewardsController(request: FastifyRequest, reply: Fas
 } //end
 
 export async function redeemRewardController(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const { reward_id: rewardId }: any = request.params;
+
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodePayload = Auth.verifyAndDecodeToken<CustomerPayload>(accessToken);
+
+        const voucher = await CustomerService.redeemReward(decodePayload.id, rewardId);
+
+        const res = ApiResponse.success({
+            statusCode: 201,
+            msg: 'Voucher created.',
+            data: { voucher: voucher }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
 
 } //end
