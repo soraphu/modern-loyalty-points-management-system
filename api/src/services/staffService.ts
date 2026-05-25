@@ -32,7 +32,7 @@ export class StaffService {
 
             return qrCode.codeString;
         } catch (error: any) {
-            throw error;
+            throw ApiResponse.internalServerError(error.message);
         }
     }
 
@@ -56,7 +56,7 @@ export class StaffService {
                     reward: {
                         select: {
                             id: true,
-                            rewardName: true, // 🟢 Correctly mapped from your updated schema field
+                            rewardName: true,
                             pointsCost: true,
                             imageUrl: true,
                             active: true,
@@ -66,7 +66,7 @@ export class StaffService {
                 }
             });
         } catch (error: any) {
-            throw error;
+            throw ApiResponse.internalServerError(error.message);
         }
     }
 
@@ -84,15 +84,15 @@ export class StaffService {
                 });
 
                 if (!voucher) {
-                    throw new Error("VOUCHER_NOT_FOUND");
+                    throw ApiResponse.fail({ statusCode: 404, msg: "Voucher not found.", error_code: 'NOT_FOUND' });
                 }
 
                 if (voucher.status === VoucherStatus.CLAIMED) {
-                    throw new Error("VOUCHER_ALREADY_CLAIMED");
+                    throw ApiResponse.fail({ statusCode: 400, msg: "Voucher already claimed.", error_code: 'ALREADY_CLAIMED' });
                 }
 
                 if (voucher.status === VoucherStatus.EXPIRED || (voucher.expiresAt && voucher.expiresAt < new Date())) {
-                    throw new Error("VOUCHER_EXPIRED");
+                    throw ApiResponse.fail({ statusCode: 410, msg: "Voucher expired.", error_code: 'EXPIRED' });
                 }
 
                 await tx.voucher.update({
@@ -118,40 +118,25 @@ export class StaffService {
                 });
             });
         } catch (error: any) {
-            if (
-                error.message === "VOUCHER_NOT_FOUND" ||
-                error.message === "VOUCHER_ALREADY_CLAIMED" ||
-                error.message === "VOUCHER_EXPIRED"
-            ) {
-                throw error; // Let specific business layer violations pass clean up to the controller
+            if (error.payload) {
+                throw error;
             }
-            throw ApiResponse.internalServerError(error);
+            throw ApiResponse.internalServerError(error.message);
         }
     }
 
     /**
-     * Ref: Fetch Available Rewards.yml (GET {{baseURL}}{{ApiURL}}/admin/rewards)
-     */
+    * Ref: Fetch Available Rewards.yml (GET {{baseURL}}{{ApiURL}}/admin/rewards)
+    */
     public static async fetchAvailableRewards() {
         try {
             return await prisma.reward.findMany({
-                where: {
-                    active: true // Filters down exclusively to active rewards per documentation specs
-                },
-                select: {
-                    id: true,
-                    rewardName: true, // 🟢 Correctly mapped from your updated schema field
-                    pointsCost: true,
-                    imageUrl: true,
-                    active: true,
-                    createdAt: true
-                },
                 orderBy: {
                     createdAt: 'desc'
                 }
             });
         } catch (error: any) {
-            throw error;
+            throw ApiResponse.internalServerError(error.message);
         }
     }
 }

@@ -6,6 +6,7 @@ import { ApiResponse } from '../utils/apiResponse';
 import { Auth } from '../services/authService';
 import { AdminRoles } from '../generated/prisma/enums';
 import { StaffService } from '../services/staffService';
+import { ManagerService } from '../services/managerService';
 
 export interface AdminTokenPayload {
     id: string;
@@ -14,6 +15,8 @@ export interface AdminTokenPayload {
 }
 
 const logs = new Logger('Admin Controller');
+
+//========= STAFF
 
 export async function adminLoginController(request: FastifyRequest, reply: FastifyReply) {
     try {
@@ -83,9 +86,31 @@ export function settleVoucherController(request: FastifyRequest, reply: FastifyR
 
 }//end
 
-export function fetchRewardsController(request: FastifyRequest, reply: FastifyReply) {
+export async function fetchRewardsController(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const accessToken = Validation.requireAuthHeader(request);
 
+        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });
+
+        const rewards = await StaffService.fetchAvailableRewards();
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: 'Fetch rewards success.',
+            data: { rewards: rewards }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
 }//end
+
+//========= MANAGER
 
 export function createRewardController(request: FastifyRequest, reply: FastifyReply) {
 
@@ -106,6 +131,8 @@ export function listCustomersController(request: FastifyRequest, reply: FastifyR
 export function manualPointsOverrideController(request: FastifyRequest, reply: FastifyReply) {
 
 }//end
+
+//========= OWNER
 
 export function fetchAdminDirectoryController(request: FastifyRequest, reply: FastifyReply) {
 
@@ -136,12 +163,12 @@ export async function createAdminController(request: FastifyRequest, reply: Fast
 
 export async function modifyAdminRoleController(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const jsonBody: any = request.body;
+        const { new_role: newRole }: any = request.body;
         const { adminId }: any = request.params;
 
-        Validation.requiredFields(jsonBody, ['role']);
+        Validation.requiredFields({ new_role: newRole }, ['new_role']);
 
-        if (jsonBody.role === 'OWNER') {
+        if (newRole === 'OWNER') {
             throw ApiResponse.fail({
                 statusCode: 403,
                 msg: 'Changing role to OWNER is not allowed.',
@@ -149,7 +176,7 @@ export async function modifyAdminRoleController(request: FastifyRequest, reply: 
             });
         }
 
-        if (jsonBody.role != 'STAFF' && jsonBody.role != 'MANAGER') {
+        if (newRole != 'STAFF' && newRole != 'MANAGER') {
             throw ApiResponse.fail({
                 statusCode: 400,
                 msg: 'Invalid role type.',
@@ -165,7 +192,7 @@ export async function modifyAdminRoleController(request: FastifyRequest, reply: 
         const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'OWNER' });
         logs.info('Admin: ', admin);
 
-        const updateAdmin = await OwnerService.adjustAdminRole(adminId, jsonBody.role);
+        const updateAdmin = await OwnerService.adjustAdminRole(adminId, newRole);
 
         const res = ApiResponse.success({
             statusCode: 200,

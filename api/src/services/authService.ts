@@ -95,7 +95,7 @@ export class Auth {
      */
     public static async lowestAllowRole({ adminId, lowestAllowRole }: { adminId: string, lowestAllowRole: AdminRoles }): Promise<any> {
         try {
-            // 1. Query the live row configuration from the database using the pre-decoded adminId
+            // Query the live row configuration from the database using the pre-decoded adminId
             const admin = await prisma.admin.findUnique({
                 where: { id: adminId },
                 select: {
@@ -107,7 +107,7 @@ export class Auth {
                 }
             });
 
-            // 2. Ensure the account still exists in the system rows
+            // Ensure the account still exists in the system rows
             if (!admin) {
                 throw ApiResponse.fail({
                     statusCode: 404,
@@ -116,7 +116,7 @@ export class Auth {
                 });
             }
 
-            // 3. Define the hierarchical authority ranks (Higher number = Higher clearance)
+            // Define the hierarchical authority ranks (Higher number = Higher clearance)
             const roleHierarchy: Record<AdminRoles, number> = {
                 [AdminRoles.STAFF]: 1,
                 [AdminRoles.MANAGER]: 2,
@@ -126,7 +126,7 @@ export class Auth {
             const adminLiveRank = roleHierarchy[admin.role];
             const requiredRank = roleHierarchy[lowestAllowRole];
 
-            // 4. Check if the current admin's clearance rank meets or exceeds the endpoint minimum
+            // Check if the current admin's clearance rank meets or exceeds the endpoint minimum
             if (adminLiveRank < requiredRank) {
                 throw ApiResponse.fail({
                     statusCode: 403,
@@ -139,7 +139,6 @@ export class Auth {
             return admin;
 
         } catch (error: any) {
-            // Forward our mapped operational ApiResponse failures cleanly to the outer block execution chain
             if (error.payload) {
                 throw error;
             }
