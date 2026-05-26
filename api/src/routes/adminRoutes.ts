@@ -3,7 +3,7 @@ import { FastifyInstance } from 'fastify';
 import {
     adminLoginController,
     generatePointsTokenController,
-    queryVouchersController,
+    queryTargetVoucherController,
     settleVoucherController,
     fetchRewardsController,
     createRewardController,
@@ -16,6 +16,7 @@ import {
     modifyAdminRoleController,
     forcePasswordResetController,
     deleteAdminController,
+    cancelVoucherController,
 } from '../controllers/adminController';
 
 export async function adminRoutes(fastify: FastifyInstance) {
@@ -28,13 +29,15 @@ export async function adminRoutes(fastify: FastifyInstance) {
     // POST -> /api/v1/admin/points-token
     fastify.post('/points-token', generatePointsTokenController);
 
-    // Query and Search Customer Vouchers
-    // POST -> /api/v1/admin/vouchers
-    fastify.post('/vouchers', queryVouchersController);
+    // Query and Search Customer Target Vouchers
+    // GET -> /api/v1/admin/vouchers
+    fastify.get('/vouchers/:voucher_code', queryTargetVoucherController);
 
     // Settle and Redeem Outstanding Voucher
-    // POST -> /api/v1/admin/vouchers/:voucher_id/settle
-    fastify.post('/vouchers/:voucher_id/settle', settleVoucherController);
+    // PATCH -> /api/v1/admin/vouchers/:voucher_id/settle
+    fastify.patch('/vouchers/:voucher_code/settle', settleVoucherController);
+
+    fastify.patch('/vouchers/:voucher_code/cancel', cancelVoucherController);
 
     // Fetch Complete Available Rewards Listing
     // GET -> /api/v1/admin/rewards

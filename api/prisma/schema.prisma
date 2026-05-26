@@ -35,6 +35,7 @@ enum VoucherStatus {
   PENDING
   CLAIMED
   EXPIRED
+  CANCELLED
 
   @@map("voucherStatus")
 }
@@ -113,12 +114,13 @@ model Transaction {
 }
 
 model Voucher {
-  id        String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId    String        @map("user_id") @db.Uuid
-  rewardId  String        @map("reward_id") @db.Uuid
-  status    VoucherStatus @default(PENDING)
-  createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz
-  expiresAt DateTime?     @map("expires_at") @db.Timestamptz
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId      String        @map("user_id") @db.Uuid
+  rewardId    String        @map("reward_id") @db.Uuid
+  status      VoucherStatus @default(PENDING)
+  voucherCode String        @unique @map("voucher_code")
+  createdAt   DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  expiresAt   DateTime?     @map("expires_at") @db.Timestamptz
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   reward Reward @relation(fields: [rewardId], references: [id], onDelete: Restrict)

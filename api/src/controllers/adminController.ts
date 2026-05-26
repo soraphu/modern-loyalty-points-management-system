@@ -78,12 +78,58 @@ export async function generatePointsTokenController(request: FastifyRequest, rep
     }
 }//end
 
-export function queryVouchersController(request: FastifyRequest, reply: FastifyReply) {
+export async function queryTargetVoucherController(request: FastifyRequest, reply: FastifyReply) {
+    const { voucher_code: voucherCode }: any = request.params;
 
+    try {
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });
+        logs.info('Admin: ', admin);
+
+        const voucher = await StaffService.fetchVouchersByCode(voucherCode);
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: `Fetch voucher ${voucherCode} successful.`,
+            data: { voucher: voucher }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
 }//end
 
 export async function settleVoucherController(request: FastifyRequest, reply: FastifyReply) {
+    const { voucher_code: voucherCode }: any = request.params;
 
+    try {
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });
+        logs.info('Admin: ', admin);
+
+        const settledInfo = await StaffService.settleVoucher(voucherCode);
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: `Settled voucher ${voucherCode} successful.`,
+            data: settledInfo
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
 }//end
 
 export async function fetchRewardsController(request: FastifyRequest, reply: FastifyReply) {
@@ -109,6 +155,33 @@ export async function fetchRewardsController(request: FastifyRequest, reply: Fas
 
     }
 }//end
+
+export async function cancelVoucherController(request: FastifyRequest, reply: FastifyReply) {
+    const { voucher_code: voucherCode }: any = request.params;
+
+    try {
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });
+        logs.info('Admin: ', admin);
+
+        const cancelledInfo = await StaffService.cancelVoucher(voucherCode);
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: `Settled voucher ${voucherCode} successful.`,
+            data: cancelledInfo
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
+}
 
 //========= MANAGER
 

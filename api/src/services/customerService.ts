@@ -2,12 +2,16 @@ import { prisma } from '../config/database';
 import axios from 'axios';
 import { ApiResponse } from '../utils/apiResponse';
 import { CONFIG } from '../config/constants';
+import { Auth } from './authService';
+import { Logger } from '../utils/logger';
 
 export interface LineProfileInput {
     userId: string;
     displayName: string;
     pictureUrl: string;
 }
+
+const logs = new Logger('Customer Service');
 
 export class CustomerService {
 
@@ -180,10 +184,13 @@ export class CustomerService {
             return await prisma.$transaction(async (tx) => {
                 // Check reward item profile parameters
                 const reward = await tx.reward.findUnique({
-                    where: { id: rewardId },
+                    where: {
+                        id: rewardId,
+                        active: true
+                    }
                 });
 
-                if (!reward || !reward.active) {
+                if (!reward) {
                     throw ApiResponse.fail({
                         statusCode: 404,
                         msg: 'Reward item is unavailable or does not exist.',
@@ -222,24 +229,8 @@ export class CustomerService {
                 const expirationTimeline = new Date();
                 expirationTimeline.setDate(expirationTimeline.getDate() + 30);
 
-                // Generate an outstanding structural Voucher record
-                const newVoucher = await tx.voucher.create({
-                    data: {
-                        userId: userId,
-                        rewardId: rewardId,
-                        expiresAt: expirationTimeline,
-                    },
-                });
-
-                // Add log context to the system immutable audit ledger via the REDEEM transaction type string
-                await tx.transaction.create({
-                    data: {
-                        userId: userId,
-                        referenceId: newVoucher.id,
-                        pointsAmount: -reward.pointsCost, // Kept as negative value inside ledger history configuration
-                        type: 'REDEEM',
-                    },
-                });
+                const newVoucher = await Auth.createUniqueVoucher(userId, rewardId);
+                logs.info('New Voucher : ', newVoucher);
 
                 return { voucher: newVoucher, remainingPoints: updatedUser.totalPoints };
             });

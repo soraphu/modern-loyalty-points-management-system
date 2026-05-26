@@ -3,6 +3,9 @@ import { prisma } from '../config/database';
 import { ApiResponse } from '../utils/apiResponse';
 import crypto from 'crypto';
 import { Logger } from '../utils/logger';
+import { CONFIG } from '../config/constants';
+import { Auth } from './authService';
+import { Validation } from '../utils/validation';
 
 const logs = new Logger('StaffService');
 
@@ -42,12 +45,12 @@ export class StaffService {
     /**
      * Ref: Fetch Vouchers.yml (POST {{baseURL}}{{ApiURL}}/admin/vouchers)
      */
-    public static async fetchVouchersByCode(voucherId: string) {
+    public static async fetchVouchersByCode(voucherCode: string) {
         try {
             // Locates vouchers matching the specific code payload, including nested rewards
-            return await prisma.voucher.findMany({
+            return await prisma.voucher.findUnique({
                 where: {
-                    id: voucherId // Assuming code_string is passed as the voucher's UUID lookup parameter
+                    voucherCode: voucherCode
                 },
                 select: {
                     id: true,
@@ -56,6 +59,14 @@ export class StaffService {
                     status: true,
                     createdAt: true,
                     expiresAt: true,
+                    user: {
+                        select: {
+                            id: true,
+                            lineId: true,
+                            lineDisplayName: true,
+                            linePictureUrl: true
+                        }
+                    },
                     reward: {
                         select: {
                             id: true,
@@ -73,41 +84,53 @@ export class StaffService {
         }
     }
 
-    /**
-     * Ref: Redeem Voucher.yml (POST {{baseURL}}{{ApiURL}}/admin/vouchers/:voucher_id/settle)
-     */
-    public static async settleVoucher(voucherId: string) {
+    public static async cancelVoucher(voucherCode: string) {
         try {
-            // Run an isolated interactive database transaction block to guarantee atomic balance handling
             return await prisma.$transaction(async (tx) => {
+                const voucher = await Validation.getValidatedVoucher(tx, voucherCode);
 
-                const voucher = await tx.voucher.findUnique({
-                    where: { id: voucherId },
-                    include: { reward: true }
+                const cancelledVoucher = await tx.voucher.update({
+                    where: { voucherCode: voucherCode },
+                    data: { status: VoucherStatus.CANCELLED }
                 });
 
-                if (!voucher) {
-                    throw ApiResponse.fail({ statusCode: 404, msg: "Voucher not found.", error_code: 'NOT_FOUND' });
-                }
+                // Refund points for a normal active cancellation request
+                await Auth.returnCustomerPoints(voucher.userId, voucher.reward.pointsCost);
 
-                if (voucher.status === VoucherStatus.CLAIMED) {
-                    throw ApiResponse.fail({ statusCode: 400, msg: "Voucher already claimed.", error_code: 'ALREADY_CLAIMED' });
-                }
+                return {
+                    cancelled_voucher: cancelledVoucher,
+                    return_points: {
+                        userId: voucher.userId,
+                        returnPoints: voucher.reward.pointsCost
+                    }
+                };
+            });
+        } catch (error: any) {
+            if (error.payload) throw error;
 
-                if (voucher.status === VoucherStatus.EXPIRED || (voucher.expiresAt && voucher.expiresAt < new Date())) {
-                    throw ApiResponse.fail({ statusCode: 410, msg: "Voucher expired.", error_code: 'EXPIRED' });
-                }
+            logs.error('[VOUCHER FAULT] cancelVoucher execution failed', error);
+            throw ApiResponse.internalServerError('Unable to complete voucher cancellation.');
+        }
+    }
+
+    /**
+     * Settle Voucher (Will now auto-refund if the voucher is expired)
+     */
+    public static async settleVoucher(voucherCode: string) {
+        try {
+            return await prisma.$transaction(async (tx) => {
+                const voucher = await Validation.getValidatedVoucher(tx, voucherCode);
 
                 await tx.voucher.update({
-                    where: { id: voucherId },
+                    where: { voucherCode: voucherCode },
                     data: { status: VoucherStatus.CLAIMED }
                 });
 
-                return await tx.transaction.create({
+                const transaction = await tx.transaction.create({
                     data: {
                         userId: voucher.userId,
-                        referenceId: voucher.id, // Links back to the source voucher reference ID
-                        pointsAmount: -voucher.reward.pointsCost, // Stored as a negative value since it is a REDEEM action
+                        referenceId: voucher.id,
+                        pointsAmount: -voucher.reward.pointsCost,
                         type: TransactionType.REDEEM
                     },
                     select: {
@@ -119,14 +142,14 @@ export class StaffService {
                         createdAt: true
                     }
                 });
+
+                return { settled_voucher: transaction, reward: voucher.reward };
             });
         } catch (error: any) {
-            // Ensure that clean, custom validation responses (404, 400, 410) pass straight through to the user
-            if (error.payload) {
-                throw error;
-            }
+            if (error.payload) throw error;
 
-            throw ApiResponse.internalServerError('Unable to complete voucher settlement, an unexpected internal server error occurred.');
+            logs.error('[VOUCHER FAULT] settleVoucher execution failed', error);
+            throw ApiResponse.internalServerError('Unable to complete voucher settlement.');
         }
     }
 

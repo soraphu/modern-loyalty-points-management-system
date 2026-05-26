@@ -1,5 +1,10 @@
 import { FastifyRequest } from 'fastify';
 import { ApiResponse } from './apiResponse'; // Adjust the import path as needed
+import { VoucherStatus } from '../generated/prisma/enums';
+import { Auth } from '../services/authService';
+import { Logger } from './logger';
+
+const logs = new Logger('Validation');
 
 export class Validation {
     /**
@@ -22,6 +27,54 @@ export class Validation {
             if (!(field in obj) || this.isEmpty(obj[field])) {
                 throw ApiResponse.requiredFieldsMissing(`Missing or empty required field: '${field}'`);
             }
+        }
+    }
+
+    public static async getValidatedVoucher(tx: any, voucherCode: string) {
+        try {
+            const voucher = await tx.voucher.findUnique({
+                where: { voucherCode: voucherCode },
+                include: { reward: true }
+            });
+
+            // 1. Existence Guard
+            if (!voucher) {
+                throw ApiResponse.fail({ statusCode: 404, msg: "Voucher not found.", error_code: 'NOT_FOUND' });
+            }
+
+            // 2. Already Claimed Guard
+            if (voucher.status === VoucherStatus.CLAIMED) {
+                throw ApiResponse.fail({ statusCode: 400, msg: "Voucher already claimed.", error_code: 'ALREADY_CLAIMED' });
+            }
+
+            // 3. Already Cancelled Guard
+            if (voucher.status === VoucherStatus.CANCELLED) {
+                throw ApiResponse.fail({ statusCode: 400, msg: "Voucher already cancelled.", error_code: 'ALREADY_CANCELLED' });
+            }
+
+            // 4. Expiration Guard with AUTOMATIC REFUND 🔄
+            if (voucher.status === VoucherStatus.EXPIRED || (voucher.expiresAt && voucher.expiresAt < new Date())) {
+                if (voucher.status !== VoucherStatus.EXPIRED) {
+                    // Update status to EXPIRED inside the database
+                    await tx.voucher.update({
+                        where: { voucherCode: voucherCode },
+                        data: { status: VoucherStatus.EXPIRED }
+                    });
+
+                    // Refund the points back to the user right here!
+                    await Auth.returnCustomerPoints(voucher.userId, voucher.reward.pointsCost);
+                }
+
+                // Halt execution and return the clean 410 response to the client
+                throw ApiResponse.fail({ statusCode: 410, msg: "Voucher expired.", error_code: 'EXPIRED' });
+            }
+
+            return voucher;
+        } catch (error: any) {
+            if (error.payload) throw error;
+
+            logs.error('[VOUCHER FAULT] cancelVoucher execution failed', error);
+            throw ApiResponse.internalServerError('Unable to complete voucher validation.');
         }
     }
 

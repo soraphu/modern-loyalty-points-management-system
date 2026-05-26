@@ -1,10 +1,10 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import bcrypt from 'bcryptjs';
 import { CONFIG } from '../config/constants';
 import { fastify } from '../server';
 import { prisma } from '../config/database';
 import { ApiResponse } from '../utils/apiResponse';
 import { AdminRoles } from '../generated/prisma/enums';
+import crypto from 'crypto';
 
 export interface CustomerTokenPayload {
     id: string;
@@ -16,6 +16,72 @@ export interface CustomerTokenPayload {
 
 export class Auth {
     private static readonly TOKEN_EXPIRY = '7d';
+
+    private static generateAlphanumericCode(): string {
+        const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let code = '';
+
+        for (let i = 0; i < 6; i++) {
+            const randomIndex = crypto.randomInt(0, chars.length);
+            code += chars[randomIndex];
+        }
+
+        return code;
+    }
+
+    public static async returnCustomerPoints(userId: string, pointsAmount: number) {
+        try {
+            return await prisma.user.update({
+                where: { id: userId },
+                data: {
+                    totalPoints: {
+                        increment: pointsAmount
+                    }
+                },
+            });
+        } catch (error) {
+            throw ApiResponse.internalServerError('Unable to return points an unexpected internal server error occurred.');
+
+        }
+    }
+
+    public static async createUniqueVoucher(userId: string, rewardId: string) {
+        let uniqueCode = '';
+        let isUnique = false;
+        let attempts = 0;
+        const voucherValidityPeriod = 24;
+        const expiryDate = new Date();
+        expiryDate.setDate(expiryDate.getHours() + voucherValidityPeriod);
+        const maxAttempts = 5;
+
+        while (!isUnique && attempts < maxAttempts) {
+            uniqueCode = this.generateAlphanumericCode();
+            attempts++;
+
+            // Check if this code already exists in the table
+            const existingVoucher = await prisma.voucher.findUnique({
+                where: { voucherCode: uniqueCode }
+            });
+
+            if (!existingVoucher) {
+                isUnique = true;
+            }
+        }
+
+        if (!isUnique) {
+            throw ApiResponse.internalServerError('System temporary congestion: Could not allocate unique token shortcode.');
+        }
+
+        // 💾 Safely write to database once confirmed free
+        return await prisma.voucher.create({
+            data: {
+                userId,
+                rewardId,
+                voucherCode: uniqueCode,
+                expiresAt: expiryDate
+            }
+        });
+    }// end
 
     public static async handleAdminLogin(username: string, passwordRaw: string) {
         try {

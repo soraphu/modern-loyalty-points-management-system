@@ -118,7 +118,7 @@ export async function redeemRewardController(request: FastifyRequest, reply: Fas
         const res = ApiResponse.success({
             statusCode: 201,
             msg: 'Voucher created.',
-            data: { voucher: voucher }
+            data: voucher
         });
 
         return reply.status(res.statusCode).send(res.payload);
