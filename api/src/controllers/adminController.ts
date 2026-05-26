@@ -158,8 +158,29 @@ export function manualPointsOverrideController(request: FastifyRequest, reply: F
 
 //========= OWNER
 
-export function fetchAdminDirectoryController(request: FastifyRequest, reply: FastifyReply) {
+export async function fetchAdminDirectoryController(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const accessToken = Validation.requireAuthHeader(request);
 
+        const decodePayload = Auth.verifyAndDecodeToken<AdminTokenPayload>(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'OWNER' });
+        logs.info('Admin: ', admin);
+
+        const admins: any = await OwnerService.fetchAdmins();
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: `Fetch admins successfully.`,
+            data: { admins: admins }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
 }//end
 
 export async function createAdminController(request: FastifyRequest, reply: FastifyReply) {
@@ -186,9 +207,10 @@ export async function createAdminController(request: FastifyRequest, reply: Fast
 }//end
 
 export async function modifyAdminRoleController(request: FastifyRequest, reply: FastifyReply) {
+    const { new_role: newRole }: any = request.body;
+    const { admin_id: adminId }: any = request.params;
+
     try {
-        const { new_role: newRole }: any = request.body;
-        const { admin_id: adminId }: any = request.params;
 
         Validation.requiredFields({ new_role: newRole }, ['new_role']);
 
@@ -231,10 +253,61 @@ export async function modifyAdminRoleController(request: FastifyRequest, reply: 
     }
 }//end
 
-export function forcePasswordResetController(request: FastifyRequest, reply: FastifyReply) {
+export async function forcePasswordResetController(request: FastifyRequest, reply: FastifyReply) {
+    const { new_password: newPassword }: any = request.body;
+    const { admin_id: targetAdminId }: any = request.params;
 
+    try {
+
+        Validation.requiredFields({ new_password: newPassword }, ['new_password']);
+
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodePayload = Auth.verifyAndDecodeToken<AdminTokenPayload>(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'OWNER' });
+        logs.info('Admin: ', admin);
+
+        const updatedAdmin: any = await OwnerService.resetAdminPassword(targetAdminId, newPassword);
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: `Reset admin ${updatedAdmin.username} password successfully.`,
+            data: { updated_admin: updatedAdmin }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
 }//end
 
-export function deleteAdminController(request: FastifyRequest, reply: FastifyReply) {
+export async function deleteAdminController(request: FastifyRequest, reply: FastifyReply) {
+    const { admin_id: targetAdminId }: any = request.params;
+
+    try {
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodePayload = Auth.verifyAndDecodeToken<AdminTokenPayload>(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'OWNER' });
+        logs.info('Admin: ', admin);
+
+        const deletedAdmin: any = await OwnerService.deleteAdmin(targetAdminId);
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: `Admin ${deletedAdmin.username} deleted.`,
+            data: { deleted_admin: deletedAdmin }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
 
 }//end

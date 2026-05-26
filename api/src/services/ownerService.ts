@@ -40,7 +40,7 @@ export class OwnerService {
                 }
             });
         } catch (error: any) {
-            throw ApiResponse.internalServerError(error);
+            throw ApiResponse.internalServerError('Unable to fetch admins an unexpected internal server error occurred.');
         }
     }
 
@@ -83,7 +83,7 @@ export class OwnerService {
             if (error.payload) {
                 throw error;
             }
-            throw ApiResponse.internalServerError(error.message);
+            throw ApiResponse.internalServerError('Unable to create admin an unexpected internal server error occurred.');
         }
     }
 
@@ -105,7 +105,7 @@ export class OwnerService {
                 }
             });
         } catch (error: any) {
-            throw ApiResponse.internalServerError(error);
+            throw ApiResponse.internalServerError('Unable to adjust role an unexpected internal server error occurred.');
         }
     }
 
@@ -114,8 +114,7 @@ export class OwnerService {
      */
     public static async resetAdminPassword(adminId: string, passwordRaw: string) {
         try {
-            const salt = await bcrypt.genSalt(10);
-            const passwordHashed = await bcrypt.hash(passwordRaw, salt);
+            const passwordHashed = await Auth.hashPassword(passwordRaw);
 
             return await prisma.admin.update({
                 where: { id: adminId },
@@ -125,11 +124,15 @@ export class OwnerService {
                 },
                 select: {
                     id: true,
-                    username: true
+                    username: true,
+                    firstname: true,
+                    lastname: true,
+                    role: true,
+                    updatedAt: true
                 }
             });
         } catch (error: any) {
-            throw ApiResponse.internalServerError(error);
+            throw ApiResponse.internalServerError('Unable to reset admin password an unexpected internal server error occurred.');
         }
     }
 
@@ -142,11 +145,14 @@ export class OwnerService {
                 where: { id: adminId },
                 select: {
                     id: true,
-                    username: true
+                    username: true,
+                    firstname: true,
+                    lastname: true,
+                    role: true,
                 }
             });
         } catch (error: any) {
-            throw ApiResponse.internalServerError(error);
+            throw ApiResponse.internalServerError('Unable to delete admin account an unexpected internal server error occurred.');
         }
     }
 }

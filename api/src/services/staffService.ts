@@ -42,12 +42,12 @@ export class StaffService {
     /**
      * Ref: Fetch Vouchers.yml (POST {{baseURL}}{{ApiURL}}/admin/vouchers)
      */
-    public static async fetchVouchersByCode(codeString: string) {
+    public static async fetchVouchersByCode(voucherId: string) {
         try {
             // Locates vouchers matching the specific code payload, including nested rewards
             return await prisma.voucher.findMany({
                 where: {
-                    id: codeString // Assuming code_string is passed as the voucher's UUID lookup parameter
+                    id: voucherId // Assuming code_string is passed as the voucher's UUID lookup parameter
                 },
                 select: {
                     id: true,
