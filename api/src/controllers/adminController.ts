@@ -166,8 +166,32 @@ export async function deleteRewardController(request: FastifyRequest, reply: Fas
     }
 }//end
 
-export function adjustRewardStateController(request: FastifyRequest, reply: FastifyReply) {
+export async function adjustRewardStateController(request: FastifyRequest, reply: FastifyReply) {
+    const { active }: any = request.body;
+    const { reward_id: rewardId }: any = request.params;
 
+    try {
+        Validation.requiredFields({ active: active }, ['active']);
+
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'MANAGER' });
+
+        const updatedReward: any = await ManagerService.adjustRewardState(rewardId, active);
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: `Reward ${updatedReward.rewardName} active to ${updatedReward.active} successfully.`,
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
 }//end
 
 export function listCustomersController(request: FastifyRequest, reply: FastifyReply) {

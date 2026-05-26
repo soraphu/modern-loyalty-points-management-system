@@ -125,33 +125,13 @@ export class ManagerService {
      */
     public static async adjustRewardState(rewardId: string, active: boolean) {
         try {
-            if (active === undefined) {
-                throw ApiResponse.fail({
-                    statusCode: 400,
-                    msg: "Required validation structural flag 'active' missing.",
-                    error_code: "FIELDS_MISSING"
-                });
-            }
-
-            const updatedReward = await prisma.reward.update({
+            return await prisma.reward.update({
                 where: { id: rewardId },
                 data: { active: active },
-                select: { name: true, active: true }
+                select: { rewardName: true, active: true }
             });
 
-            return {
-                success: true,
-                msg: `Rewards ${updatedReward.name} active ${updatedReward.active}.`
-            };
         } catch (error: any) {
-            // Prisma error target exception routing verification rule structure maps here
-            if (error.code === 'P2025') {
-                throw ApiResponse.fail({
-                    statusCode: 404,
-                    msg: "Target reward matching that tracking identifier not found.",
-                    error_code: "NOT_FOUND"
-                });
-            }
             if (error.payload) throw error;
             throw ApiResponse.internalServerError('Unable to adjust reward state an unexpected internal server error occurred.');
         }
