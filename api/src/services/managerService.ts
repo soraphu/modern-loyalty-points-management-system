@@ -1,3 +1,4 @@
+import { CONFIG } from '../config/constants';
 import { prisma } from '../config/database'; // Adjust path to your Prisma instance config
 import { ApiResponse } from '../utils/apiResponse'; // Adjust path to your custom global API response utility
 import { Logger } from '../utils/logger';
@@ -104,15 +105,11 @@ export class ManagerService {
             }
 
             // Update the record total inside the database layer context mapping
-            await prisma.user.update({
+            return await prisma.user.update({
                 where: { id: userId },
                 data: { totalPoints: newPoints }
             });
 
-            return {
-                success: true,
-                msg: `Customer ${customer.lineDisplayName || 'User'} Points adjustment successfully.`
-            };
         } catch (error: any) {
             if (error.payload) throw error;
             throw ApiResponse.internalServerError('Unable adjust customer points an unexpected internal server error occurred.');
@@ -143,7 +140,8 @@ export class ManagerService {
      */
     public static async fetchCustomers() {
         try {
-            const customersList = await prisma.user.findMany({
+            return await prisma.user.findMany({
+                take: CONFIG.API_DEFAULT_LIMIT,
                 select: {
                     id: true,
                     lineId: true,           // Prisma standard camelCase mapping rules
@@ -157,21 +155,6 @@ export class ManagerService {
                 }
             });
 
-            // Re-map dataset structures elegantly to directly match the API spec layout contracts
-            const formattedCustomers = customersList.map(cust => ({
-                id: cust.id,
-                line_id: cust.lineId,
-                line_display_name: cust.lineDisplayName,
-                line_picture_url: cust.linePictureUrl,
-                total_points: cust.totalPoints,
-                created_at: cust.createdAt
-            }));
-
-            return {
-                success: true,
-                msg: "Fetch customers successfully.",
-                customers: formattedCustomers
-            };
         } catch (error: any) {
             if (error.payload) throw error;
             throw ApiResponse.internalServerError('Unable to fetch customers an unexpected internal server error occurred.');

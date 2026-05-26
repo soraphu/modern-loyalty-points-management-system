@@ -194,12 +194,61 @@ export async function adjustRewardStateController(request: FastifyRequest, reply
     }
 }//end
 
-export function listCustomersController(request: FastifyRequest, reply: FastifyReply) {
+export async function listCustomersController(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const accessToken = Validation.requireAuthHeader(request);
 
+        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'MANAGER' });
+
+        const customers: any = await ManagerService.fetchCustomers();
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: `Fetch customers successfully.`,
+            data: {
+                customers: customers
+            }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
 }//end
 
-export function manualPointsOverrideController(request: FastifyRequest, reply: FastifyReply) {
+export async function manualPointsOverrideController(request: FastifyRequest, reply: FastifyReply) {
+    const { new_points: newPoints }: any = request.body;
+    const { user_id: targetUserId }: any = request.params;
 
+    try {
+        Validation.requiredFields({ new_points: newPoints }, ['new_points']);
+
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'MANAGER' });
+
+        const customer: any = await ManagerService.adjustCustomerPoints(targetUserId, newPoints);
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: `Customer ${customer} Points adjustment successfully`,
+            data: {
+                customer: customer
+            }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
 }//end
 
 //========= OWNER
