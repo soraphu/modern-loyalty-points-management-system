@@ -129,7 +129,7 @@ export async function createRewardController(request: FastifyRequest, reply: Fas
 
         const res = ApiResponse.success({
             statusCode: 201,
-            msg: 'Rewards created.',
+            msg: 'Reward created.',
             data: { new_reward: newReward }
         });
 
@@ -140,8 +140,30 @@ export async function createRewardController(request: FastifyRequest, reply: Fas
     }
 }//end
 
-export function deleteRewardController(request: FastifyRequest, reply: FastifyReply) {
+export async function deleteRewardController(request: FastifyRequest, reply: FastifyReply) {
+    const { reward_id: rewardId }: any = request.params;
 
+    try {
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'MANAGER' });
+
+        const deletedReward = await ManagerService.deleteReward(rewardId);
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: 'Reward deleted.',
+            data: { deleted_reward: deletedReward }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
 }//end
 
 export function adjustRewardStateController(request: FastifyRequest, reply: FastifyReply) {

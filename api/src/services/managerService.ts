@@ -1,5 +1,8 @@
 import { prisma } from '../config/database'; // Adjust path to your Prisma instance config
 import { ApiResponse } from '../utils/apiResponse'; // Adjust path to your custom global API response utility
+import { Logger } from '../utils/logger';
+
+const logs = new Logger('Manager Service');
 
 export class ManagerService {
 
@@ -58,7 +61,7 @@ export class ManagerService {
                 where: { id: rewardId },
                 select: {
                     id: true,
-                    name: true,
+                    rewardName: true,
                     pointsCost: true,
                     imageUrl: true,
                     active: true,
@@ -67,6 +70,8 @@ export class ManagerService {
             });
         } catch (error: any) {
             if (error.payload) throw error;
+            logs.error(error);
+
             throw ApiResponse.internalServerError('Unable to delete reward an unexpected internal server error occurred.');
         }
     }
