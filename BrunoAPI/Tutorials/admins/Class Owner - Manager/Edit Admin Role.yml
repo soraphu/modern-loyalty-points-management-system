@@ -1,0 +1,106 @@
+info:
+  name: Edit Admin Role
+  type: http
+  seq: 2
+
+http:
+  method: PATCH
+  url: "{{baseURL}}{{ApiURL}}/admin/admins/:admin_id"
+  headers:
+    - name: Authorization
+      value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFhNDhhYWMzLTRhMjMtNGZjMy1iMGM4LWViNzY4ZGUxZjZjNCIsInJvbGUiOiJPV05FUiIsInVzZXJuYW1lIjoic29yYXBodSIsImlhdCI6MTc3OTUzNzg0OSwiZXhwIjoxNzgwMTQyNjQ5fQ.q_k53v-ZIJ2kcy2joJeEOlXmoGozdA4axPKLKdxu0_g
+  params:
+    - name: admin_id
+      value: ""
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+          "new_role" : "STAFF"
+      }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |-
+  200 => {
+    success : true,
+    msg : "Admin ${admin.username} role changed.",
+    data : {
+      updated_admin : {
+        id: string;
+        username: string;
+        role: AdminRoles;
+      }
+    }
+  }
+
+  ---------------------------------------------------------------
+
+  400 => {
+    success : false,
+    msg : "Invalid role type.",
+    error_code : "INVALID_TYPE"
+  }
+
+  ---------------------------------------------------------------
+
+  400 => {
+    success : false,
+    msg : "You do not have permission to access this resource.",
+    error_code : "FORBIDDEN_ROLE"
+  }
+
+  ---------------------------------------------------------------
+
+  401 => {
+    success : false,
+    msg : "Access token missing.",
+    error_code : "ACC_TOKEN_MISSING"
+  }
+
+  ---------------------------------------------------------------
+
+  401 => {
+    success : false,
+    msg : "Invalid or expires access token.",
+    error_code : "INVALID_ACC_TOKEN"
+  }
+
+  ---------------------------------------------------------------
+
+  403 => {
+    success : false,
+    msg : "Changing role to OWNER is not allowed.",
+    error_code : "FORBIDDEN_REQUEST"
+  }
+
+  ---------------------------------------------------------------
+
+  404 => {
+    success : false,
+    msg : "Admin account record not found.",
+    error_code : "ADMIN_NOT_FOUND"
+  }
+
+  ---------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : "Unable to adjust role an unexpected internal server error occurred.",
+    error_code : "SERVER_ERROR"
+  } 
+
+  ---------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : "Internal server error",
+    error_code : "SERVER_ERROR"
+  }
+
+  ---------------------------------------------------------------

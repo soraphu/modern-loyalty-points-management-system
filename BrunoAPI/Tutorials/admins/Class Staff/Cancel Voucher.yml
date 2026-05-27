@@ -1,0 +1,143 @@
+info:
+  name: Cancel Voucher
+  type: http
+  seq: 5
+
+http:
+  method: PATCH
+  url: "{{baseURL}}{{ApiURL}}/admin/vouchers/:voucher_code/cancel"
+  headers:
+    - name: Authorization
+      value: Bearer {{staffToken}}
+  params:
+    - name: voucher_code
+      value: 52WNIQ
+      type: path
+  body:
+    type: json
+    data: "{}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |-
+  200 => {
+    success : true,
+    msg : "Cancelled voucher ${voucherCode} successful.",
+    data : {
+      cancelled_voucher: {
+        id: string;
+        createdAt: Date;
+        userId: string;
+        voucherCode: string;
+        rewardId: string;
+        status: VoucherStatus;
+        expiresAt: Date | null;
+        reward : {
+          id: string;
+          createdAt: Date;
+          rewardName: string;
+          pointsCost: number;
+          imageUrl: string | null;
+          active: boolean;
+        }
+      },
+      return_points: {
+        userId: string;
+        returnPoints: number;
+      }
+    }
+  }
+
+  ---------------------------------------------------------------
+
+  400 => {
+    success : false,
+    msg : "Voucher already claimed.",
+    error_code : "ALREADY_CLAIMED"
+  }
+
+  ---------------------------------------------------------------
+
+  400 => {
+    success : false,
+    msg : "Voucher already cancelled.",
+    error_code : "ALREADY_CANCELLED"
+  }
+
+  ---------------------------------------------------------------
+
+  401 => {
+    success : false,
+    msg : "Access token missing.",
+    error_code : "ACC_TOKEN_MISSING"
+  }
+
+  ---------------------------------------------------------------
+
+  401 => {
+    success : false,
+    msg : "Invalid or expires access token.",
+    error_code : "INVALID_ACC_TOKEN"
+  }
+
+  ---------------------------------------------------------------
+
+  404 => {
+    success : false,
+    msg : "Admin account record not found.",
+    error_code : "ADMIN_NOT_FOUND"
+  }
+
+  ---------------------------------------------------------------
+
+  404 => {
+    success : false,
+    msg : "Voucher not found.",
+    error_code : "VOUCHER_NOT_FOUND"
+  }
+
+  ---------------------------------------------------------------
+
+  410 => {
+    success : false,
+    msg : "Voucher expired.",
+    error_code : "EXPIRED"
+  }
+
+  ---------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : "Unable to complete voucher validation.",
+    error_code : "SERVER_ERROR"
+  } 
+
+  ---------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : "Unable to complete voucher cancellation.",
+    error_code : "SERVER_ERROR"
+  } 
+
+  ---------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : "Unable to return points an unexpected internal server error occurred.",
+    error_code : "SERVER_ERROR"
+  } 
+
+  ---------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : "Internal server error",
+    error_code : "SERVER_ERROR"
+  }
+
+  ---------------------------------------------------------------

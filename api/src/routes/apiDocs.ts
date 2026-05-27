@@ -1,11 +1,36 @@
 import { FastifyInstance } from "fastify";
 import { ApiResponse } from "../utils/apiResponse";
 import { CONFIG } from "../config/constants";
-import { customerPaths } from "../docs/customerPath.ts";
-import { adminPaths } from "../docs/adminPath";
+import { customerPath } from "../docs/customerPath";
+import { adminPath } from "../docs/adminPath";
+
+export interface ApiResponsePayload {
+    success: boolean;
+    msg: string;
+    error_code?: string;
+    data?: any;
+    transactions?: any[];
+    rewards?: any[];
+    customers?: any[];
+    admins?: any[];
+}
+
+export interface EndpointDocFormat {
+    name: string;
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+    path: string;
+    headers?: Array<{ name: string; required: boolean; description: string }>;
+    bodyExample?: any;
+    pathParams?: Array<{ name: string; description: string }>;
+    responses: {
+        [statusCode: number]: ApiResponsePayload | ApiResponsePayload[];
+    };
+}
 
 export async function apiDocs(fastify: FastifyInstance) {
     const baseUri = CONFIG.API_PREFIX; // e.g., '/api/v1'
+
+    const allPathDocs = { ...customerPath, ...adminPath };
 
     fastify.get('/', async (request, reply) => {
 
@@ -38,10 +63,7 @@ export async function apiDocs(fastify: FastifyInstance) {
                 }
             },
             // ◄── MANUALLY MAP ENDPOINTS ──►
-            paths: {
-                customerPaths,
-                adminPaths
-            }
+            paths: allPathDocs
         }//return
     });
 

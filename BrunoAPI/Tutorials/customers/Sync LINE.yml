@@ -1,0 +1,80 @@
+info:
+  name: Sync LINE
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{baseURL}}{{ApiURL}}/customer/sync"
+  headers:
+    - name: Authorization
+      value: Bearer {{lineToken}}
+  body:
+    type: json
+    data: ""
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |-
+  200 => {
+    success : true,
+    msg : "Sync successfully.",
+    data : {
+      user : {
+        id: string;
+        createdAt: Date;
+        lineId: string;
+        lineDisplayName: string;
+        linePictureUrl: string | null;
+        totalPoints: number;
+      },
+      access_token : str
+    }
+  }
+
+  ---------------------------------------------------------------
+
+  401 => {
+    success : false,
+    msg : "Access token missing.",
+    error_code : "ACC_TOKEN_MISSING"
+  }
+
+  ---------------------------------------------------------------
+
+  401 => {
+    "success": false,
+    "msg": "LINE response : $lineResponse",
+    "error_code": "LINE_VALIDATE_FAILED"
+  }
+
+  ----------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : 'Unable to get line profile an unexpected internal server error occurred.',
+    error_code : "SERVER_ERROR"
+  } 
+
+  ---------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : 'Unable to sync with line profile an unexpected internal server error occurred.',
+    error_code : "SERVER_ERROR"
+  } 
+
+  ---------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : "Internal server error",
+    error_code : "SERVER_ERROR"
+  }
+
+  ---------------------------------------------------------------

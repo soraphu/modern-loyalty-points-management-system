@@ -1,0 +1,125 @@
+info:
+  name: Edit Customer Points
+  type: http
+  seq: 3
+
+http:
+  method: PATCH
+  url: "{{baseURL}}{{ApiURL}}/admin/customers/:user_id/points-adjustment"
+  headers:
+    - name: Authorization
+      value: Bearer {{managerToken}}
+  params:
+    - name: user_id
+      value: 91e40887-c339-48bd-b48c-a82d83219bb0
+      type: path
+  body:
+    type: json
+    data: |-
+      {
+        "new_points" : 32
+      }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |-
+  200 => {
+    success : true,
+    msg : "Customer ${customer.lineDisplayName} Points adjustment successfully.",
+    data : {
+      customer: {
+          id: string;
+          lineId: string;
+          lineDisplayName: string;
+          linePictureUrl: string | null;
+          totalPoints: number;
+          createdAt: Date;
+      }
+    }
+  }
+
+  ---------------------------------------------------------------
+
+  400 => {
+    success : false,
+    msg : "Request payload body or parameters are missing entirely.",
+    error_code : "FIEDS_MISSING"
+  }
+
+  ---------------------------------------------------------------
+
+  400 => {
+    success : false,
+    msg : "Missing or empty required field: '${field}'",
+    error_code : "FIEDS_MISSING"
+  }
+
+  ---------------------------------------------------------------
+
+  400 => {
+    success : false,
+    msg : "You do not have permission to access this resource.",
+    error_code : "FORBIDDEN_ROLE"
+  }
+
+  ---------------------------------------------------------------
+
+  400 => {
+    success : false,
+    msg : "Invalid points numerical assignment value provided.",
+    error_code : "INVALID_POINTS_VALUE"
+  }
+
+  ---------------------------------------------------------------
+
+  401 => {
+    success : false,
+    msg : "Access token missing.",
+    error_code : "ACC_TOKEN_MISSING"
+  }
+
+  ---------------------------------------------------------------
+
+  401 => {
+    success : false,
+    msg : "Invalid or expires access token.",
+    error_code : "INVALID_ACC_TOKEN"
+  }
+
+  ---------------------------------------------------------------
+
+  404 => {
+    success : false,
+    msg : "Customer account context profile not found.",
+    error_code : "CUSTOMER_NOT_FOUND"
+  }
+
+  ---------------------------------------------------------------
+
+  404 => {
+    success : false,
+    msg : "Admin account record not found.",
+    error_code : "ADMIN_NOT_FOUND"
+  }
+
+  ---------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : "Unable adjust customer points an unexpected internal server error occurred.",
+    error_code : "SERVER_ERROR"
+  } 
+
+  ---------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : "Internal server error",
+    error_code : "SERVER_ERROR"
+  }
+
+  ---------------------------------------------------------------

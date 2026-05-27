@@ -1,0 +1,7 @@
+info:
+  name: Class Owner > Manager
+  type: folder
+  seq: 3
+
+request:
+  auth: inherit

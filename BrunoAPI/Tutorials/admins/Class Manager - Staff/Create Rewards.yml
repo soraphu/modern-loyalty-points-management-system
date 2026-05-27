@@ -1,0 +1,92 @@
+info:
+  name: Create Rewards
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{baseURL}}{{ApiURL}}/admin/rewards"
+  headers:
+    - name: Authorization
+      value: Bearer {{managerToken}}
+  body:
+    type: json
+    data: |-
+      {
+          "reward_name" : "TEST_REDEEM" ,
+          "points_cost" : 1 ,
+          "active" : true,
+          "image_url": null
+      }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |-
+  201 => {
+    success : true,
+    msg : "Reward created.",
+    data : {
+      new_reward : {
+        id: string;
+        createdAt: Date;
+        rewardName: string;
+        pointsCost: number;
+        imageUrl: string | null;
+        active: boolean;
+      }
+    }
+  }
+
+  ---------------------------------------------------------------
+
+  400 => {
+    success : false,
+    msg : "You do not have permission to access this resource.",
+    error_code : "FORBIDDEN_ROLE"
+  }
+
+  ---------------------------------------------------------------
+
+  401 => {
+    success : false,
+    msg : "Access token missing.",
+    error_code : "ACC_TOKEN_MISSING"
+  }
+
+  ---------------------------------------------------------------
+
+  401 => {
+    success : false,
+    msg : "Invalid or expires access token.",
+    error_code : "INVALID_ACC_TOKEN"
+  }
+
+  ---------------------------------------------------------------
+
+  404 => {
+    success : false,
+    msg : "Admin account record not found.",
+    error_code : "ADMIN_NOT_FOUND"
+  }
+
+  ---------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : "Unable to create reward an unexpected internal server error occurred.",
+    error_code : "SERVER_ERROR"
+  } 
+
+  ---------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : "Internal server error",
+    error_code : "SERVER_ERROR"
+  }
+
+  ---------------------------------------------------------------

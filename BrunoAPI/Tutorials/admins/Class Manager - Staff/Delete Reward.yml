@@ -1,0 +1,96 @@
+info:
+  name: Delete Reward
+  type: http
+  seq: 2
+
+http:
+  method: DELETE
+  url: "{{baseURL}}{{ApiURL}}/admin/rewards/:reward_id"
+  headers:
+    - name: Authorization
+      value: Bearer {{managerToken}}
+  params:
+    - name: reward_id
+      value: 407d110a-9bd5-4974-9ffb-9338aa45b39d
+      type: path
+  body:
+    type: json
+    data: "{}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |-
+  200 => {
+    success : true,
+    msg : "Reward deleted.",
+    deleted_reward : {
+      id: string;
+      createdAt: Date;
+      rewardName: string;
+      pointsCost: number;
+      imageUrl: string | null;
+      active: boolean;
+    }
+  }
+
+  ---------------------------------------------------------------
+
+  400 => {
+    success : false,
+    msg : "You do not have permission to access this resource.",
+    error_code : "FORBIDDEN_ROLE"
+  }
+
+  ---------------------------------------------------------------
+
+  401 => {
+    success : false,
+    msg : "Access token missing.",
+    error_code : "ACC_TOKEN_MISSING"
+  }
+
+  ---------------------------------------------------------------
+
+  401 => {
+    success : false,
+    msg : "Invalid or expires access token.",
+    error_code : "INVALID_ACC_TOKEN"
+  }
+
+  ---------------------------------------------------------------
+
+  404 => {
+    success : false,
+    msg : "Admin account record not found.",
+    error_code : "ADMIN_NOT_FOUND"
+  }
+
+  ---------------------------------------------------------------
+
+  404 => {
+    success : false,
+    msg : "Target reward item not found.",
+    error_code : "NOT_FOUND"
+  }
+
+  ---------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : "Unable to delete reward an unexpected internal server error occurred.",
+    error_code : "SERVER_ERROR"
+  } 
+
+  ---------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : "Internal server error",
+    error_code : "SERVER_ERROR"
+  }
+
+  ---------------------------------------------------------------

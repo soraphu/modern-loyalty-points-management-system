@@ -1,0 +1,107 @@
+info:
+  name: Redemption Reward
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: "{{baseURL}}{{ApiURL}}/customer/rewards/:reward_id/redeem"
+  headers:
+    - name: Authorization
+      value: Bearer {{customerToken}}
+  params:
+    - name: reward_id
+      value: 5532c330-8c95-4215-adaa-21a3c844be4d
+      type: path
+  body:
+    type: json
+    data: "{}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |-
+  201 => {
+    success : true,
+    msg : "Voucher created.",
+    data : {
+      voucher : {
+        id: string;
+        createdAt: Date;
+        userId: string;
+        expiresAt: Date | null;
+        status: VoucherStatus;
+        voucherCode: string;
+        rewardId: string;
+        reward : {
+          id: string;
+          createdAt: Date;
+          rewardName: string;
+          pointsCost: number;
+          imageUrl: string | null;
+          active: boolean;
+        }
+      }
+    }
+  }
+
+  ---------------------------------------------------------------
+
+  401 => {
+    success : false,
+    msg : "Access token missing.",
+    error_code : "ACC_TOKEN_MISSING"
+  }
+
+  ---------------------------------------------------------------
+
+  401 => {
+    success : false,
+    msg : "Invalid or expires access token.",
+    error_code : "INVALID_ACC_TOKEN"
+  }
+
+  ---------------------------------------------------------------
+
+  404 => {
+    success : false,
+    msg : "Reward item is unavailable or does not exist.",
+    error_code : "REWARD_NOT_FOUND"
+  }
+
+  ---------------------------------------------------------------
+
+  404 => {
+    success : false,
+    msg : "User profile record not found.",
+    error_code : "USER_NOT_FOUND"
+  }
+
+  ---------------------------------------------------------------
+
+  400 => {
+    success : false,
+    msg : "Insufficient point reserves to complete this redemption.",
+    error_code : "INSUFFICIENT_POINTS"
+  }
+
+  ---------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : "Unable to redeem an unexpected internal server error occurred.",
+    error_code : "SERVER_ERROR"
+  } 
+
+  ---------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : "Internal server error",
+    error_code : "SERVER_ERROR"
+  }
+
+  ---------------------------------------------------------------

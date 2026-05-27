@@ -1,0 +1,74 @@
+info:
+  name: Fetch Rewards
+  type: http
+  seq: 4
+
+http:
+  method: GET
+  url: "{{baseURL}}{{ApiURL}}/customer/rewards"
+  headers:
+    - name: Authorization
+      value: Bearer {{customerToken}}
+  body:
+    type: json
+    data: ""
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |-
+  200 => {
+    success : true,
+    msg : "Fetch available rewards successful.",
+    rewards : [
+      {
+        id: string;
+        rewardName: string;
+        pointsCost: number;
+        imageUrl: string | null;
+        active: true;
+        createdAt: Date;
+      }, ...
+    ]
+  }
+
+  ---------------------------------------------------------------
+
+
+  401 => {
+    success : false,
+    msg : "Access token missing.",
+    error_code : "ACC_TOKEN_MISSING"
+  }
+
+
+  ---------------------------------------------------------------
+
+
+  401 => {
+    success : false,
+    msg : "Invalid or expires access token.'",
+    error_code : "INVALID_ACC_TOKEN"
+  }
+
+
+  ---------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : "Unable to fetch available rewards profile an unexpected internal server error occurred.",
+    error_code : "SERVER_ERROR"
+  } 
+
+  ---------------------------------------------------------------
+
+  500 => {
+    success : false,
+    msg : "Internal server error",
+    error_code : "SERVER_ERROR"
+  }
+
+  ---------------------------------------------------------------
