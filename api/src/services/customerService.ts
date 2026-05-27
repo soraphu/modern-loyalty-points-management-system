@@ -126,7 +126,7 @@ export class CustomerService {
                 }
 
                 // Update user balance using native model field labels
-                const updatedUser = await tx.user.update({
+                await tx.user.update({
                     where: { id: userId },
                     data: { totalPoints: { increment: qrCodeRecord.pointValue } },
                 });
@@ -138,7 +138,7 @@ export class CustomerService {
                 });
 
                 // Log entry into the transactions ledger using the EARN transaction type string
-                await tx.transaction.create({
+                const transaction = await tx.transaction.create({
                     data: {
                         userId: userId,
                         referenceId: qrCodeRecord.id,
@@ -147,7 +147,7 @@ export class CustomerService {
                     },
                 });
 
-                return { user: updatedUser, pointsEarned: qrCodeRecord.pointValue };
+                return transaction;
             });
         } catch (error: any) {
             if (error.payload) {

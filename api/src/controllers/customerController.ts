@@ -50,9 +50,9 @@ export async function earnPointsController(request: FastifyRequest, reply: Fasti
 
         Validation.requiredFields(jsonBody, ['code_string']);
 
-        const updatedData = await CustomerService.earnPoints(decodePayload.id, jsonBody.code_string);
+        const earnTransaction = await CustomerService.earnPoints(decodePayload.id, jsonBody.code_string);
 
-        const res = ApiResponse.success({ data: { update_info: updatedData }, msg: 'Earn points successfully.' });
+        const res = ApiResponse.success({ data: { transaction: earnTransaction }, msg: 'Earn points successfully.' });
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
@@ -94,7 +94,7 @@ export async function fetchRewardsController(request: FastifyRequest, reply: Fas
 
         const res = ApiResponse.success({
             statusCode: 200,
-            msg: 'Fetch available rewards success.',
+            msg: 'Fetch available rewards successful.',
             data: { rewards: rewards }
         });
 

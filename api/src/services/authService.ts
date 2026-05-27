@@ -79,7 +79,8 @@ export class Auth {
                 rewardId,
                 voucherCode: uniqueCode,
                 expiresAt: expiryDate
-            }
+            },
+            select: { reward: true }
         });
     }// end
 
@@ -137,7 +138,7 @@ export class Auth {
         try {
             return fastify.jwt.verify<T>(token);
         } catch (error: any) {
-            throw ApiResponse.fail({ statusCode: 401, msg: "Invalid access token or expires.", error_code: "UNAUTH_ACC_TOKEN" });
+            throw ApiResponse.authTokenInvalid();
         }
     }// end
 
