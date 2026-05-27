@@ -12,6 +12,9 @@ RUN npm install
 # Copy the rest of your application source code
 COPY . .
 
+ENV DIRECT_URL="mock"
+ENV DATABASE_URL="mock"
+
 # Generate Prisma Client (Crucial step before building!)
 RUN npx prisma generate
 
