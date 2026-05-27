@@ -17,14 +17,22 @@ import {
     forcePasswordResetController,
     deleteAdminController,
     cancelVoucherController,
+    adminGetProfile,
+    adminGetTokenPayload,
 } from '../controllers/adminController';
 
 export async function adminRoutes(fastify: FastifyInstance) {
 
     // Administrative Personnel Authentication
     // POST -> /api/v1/admin/login
-
     fastify.post('/login', adminLoginController);
+
+    // Get Admin Payload
+    fastify.get('/payload', adminGetTokenPayload);
+
+    // Get Admin Profile
+    fastify.get('/profile', adminGetProfile);
+
     // Generate Secure Points Allocation Token
     // POST -> /api/v1/admin/points-token
     fastify.post('/points-token', generatePointsTokenController);

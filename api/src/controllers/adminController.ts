@@ -7,6 +7,7 @@ import { Auth } from '../services/authService';
 import { AdminRoles } from '../generated/prisma/enums';
 import { StaffService } from '../services/staffService';
 import { ManagerService } from '../services/managerService';
+import { prisma } from '../config/database';
 
 export interface AdminTokenPayload {
     id: string;
@@ -37,12 +38,66 @@ export async function adminLoginController(request: FastifyRequest, reply: Fasti
             msg: 'Login successfully.',
             data: {
                 access_token: accessToken,
-                admin_data: admin,
             }
         });
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
+}//end
+
+export async function adminGetTokenPayload(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodedPayload = Auth.verifyAndDecodeToken<AdminTokenPayload>(accessToken);
+        logs.info('Decode Payload: ', decodedPayload);
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: 'Get token payload success.',
+            data: { admin_payload: decodedPayload }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        return reply.status(error.statusCode).send(error.payload);
+
+    }
+}//end
+
+export async function adminGetProfile(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodedPayload = Auth.verifyAndDecodeToken<AdminTokenPayload>(accessToken);
+        logs.info('Decode Payload: ', decodedPayload);
+
+        const adminProfile = await prisma.admin.findUnique({
+            where: { id: decodedPayload.id },
+            select: {
+                id: true,
+                role: true,
+                username: true,
+                firstname: true,
+                lastname: true,
+                createdAt: true,
+                updatedAt: true,
+            }
+        });
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: 'Get profile success.',
+            data: { admin: adminProfile }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        logs.error(error);
+
         return reply.status(error.statusCode).send(error.payload);
 
     }
@@ -56,7 +111,7 @@ export async function generatePointsTokenController(request: FastifyRequest, rep
 
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        const decodePayload: any = Auth.verifyAndDecodeToken<AdminTokenPayload>(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
         const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });

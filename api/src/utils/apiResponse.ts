@@ -53,7 +53,7 @@ export class ApiResponse {
      * Semantic Error: 400 Bad Request (Missing Fields)
      * Triggered when payload or query parameters fail basic presence checks
      */
-    static requiredFieldsMissing(msg = 'Required payload or query parameters are missing'): ReponseFailedType {
+    static requiredFieldsMissing(msg = 'Required payload or query parameters are missing.'): ReponseFailedType {
         return this.fail({ msg, statusCode: 400, error_code: "FIEDS_MISSING" });
     }
 
