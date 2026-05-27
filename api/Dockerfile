@@ -11,4 +11,6 @@ EXPOSE 3000
 
 RUN ["npm", "run", "build"]
 
+RUN ["npx", "prisma", "generate"]
+
 CMD ["npm", "run", "start"]
