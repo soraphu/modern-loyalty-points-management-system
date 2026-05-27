@@ -39,7 +39,7 @@ export class Validation {
 
             // 1. Existence Guard
             if (!voucher) {
-                throw ApiResponse.fail({ statusCode: 404, msg: "Voucher not found.", error_code: 'NOT_FOUND' });
+                throw ApiResponse.fail({ statusCode: 404, msg: "Voucher not found.", error_code: 'VOUCHER_NOT_FOUND' });
             }
 
             // 2. Already Claimed Guard

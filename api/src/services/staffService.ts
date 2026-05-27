@@ -143,7 +143,7 @@ export class StaffService {
                     }
                 });
 
-                return { settled_voucher: transaction, reward: voucher.reward };
+                return { transaction: transaction, settled_voucher: voucher };
             });
         } catch (error: any) {
             if (error.payload) throw error;

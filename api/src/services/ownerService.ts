@@ -33,7 +33,6 @@ export class OwnerService {
                     lastname: true,
                     createdAt: true,
                     updatedAt: true
-                    // passwordHashed is explicitly omitted here for API security
                 },
                 orderBy: {
                     createdAt: 'desc'

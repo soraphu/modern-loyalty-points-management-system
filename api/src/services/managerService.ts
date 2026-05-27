@@ -125,7 +125,6 @@ export class ManagerService {
             return await prisma.reward.update({
                 where: { id: rewardId },
                 data: { active: active },
-                select: { rewardName: true, active: true }
             });
 
         } catch (error: any) {

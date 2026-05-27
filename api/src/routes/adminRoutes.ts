@@ -9,7 +9,7 @@ import {
     createRewardController,
     deleteRewardController,
     adjustRewardStateController,
-    listCustomersController,
+    fetchCustomersController,
     manualPointsOverrideController,
     fetchAdminDirectoryController,
     createAdminController,
@@ -17,8 +17,8 @@ import {
     forcePasswordResetController,
     deleteAdminController,
     cancelVoucherController,
-    adminGetProfile,
-    adminGetTokenPayload,
+    adminGetProfileController,
+    adminGetTokenPayloadController,
 } from '../controllers/adminController';
 
 export async function adminRoutes(fastify: FastifyInstance) {
@@ -28,10 +28,10 @@ export async function adminRoutes(fastify: FastifyInstance) {
     fastify.post('/login', adminLoginController);
 
     // Get Admin Payload
-    fastify.get('/payload', adminGetTokenPayload);
+    fastify.get('/payload', adminGetTokenPayloadController);
 
     // Get Admin Profile
-    fastify.get('/profile', adminGetProfile);
+    fastify.get('/profile', adminGetProfileController);
 
     // Generate Secure Points Allocation Token
     // POST -> /api/v1/admin/points-token
@@ -65,7 +65,7 @@ export async function adminRoutes(fastify: FastifyInstance) {
 
     // List Registered Platform Customers
     // GET -> /api/v1/admin/customers
-    fastify.get('/customers', listCustomersController);
+    fastify.get('/customers', fetchCustomersController);
 
     // Manual Customer Wallet Balance Override
     // PATCH -> /api/v1/admin/customers/:user_id/points-adjustment

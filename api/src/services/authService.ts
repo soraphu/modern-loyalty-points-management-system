@@ -156,6 +156,26 @@ export class Auth {
         return await bcrypt.compare(password, hash);
     }// end
 
+    public static async getAdminProfile(adminId: string) {
+        try {
+            return await prisma.admin.findUnique({
+                where: { id: adminId },
+                select: {
+                    id: true,
+                    role: true,
+                    username: true,
+                    firstname: true,
+                    lastname: true,
+                    createdAt: true,
+                    updatedAt: true,
+                }
+            });
+        } catch (error) {
+            throw ApiResponse.internalServerError('Unable to get admin profile an unexpected internal server error occurred.');
+
+        }
+    }// end
+
     /**
      * Ensures the admin's live role meets or exceeds the required `lowestAllowRole`.
      */
@@ -196,8 +216,8 @@ export class Auth {
             if (adminLiveRank < requiredRank) {
                 throw ApiResponse.fail({
                     statusCode: 403,
-                    msg: "Forbidden: You do not have permission to access this resource.",
-                    error_code: "FORBIDDEN"
+                    msg: "You do not have permission to access this resource.",
+                    error_code: "FORBIDDEN_ROLE"
                 });
             }
 

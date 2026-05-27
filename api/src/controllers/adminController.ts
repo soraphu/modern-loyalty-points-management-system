@@ -43,12 +43,15 @@ export async function adminLoginController(request: FastifyRequest, reply: Fasti
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
 
+        return reply.status(serverError.statusCode).send(serverError.payload);
     }
 }//end
 
-export async function adminGetTokenPayload(request: FastifyRequest, reply: FastifyReply) {
+export async function adminGetTokenPayloadController(request: FastifyRequest, reply: FastifyReply) {
     try {
         const accessToken = Validation.requireAuthHeader(request);
 
@@ -63,30 +66,22 @@ export async function adminGetTokenPayload(request: FastifyRequest, reply: Fasti
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
 
+        return reply.status(serverError.statusCode).send(serverError.payload);
     }
 }//end
 
-export async function adminGetProfile(request: FastifyRequest, reply: FastifyReply) {
+export async function adminGetProfileController(request: FastifyRequest, reply: FastifyReply) {
     try {
         const accessToken = Validation.requireAuthHeader(request);
 
         const decodedPayload = Auth.verifyAndDecodeToken<AdminTokenPayload>(accessToken);
         logs.info('Decode Payload: ', decodedPayload);
 
-        const adminProfile = await prisma.admin.findUnique({
-            where: { id: decodedPayload.id },
-            select: {
-                id: true,
-                role: true,
-                username: true,
-                firstname: true,
-                lastname: true,
-                createdAt: true,
-                updatedAt: true,
-            }
-        });
+        const adminProfile = await Auth.getAdminProfile(decodedPayload.id);
 
         const res = ApiResponse.success({
             statusCode: 200,
@@ -97,8 +92,10 @@ export async function adminGetProfile(request: FastifyRequest, reply: FastifyRep
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
         logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
 
-        return reply.status(error.statusCode).send(error.payload);
+        return reply.status(serverError.statusCode).send(serverError.payload);
 
     }
 }//end
@@ -128,7 +125,11 @@ export async function generatePointsTokenController(request: FastifyRequest, rep
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
 
     }
 }//end
@@ -155,7 +156,11 @@ export async function queryTargetVoucherController(request: FastifyRequest, repl
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
 
     }
 }//end
@@ -182,7 +187,11 @@ export async function settleVoucherController(request: FastifyRequest, reply: Fa
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
 
     }
 }//end
@@ -200,13 +209,17 @@ export async function fetchRewardsController(request: FastifyRequest, reply: Fas
 
         const res = ApiResponse.success({
             statusCode: 200,
-            msg: 'Fetch rewards success.',
+            msg: 'Fetch rewards successful.',
             data: { rewards: rewards }
         });
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
 
     }
 }//end
@@ -227,13 +240,17 @@ export async function cancelVoucherController(request: FastifyRequest, reply: Fa
 
         const res = ApiResponse.success({
             statusCode: 200,
-            msg: `Settled voucher ${voucherCode} successful.`,
+            msg: `Cancelled voucher ${voucherCode} successful.`,
             data: cancelledInfo
         });
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
 
     }
 }
@@ -263,7 +280,11 @@ export async function createRewardController(request: FastifyRequest, reply: Fas
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
 
     }
 }//end
@@ -289,7 +310,11 @@ export async function deleteRewardController(request: FastifyRequest, reply: Fas
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
 
     }
 }//end
@@ -308,21 +333,26 @@ export async function adjustRewardStateController(request: FastifyRequest, reply
 
         await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'MANAGER' });
 
-        const updatedReward: any = await ManagerService.adjustRewardState(rewardId, active);
+        const updatedReward = await ManagerService.adjustRewardState(rewardId, active);
 
         const res = ApiResponse.success({
             statusCode: 200,
-            msg: `Reward ${updatedReward.rewardName} active to ${updatedReward.active} successfully.`,
+            msg: `Set reward name ${updatedReward.rewardName} active ${updatedReward.active} successful.`,
+            data: { updated_reward: updatedReward }
         });
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
 
     }
 }//end
 
-export async function listCustomersController(request: FastifyRequest, reply: FastifyReply) {
+export async function fetchCustomersController(request: FastifyRequest, reply: FastifyReply) {
     try {
         const accessToken = Validation.requireAuthHeader(request);
 
@@ -331,7 +361,7 @@ export async function listCustomersController(request: FastifyRequest, reply: Fa
 
         await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'MANAGER' });
 
-        const customers: any = await ManagerService.fetchCustomers();
+        const customers = await ManagerService.fetchCustomers();
 
         const res = ApiResponse.success({
             statusCode: 200,
@@ -343,7 +373,11 @@ export async function listCustomersController(request: FastifyRequest, reply: Fa
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
 
     }
 }//end
@@ -362,11 +396,11 @@ export async function manualPointsOverrideController(request: FastifyRequest, re
 
         await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'MANAGER' });
 
-        const customer: any = await ManagerService.adjustCustomerPoints(targetUserId, newPoints);
+        const customer = await ManagerService.adjustCustomerPoints(targetUserId, newPoints);
 
         const res = ApiResponse.success({
             statusCode: 200,
-            msg: `Customer ${customer} Points adjustment successfully`,
+            msg: `Customer ${customer.lineDisplayName} Points adjustment successfully.`,
             data: {
                 customer: customer
             }
@@ -374,7 +408,11 @@ export async function manualPointsOverrideController(request: FastifyRequest, re
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
 
     }
 }//end
@@ -391,7 +429,7 @@ export async function fetchAdminDirectoryController(request: FastifyRequest, rep
         const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'OWNER' });
         logs.info('Admin: ', admin);
 
-        const admins: any = await OwnerService.fetchAdmins();
+        const admins = await OwnerService.fetchAdmins();
 
         const res = ApiResponse.success({
             statusCode: 200,
@@ -401,7 +439,11 @@ export async function fetchAdminDirectoryController(request: FastifyRequest, rep
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
 
     }
 }//end
@@ -412,19 +454,23 @@ export async function createAdminController(request: FastifyRequest, reply: Fast
     try {
         Validation.requiredFields(reqBody, ['username', 'firstname', 'lastname', 'password', 'role']);
 
-        Validation.length(reqBody.password, { min: 8, max: 50 }, 'password');
+        Validation.length(reqBody.password, { min: 8, max: 50 }, 'Password');
 
         const newAdmin = await OwnerService.createAdmin(reqBody);
 
         const res = ApiResponse.success({
             statusCode: 201,
             msg: 'Admin created.',
-            data: newAdmin
+            data: { new_admin: newAdmin }
         });
         ``
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
 
     }
 }//end
@@ -441,7 +487,7 @@ export async function modifyAdminRoleController(request: FastifyRequest, reply: 
             throw ApiResponse.fail({
                 statusCode: 403,
                 msg: 'Changing role to OWNER is not allowed.',
-                error_code: 'FORBIDDEN'
+                error_code: 'FORBIDDEN_REQUEST'
             });
         }
 
@@ -461,17 +507,21 @@ export async function modifyAdminRoleController(request: FastifyRequest, reply: 
         const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'OWNER' });
         logs.info('Admin: ', admin);
 
-        const updateAdmin = await OwnerService.adjustAdminRole(adminId, newRole);
+        const updatedAdmin = await OwnerService.adjustAdminRole(adminId, newRole);
 
         const res = ApiResponse.success({
             statusCode: 200,
             msg: `Admin ${admin.username} role changed.`,
-            data: { update_admin: updateAdmin }
+            data: { updated_admin: updatedAdmin }
         });
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
 
     }
 }//end
@@ -492,7 +542,7 @@ export async function forcePasswordResetController(request: FastifyRequest, repl
         const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'OWNER' });
         logs.info('Admin: ', admin);
 
-        const updatedAdmin: any = await OwnerService.resetAdminPassword(targetAdminId, newPassword);
+        const updatedAdmin = await OwnerService.resetAdminPassword(targetAdminId, newPassword);
 
         const res = ApiResponse.success({
             statusCode: 200,
@@ -502,7 +552,11 @@ export async function forcePasswordResetController(request: FastifyRequest, repl
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
 
     }
 }//end
@@ -519,7 +573,7 @@ export async function deleteAdminController(request: FastifyRequest, reply: Fast
         const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'OWNER' });
         logs.info('Admin: ', admin);
 
-        const deletedAdmin: any = await OwnerService.deleteAdmin(targetAdminId);
+        const deletedAdmin = await OwnerService.deleteAdmin(targetAdminId);
 
         const res = ApiResponse.success({
             statusCode: 200,
@@ -529,7 +583,11 @@ export async function deleteAdminController(request: FastifyRequest, reply: Fast
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
 
     }
 
