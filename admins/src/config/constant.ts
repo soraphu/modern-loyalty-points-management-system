@@ -1,0 +1,1 @@
+const isDevMode = import.meta.env.VITE_ISDEV_MODE === 'true';
