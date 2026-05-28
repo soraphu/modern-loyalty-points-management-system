@@ -1,10 +1,9 @@
 import { useRegisterViewModel } from '../viewmodels/useRegisterViewModel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { backgroundTheme, foregroundTheme } from '@/config/constant';
 
 export default function RegisterPage() {
     // Bind your View hooks directly to the ViewModel state framework
@@ -13,8 +12,19 @@ export default function RegisterPage() {
     });
 
     return (
-        <div className={`flex min-h-screen items-center justify-center px-4 py-12 text-zinc-50 antialiased bg-${backgroundTheme}`}>
-            <Card className={`w-full max-w-md border-zinc-800 bg-${foregroundTheme} shadow-xl text-zinc-50`}>
+        <div className='flex flex-col min-h-screen items-center justify-center px-4 py-12 text-zinc-50 antialiased bg-app-background'>
+
+            {/* Page Layout Title Header */}
+            <div className="mb-6 text-center">
+                <h1 className="text-3xl font-extrabold tracking-wider text-app-primary sm:text-4xl">
+                    ADMIN OF DEEPOINTS
+                </h1>
+                <p className="mt-1 text-xs uppercase tracking-widest text-zinc-500">
+                    Internal Management Core
+                </p>
+            </div>
+
+            <Card className='w-screen h-screen sm:h-full sm:max-w-md border-zinc-800 shadow-xl text-zinc-50 bg-app-foreground'>
                 <CardHeader className="space-y-1">
                     <CardTitle className="text-2xl font-bold text-center tracking-tight text-white">
                         Create an Account
@@ -111,7 +121,7 @@ export default function RegisterPage() {
                         {/* SUBMIT ACTION BUTTON */}
                         <Button
                             type="submit"
-                            className="w-full mt-2 bg-zinc-50 text-zinc-950 hover:bg-zinc-200 focus:ring-zinc-700 font-semibold"
+                            className="w-full mt-2 bg-zinc-50 text-zinc-950 hover:bg-zinc-200 focus:ring-zinc-700 font-semibold cursor-pointer"
                             disabled={isLoading}
                         >
                             {isLoading ? (
@@ -125,6 +135,10 @@ export default function RegisterPage() {
                         </Button>
                     </form>
                 </CardContent>
+                <hr />
+                <CardFooter className="justify-center bg-transparent border-t border-slate-800 pt-4 text-xs text-slate-500">
+                    Enter your details to register this account. This system profile will automatically be assigned the global 'OWNER' role. Note: This is a single-occupancy administrative role; no other accounts can register with Owner privileges.
+                </CardFooter>
             </Card>
         </div>
     );
