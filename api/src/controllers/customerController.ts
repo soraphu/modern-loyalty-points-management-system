@@ -34,8 +34,11 @@ export async function syncLineController(request: FastifyRequest, reply: Fastify
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
 
+        return reply.status(serverError.statusCode).send(serverError.payload);
     }
 } //end
 
@@ -56,8 +59,11 @@ export async function earnPointsController(request: FastifyRequest, reply: Fasti
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
 
+        return reply.status(serverError.statusCode).send(serverError.payload);
     }
 } //end
 
@@ -78,8 +84,11 @@ export async function fetchTransactionsController(request: FastifyRequest, reply
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
 
+        return reply.status(serverError.statusCode).send(serverError.payload);
     }
 } //end
 
@@ -100,8 +109,11 @@ export async function fetchRewardsController(request: FastifyRequest, reply: Fas
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
 
+        return reply.status(serverError.statusCode).send(serverError.payload);
     }
 } //end
 
@@ -123,8 +135,11 @@ export async function redeemRewardController(request: FastifyRequest, reply: Fas
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        return reply.status(error.statusCode).send(error.payload);
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
 
+        return reply.status(serverError.statusCode).send(serverError.payload);
     }// end
 
 } //end

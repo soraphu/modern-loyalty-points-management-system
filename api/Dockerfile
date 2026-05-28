@@ -21,8 +21,6 @@ RUN npx prisma generate
 # Build the application
 RUN npm run build
 
-# Expose the port your app listens on
 EXPOSE 3000
 
-# Start the application (Using JSON array syntax is correct here)
 CMD ["npm", "run", "start"]
