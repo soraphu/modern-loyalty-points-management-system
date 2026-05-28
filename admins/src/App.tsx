@@ -1,9 +1,8 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-
-import { Button } from './components/ui/button';
+import RegisterPage from './app/views/RegisterPage';
 
 const router = createBrowserRouter([
-  { path: '/', element: <Button /> },
+  { path: '/', element: <RegisterPage /> },
 ]);
 
 function App() {
