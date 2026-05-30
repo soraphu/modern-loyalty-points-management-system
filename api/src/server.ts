@@ -63,14 +63,9 @@ const startServer = async () => {
 
             credentials: true, // Allows cross-origin cookies or auth headers to pass
         });
-        
+
         // Register Environment Variable Validation First
         await fastify.register(fastifyEnv, fastifyOptions);
-
-        // Register CORS (Adjust origin when deploy frontend app)
-        await fastify.register(cors, {
-            origin: true,
-        });
 
         fastify.register(fastifyJwt, {
             secret: CONFIG.JWT_SECRET
