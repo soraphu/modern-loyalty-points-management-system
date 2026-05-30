@@ -9,6 +9,7 @@ import { adminRoutes } from './routes/adminRoutes';
 import { CONFIG } from './config/constants';
 import { apiDocs } from './routes/apiDocs';
 import { prisma } from './config/database';
+import fastifyCors from '@fastify/cors';
 
 const serverLog = new Logger('server.ts');
 
@@ -30,10 +31,39 @@ const fastifyOptions = {
     dotenv: true, // Tells Fastify to read local .env file
 };
 
+const allowedOrigins = [
+    'http://localhost:5173'
+];
+
 const apiPrefix = CONFIG.API_PREFIX;
 
 const startServer = async () => {
     try {
+        fastify.register(fastifyCors, {
+            // Configures the dynamic origin check logic
+            origin: (origin, cb) => {
+                // Allow requests with no origin (like mobile apps, curl, or Postman)
+                if (!origin) {
+                    cb(null, true);
+                    return;
+                }
+
+                if (allowedOrigins.includes(origin)) {
+                    // Origin matches our whitelist layout
+                    cb(null, true);
+                } else {
+                    // Reject origin with a security error
+                    cb(new Error('Not allowed by CORS policy'), false);
+                }
+            },
+            methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+
+            // CRITICAL: Must include 'authorization' to allow your Axios Interceptor token through
+            allowedHeaders: ['Content-Type', 'Authorization'],
+
+            credentials: true, // Allows cross-origin cookies or auth headers to pass
+        });
+        
         // Register Environment Variable Validation First
         await fastify.register(fastifyEnv, fastifyOptions);
 
