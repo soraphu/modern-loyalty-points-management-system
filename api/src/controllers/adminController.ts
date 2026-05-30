@@ -481,6 +481,14 @@ export async function createAdminController(request: FastifyRequest, reply: Fast
     const reqBody: any = request.body;
 
     try {
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodePayload = Auth.verifyAndDecodeToken<AdminTokenPayload>(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'OWNER' });
+        logs.info('Admin: ', admin);
+
         Validation.requiredFields(reqBody, ['username', 'firstname', 'lastname', 'password', 'role']);
 
         Validation.length(reqBody.password, { min: 8, max: 50 }, 'Password');
