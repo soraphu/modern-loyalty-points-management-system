@@ -19,11 +19,15 @@ import {
     cancelVoucherController,
     adminGetProfileController,
     adminGetTokenPayloadController,
+    registerOwnerController,
 } from '../controllers/adminController';
 
 export async function adminRoutes(fastify: FastifyInstance) {
 
     // Administrative Personnel Authentication
+    // POST -> /api/v1/admin/login
+    fastify.post('/register-owner', registerOwnerController);
+
     // POST -> /api/v1/admin/login
     fastify.post('/login', adminLoginController);
 

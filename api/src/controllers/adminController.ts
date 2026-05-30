@@ -196,6 +196,35 @@ export async function settleVoucherController(request: FastifyRequest, reply: Fa
     }
 }//end
 
+export async function registerOwnerController(request: FastifyRequest, reply: FastifyReply) {
+    const reqBody: any = request.body;
+
+    try {
+        Validation.requiredFields(reqBody, ['username', 'firstname', 'lastname', 'password']);
+
+        Validation.length(reqBody.password, { min: 8, max: 50 }, 'Password');
+
+        const owner = { ...reqBody, role: "OWNER" }
+
+        const newOwner = await OwnerService.createAdmin(owner);
+
+        const res = ApiResponse.success({
+            statusCode: 201,
+            msg: 'Owner created.',
+            data: { new_owner: newOwner }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
+
+    }
+}
+
 export async function fetchRewardsController(request: FastifyRequest, reply: FastifyReply) {
     try {
         const accessToken = Validation.requireAuthHeader(request);
@@ -463,7 +492,7 @@ export async function createAdminController(request: FastifyRequest, reply: Fast
             msg: 'Admin created.',
             data: { new_admin: newAdmin }
         });
-        ``
+
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
         logs.error(error);
