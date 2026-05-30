@@ -29,6 +29,20 @@ export default function HomePage() {
         )
     }
 
+    const RoleTitle = () => {
+        const role = currentUser.role;
+        if (role === 'STAFF') return (
+            <span className="underline decoration-green-400 text-green-400 underline-offset-2">{role}</span>
+        )
+        if (role === 'MANAGER') return (
+            <span className="underline  decoration-blue-300 text-blue-300 underline-offset-2">{role}</span>
+        )
+        if (role === 'OWNER') return (
+            <span className="underline decoration-orange-400 text-orange-400 underline-offset-2">{role}</span>
+        )
+
+    }
+
     return (
         <div className="flex min-h-screen flex-col bg-app-background text-zinc-50 antialiased">
 
@@ -59,7 +73,7 @@ export default function HomePage() {
                         </h1>
                     </button>
                     <p className="text-xs font-bold uppercase tracking-widest text-blue-100">
-                        ROLE : <span className="underline decoration-white underline-offset-2">{currentUser.role}</span>
+                        ROLE : <RoleTitle />
                     </p>
                 </div>
 
