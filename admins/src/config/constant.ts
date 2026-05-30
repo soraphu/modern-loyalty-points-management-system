@@ -27,6 +27,7 @@ export const filterErrorMessage = (err: any) => {
 }
 
 export const API_PATH = {
+    checkHealth: '/',
     register: '/register-owner',
     login: '/login',
     checkOwnerExist: '/is-owner-exist'

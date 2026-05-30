@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AuthService } from '../api/authService';
-import type { RegisterFormValues } from '../models/authType';
+import type { RegisterFormValues } from '../models/authTypes';
 import { toast } from 'sonner';
 import { consoleLogOnDev } from '@/config/constant';
 
@@ -39,11 +39,11 @@ export function useRegisterViewModel() {
             setErrorMessage(null);
             setSuccessMessage(null);
 
-            const response: any = await AuthService.register(values);
+            const res: any = await AuthService.register(values);
 
-            consoleLogOnDev(response);
+            consoleLogOnDev(res);
 
-            if (response.success) {
+            if (res.success) {
                 setSuccessMessage("Account created successfully!");
                 reset(); // Clear form values
                 window.location.href = '/login';
@@ -64,4 +64,4 @@ export function useRegisterViewModel() {
         successMessage,
         onSubmit: handleSubmit(handleRegister),
     };
-}
+}//end

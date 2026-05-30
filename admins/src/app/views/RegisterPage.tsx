@@ -19,7 +19,7 @@ export default function RegisterPage() {
 
             {/* Page Layout Title Header Mobile */}
             <div className='sm:hidden flex flex-col gap-2 relative' >
-                <ShieldUser className='top-10 self-center' color='#FFBF00' size={70} />
+                <ShieldUser className='top-10 self-center text-app-primary' size={70} />
                 <h1 className="text-2xl font-extrabold tracking-wider text-app-primary self-center">
                     ADMIN OF DEEPOINTS
                 </h1>
@@ -132,7 +132,7 @@ export default function RegisterPage() {
                         {/* SUBMIT ACTION BUTTON */}
                         <Button
                             type="submit"
-                            className="w-full mt-2 bg-zinc-50 text-zinc-950 hover:bg-zinc-200 focus:ring-zinc-700 font-semibold cursor-pointer"
+                            className="w-full mt-2 bg-gray-600 text-app-primary hover:bg-gray-700 focus:ring-zinc-700 font-semibold cursor-pointer"
                             disabled={isLoading}
                         >
                             {isLoading ? (
@@ -141,8 +141,9 @@ export default function RegisterPage() {
                                     Creating account...
                                 </>
                             ) : (
-                                "Register as Owner"
+                                "Register as "
                             )}
+                            <div className='text-orange-400'>Owner</div>
                         </Button>
                     </form>
                 </CardContent>
