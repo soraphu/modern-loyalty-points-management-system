@@ -196,6 +196,23 @@ export async function settleVoucherController(request: FastifyRequest, reply: Fa
     }
 }//end
 
+export async function isOwnerExistController(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        await OwnerService.validateOwnerUniqueness('OWNER');
+
+        const res = ApiResponse.success({ statusCode: 200, msg: "There is no owner yet." });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
+
+    }
+}// end
+
 export async function registerOwnerController(request: FastifyRequest, reply: FastifyReply) {
     const reqBody: any = request.body;
 

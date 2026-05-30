@@ -6,7 +6,7 @@ import { ApiResponse } from '../utils/apiResponse';
 
 export class OwnerService {
 
-    private static async validateOwnerUniqueness(role: AdminRoles) {
+    public static async validateOwnerUniqueness(role: AdminRoles) {
         if (role !== AdminRoles.OWNER) return;
 
         const existingOwner = await prisma.admin.findFirst({

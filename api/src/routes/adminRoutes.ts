@@ -20,6 +20,7 @@ import {
     adminGetProfileController,
     adminGetTokenPayloadController,
     registerOwnerController,
+    isOwnerExistController,
 } from '../controllers/adminController';
 
 export async function adminRoutes(fastify: FastifyInstance) {
@@ -27,6 +28,8 @@ export async function adminRoutes(fastify: FastifyInstance) {
     // Administrative Personnel Authentication
     // POST -> /api/v1/admin/login
     fastify.post('/register-owner', registerOwnerController);
+
+    fastify.get('/is-owner-exist', isOwnerExistController);
 
     // POST -> /api/v1/admin/login
     fastify.post('/login', adminLoginController);
