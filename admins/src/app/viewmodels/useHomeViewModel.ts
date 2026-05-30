@@ -17,7 +17,7 @@ export function useHomeViewModel() {
                 username: 'johndoe_admin',
                 firstname: 'John',
                 lastname: 'Doe',
-                role: 'STAFF', // 👈 Change to 'MANAGER' or 'OWNER' to test dynamic button renderings!
+                role: 'OWNER', // 👈 Change to 'MANAGER' or 'OWNER' to test dynamic button renderings!
             });
             setIsLoading(false);
         }, 400);

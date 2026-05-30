@@ -1,10 +1,14 @@
 import { useHomeViewModel } from '../viewmodels/useHomeViewModel';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Loader2, QrCode, Ticket, Gift, Users, ShieldAlert, History, LogOut, User } from 'lucide-react';
+import { Loader2, QrCode, Ticket, Gift, Users, ShieldCogCorner, History, LogOut, User, ShieldUser, FileClock, type LucideProps } from 'lucide-react';
 
 export default function HomePage() {
     const { currentUser, isLoading, checkPermission, handleLogout } = useHomeViewModel();
+
+    const staffColorSideClassName = 'group-hover:text-blue-400 group-active:text-blue-400';
+    const managerColorSideClassName = 'group-hover:text-amber-400 group-active:text-amber-400';
+    const ownerColorSideClassName = 'group-hover:text-red-400 group-active:text-red-400';
 
     if (isLoading || !currentUser) {
         return (
@@ -14,8 +18,19 @@ export default function HomePage() {
         );
     }
 
+    const ActionButton = ({ Icon, iconOnHover, title }: { Icon: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>, iconOnHover: string, title: string }) => {
+        return (
+            <button className='bg-app-foreground cursor-pointer w-full items-center px-6 py-4 border-b border-zinc-800/60 text-left hover:bg-zinc-700 active:bg-zinc-600 transition-colors group'>
+                <div className='transition-transform duration-300 group-hover:translate-x-2 flex flex-row gap-4' >
+                    <Icon className={`h-6 w-6 text-zinc-400 transition-colors ${iconOnHover}`} />
+                    <span className="text-base font-semibold text-zinc-100">{title}</span>
+                </div>
+            </button>
+        )
+    }
+
     return (
-        <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-50 antialiased">
+        <div className="flex min-h-screen flex-col bg-app-background text-zinc-50 antialiased">
 
             {/* ==========================================
                 TOP NAVIGATION BAR (SOLID DEEP BLUE LAYER)
@@ -23,10 +38,26 @@ export default function HomePage() {
             <header className="flex w-full items-center justify-between bg-blue-600 px-6 py-4 shadow-md">
 
                 {/* Left Side: Text Brand Metrics */}
-                <div className="space-y-0.5">
-                    <h1 className="text-xl font-black tracking-wider text-white">
-                        ADMIN OF DEEPOINTS
-                    </h1>
+                <div className="space-y-0.5 sm:hidden">
+                    <div >
+                        <button className='cursor-pointer flex flex-row gap-2' onClick={() => window.location.href = '/home'} >
+                            <ShieldUser className='text-app-primary' size={26} />
+                            <h1 className="text-xl font-black tracking-wider text-app-primary">
+                                DEEPOINTS
+                            </h1>
+                        </button>
+                    </div>
+                    <p className="text-xs font-bold uppercase tracking-widest text-blue-100">
+                        ROLE : <span className="underline decoration-white underline-offset-2">{currentUser.role}</span>
+                    </p>
+                </div>
+
+                <div className="space-y-0.5 hidden sm:block">
+                    <button className='cursor-pointer' onClick={() => window.location.href = '/home'} >
+                        <h1 className="text-xl font-black tracking-wider text-app-primary">
+                            ADMIN OF DEEPOINTS
+                        </h1>
+                    </button>
                     <p className="text-xs font-bold uppercase tracking-widest text-blue-100">
                         ROLE : <span className="underline decoration-white underline-offset-2">{currentUser.role}</span>
                     </p>
@@ -43,20 +74,20 @@ export default function HomePage() {
                         </Avatar>
                     </DropdownMenuTrigger>
 
-                    <DropdownMenuContent align="end" className="w-56 bg-zinc-900 border-zinc-800 text-zinc-200">
+                    <DropdownMenuContent align="end" className="w-56 bg-app-foreground border-zinc-800 text-zinc-200">
                         <DropdownMenuLabel className="font-normal">
                             <div className="flex flex-col space-y-1">
                                 <p className="text-sm font-medium leading-none text-white">{currentUser.firstname} {currentUser.lastname}</p>
                                 <p className="text-xs leading-none text-zinc-400">@{currentUser.username}</p>
                             </div>
                         </DropdownMenuLabel>
-                        <DropdownMenuSeparator className="bg-zinc-800" />
-                        <DropdownMenuItem className="focus:bg-zinc-800 focus:text-white cursor-pointer gap-2">
-                            <User className="h-4 w-4" /> Account Profile
+                        <DropdownMenuSeparator className="bg-zinc-600" />
+                        <DropdownMenuItem className="focus:bg-zinc-700 focus:text-white cursor-pointer gap-2">
+                            <User className="h-4 w-4" color='#FFFFFF' /> Account Profile
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-zinc-800" />
+                        <DropdownMenuSeparator className="bg-zinc-600" />
                         <DropdownMenuItem onClick={handleLogout} className="focus:bg-red-950 text-red-400 focus:text-red-300 cursor-pointer gap-2">
-                            <LogOut className="h-4 w-4" /> Logout
+                            <LogOut className="h-4 w-4" color='#fc8181' /> Logout
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -66,58 +97,28 @@ export default function HomePage() {
                 PAGE BODY LIST BUTTONS
                 ========================================== */}
             <main className="flex-1 w-full max-w-2xl mx-auto px-4 py-6">
-                <div className="flex flex-col border border-zinc-900 bg-zinc-900/40 rounded-xl overflow-hidden shadow-xl">
+                <div className="flex flex-col border border-zinc-900 bg-zinc-900/40 rounded-xl overflow-hidden shadow-xl ">
 
-                    {/* 1. Generate Points (Accessible to all Staff+) */}
-                    <button className="flex w-full items-center gap-4 px-6 py-4 border-b border-zinc-800/60 text-left hover:bg-zinc-900/80 active:bg-zinc-900 transition-colors group">
-                        <QrCode className="h-6 w-6 text-zinc-400 group-hover:text-blue-400 transition-colors" />
-                        <span className="text-base font-semibold text-zinc-100">Generate Points</span>
-                    </button>
-
-                    {/* 2. Find Voucher (Accessible to all Staff+) */}
-                    <button className="flex w-full items-center gap-4 px-6 py-4 border-b border-zinc-800/60 text-left hover:bg-zinc-900/80 active:bg-zinc-900 transition-colors group">
-                        <Ticket className="h-6 w-6 text-zinc-400 group-hover:text-blue-400 transition-colors" />
-                        <span className="text-base font-semibold text-zinc-100">Find Voucher</span>
-                    </button>
-
-                    {/* 3. All Rewards (Accessible to all Staff+) */}
-                    <button className="flex w-full items-center gap-4 px-6 py-4 text-left hover:bg-zinc-900/80 active:bg-zinc-900 transition-colors group">
-                        <Gift className="h-6 w-6 text-zinc-400 group-hover:text-blue-400 transition-colors" />
-                        <span className="text-base font-semibold text-zinc-100">All Rewards</span>
-                    </button>
+                    <ActionButton Icon={QrCode} iconOnHover={staffColorSideClassName} title='Generate Code' />
+                    <ActionButton Icon={Ticket} iconOnHover={staffColorSideClassName} title='Find Voucher' />
+                    <ActionButton Icon={Gift} iconOnHover={staffColorSideClassName} title='All Rewards' />
+                    <ActionButton Icon={FileClock} iconOnHover={staffColorSideClassName} title='Executed Transactions' />
 
                     {/* ==========================================
                         CONDITIONAL SEPARATORS AND HIGHER PRIVILEGED BUTTONS
                         ========================================== */}
                     {checkPermission('MANAGER') && (
                         <>
-                            {/* Layout Break Line for Management Layer */}
-                            <div className="h-px bg-zinc-800 my-2 mx-4" />
-
-                            {/* 4. All Transactions (MANAGER & OWNER Only) */}
-                            <button className="flex w-full items-center gap-4 px-6 py-4 border-b border-zinc-800/60 text-left hover:bg-zinc-900/80 active:bg-zinc-900 transition-colors group">
-                                <History className="h-6 w-6 text-zinc-400 group-hover:text-amber-400 transition-colors" />
-                                <span className="text-base font-semibold text-zinc-100">All Transactions</span>
-                            </button>
-
-                            {/* 5. Manage Customers (MANAGER & OWNER Only) */}
-                            <button className="flex w-full items-center gap-4 px-6 py-4 text-left hover:bg-zinc-900/80 active:bg-zinc-900 transition-colors group">
-                                <Users className="h-6 w-6 text-zinc-400 group-hover:text-amber-400 transition-colors" />
-                                <span className="text-base font-semibold text-zinc-100">Manage Customers</span>
-                            </button>
+                            <hr />
+                            <ActionButton Icon={History} iconOnHover={managerColorSideClassName} title='All Transactions' />
+                            <ActionButton Icon={Users} iconOnHover={managerColorSideClassName} title='Manage Customers' />
                         </>
                     )}
 
                     {checkPermission('OWNER') && (
                         <>
-                            {/* Layout Break Line for Owner Layer */}
-                            <div className="h-px bg-zinc-800 my-2 mx-4" />
-
-                            {/* 6. Manage Admins (OWNER Only) */}
-                            <button className="flex w-full items-center gap-4 px-6 py-4 text-left hover:bg-zinc-900/80 active:bg-zinc-900 transition-colors group">
-                                <ShieldAlert className="h-6 w-6 text-zinc-400 group-hover:text-red-400 transition-colors" />
-                                <span className="text-base font-semibold text-zinc-100">Manage Admins</span>
-                            </button>
+                            <hr />
+                            <ActionButton Icon={ShieldCogCorner} iconOnHover={ownerColorSideClassName} title='Manage Admins' />
                         </>
                     )}
 

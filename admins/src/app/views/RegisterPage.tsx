@@ -4,15 +4,10 @@ import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, AlertCircle, CheckCircle2, ShieldUser } from 'lucide-react';
-import { useEffect } from 'react';
 
 export default function RegisterPage() {
     // Bind your View hooks directly to the ViewModel state framework
-    const { register, errors, isLoading, errorMessage, successMessage, onSubmit, initCheckOwnerExist } = useRegisterViewModel();
-
-    useEffect(() => {
-        initCheckOwnerExist();
-    }, []);
+    const { register, errors, isLoading, errorMessage, successMessage, onSubmit } = useRegisterViewModel();
 
     return (
         <div className='flex flex-col gap-6 min-h-screen items-center justify-center px-4 py-12 text-zinc-50 antialiased bg-app-background'>
@@ -141,9 +136,8 @@ export default function RegisterPage() {
                                     Creating account...
                                 </>
                             ) : (
-                                "Register as "
+                                "Register as Owner"
                             )}
-                            <div className='text-orange-400'>Owner</div>
                         </Button>
                     </form>
                 </CardContent>

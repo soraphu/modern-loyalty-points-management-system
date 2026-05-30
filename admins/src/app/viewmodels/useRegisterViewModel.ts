@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AuthService } from '../api/authService';
 import type { RegisterFormValues } from '../models/authTypes';
@@ -9,6 +9,10 @@ export function useRegisterViewModel() {
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+    useEffect(() => {
+        initCheckOwnerExist();
+    }, []);
 
     // Initialize standard React Hook Form without external schema engines
     const {

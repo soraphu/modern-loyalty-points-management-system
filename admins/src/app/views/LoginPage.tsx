@@ -95,7 +95,7 @@ export default function LoginPage() {
                     </form>
                 </CardContent>
 
-                <CardFooter className="flex justify-center text-sm text-black border-t border-zinc-800/60 pt-4 bg-gray-300">
+                <CardFooter className="flex justify-center text-sm text-black border-t border-zinc-800/60 pt-4 bg-gray-400">
                     <p>
                         Need system access?{' '}
                         <a href="/" className="font-semibold text-blue-600 hover:text-blue-400 transition-colors hover:underline">
