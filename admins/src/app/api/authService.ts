@@ -1,19 +1,36 @@
 import { apiClient } from '@/config/apiClient';
 import type { RegisterFormValues, RegisterResponse } from '../models/authType';
+import { API_PATH, filterErrorMessage } from '@/config/constant';
+import { toast } from 'sonner';
 
 export const AuthService = {
     async register(payload: RegisterFormValues): Promise<RegisterResponse> {
         try {
-            const response = await apiClient.post<RegisterResponse>('/auth/register', payload);
+            const response = await apiClient.post<RegisterResponse>(API_PATH.register, payload);
+
             return response.data;
-        } catch (error: any) {
-            console.error("API Error in AuthService.register:", error);
+        } catch (err: any) {
+            const finalErrorMsg = filterErrorMessage(err);
 
-            // Extract the server's custom error message string layout, or fall back to standard text
-            const backendMessage = error.response?.data?.message || "Registration failed. Please try again.";
+            throw finalErrorMsg;
+        }
+    },
 
-            // Re-throw a clean message string so the ViewModel catches it cleanly
-            throw new Error(backendMessage);
+    async checkOwnerExist() {
+
+        try {
+            await apiClient.get(API_PATH.checkOwnerExist);
+            const toastId = toast.loading("Checking is owner exist.");
+
+            toast.success("There is no owner exist, allow to register now.", { id: toastId });
+        } catch (err) {
+            const finalErrorMsg = filterErrorMessage(err);
+
+            if (finalErrorMsg.error_code === 'SERVER_ERROR') {
+                toast.error(finalErrorMsg.msg);
+            }
+
+            throw new Error(finalErrorMsg.msg);
         }
     }
 };

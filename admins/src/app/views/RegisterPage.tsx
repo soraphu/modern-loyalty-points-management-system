@@ -3,19 +3,30 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Loader2, AlertCircle, CheckCircle2, ShieldUser } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function RegisterPage() {
     // Bind your View hooks directly to the ViewModel state framework
-    const { register, errors, isLoading, errorMessage, successMessage, onSubmit } = useRegisterViewModel(() => {
-        console.log("Account created! Redirecting...");
-    });
+    const { register, errors, isLoading, errorMessage, successMessage, onSubmit, initCheckOwnerExist } = useRegisterViewModel();
+
+    useEffect(() => {
+        initCheckOwnerExist();
+    }, []);
 
     return (
-        <div className='flex flex-col min-h-screen items-center justify-center px-4 py-12 text-zinc-50 antialiased bg-app-background'>
+        <div className='flex flex-col gap-6 min-h-screen items-center justify-center px-4 py-12 text-zinc-50 antialiased bg-app-background'>
 
-            {/* Page Layout Title Header */}
-            <div className="mb-6 text-center">
+            {/* Page Layout Title Header Mobile */}
+            <div className='sm:hidden flex flex-col gap-2 relative' >
+                <ShieldUser className='top-10 self-center' color='#FFBF00' size={70} />
+                <h1 className="text-2xl font-extrabold tracking-wider text-app-primary self-center">
+                    ADMIN OF DEEPOINTS
+                </h1>
+            </div>
+
+            {/* Page Layout Title Header Desktop */}
+            <div className="mb-6 text-center hidden sm:block">
                 <h1 className="text-3xl font-extrabold tracking-wider text-app-primary sm:text-4xl">
                     ADMIN OF DEEPOINTS
                 </h1>
@@ -24,7 +35,7 @@ export default function RegisterPage() {
                 </p>
             </div>
 
-            <Card className='w-screen h-screen sm:h-full sm:max-w-md border-zinc-800 shadow-xl text-zinc-50 bg-app-foreground'>
+            <Card className='h-screen sm:h-full max-w-md border-zinc-800 shadow-xl text-zinc-50 bg-app-foreground'>
                 <CardHeader className="space-y-1">
                     <CardTitle className="text-2xl font-bold text-center tracking-tight text-white">
                         Create an Account

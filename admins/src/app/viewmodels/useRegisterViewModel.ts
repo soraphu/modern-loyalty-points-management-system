@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AuthService } from '../api/authService';
 import type { RegisterFormValues } from '../models/authType';
+import { toast } from 'sonner';
+import { consoleLogOnDev } from '@/config/constant';
 
-export function useRegisterViewModel(onSuccessCallback?: () => void) {
+export function useRegisterViewModel() {
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -23,24 +25,31 @@ export function useRegisterViewModel(onSuccessCallback?: () => void) {
         },
     });
 
+    async function initCheckOwnerExist() {
+        try {
+            await AuthService.checkOwnerExist();
+        } catch (error) {
+            window.location.href = '/login';
+        }
+    }// init check owner exist.
+
     async function handleRegister(values: RegisterFormValues) {
         try {
             setIsLoading(true);
             setErrorMessage(null);
             setSuccessMessage(null);
 
-            const response = await AuthService.register(values);
+            const response: any = await AuthService.register(values);
+
+            consoleLogOnDev(response);
 
             if (response.success) {
                 setSuccessMessage("Account created successfully!");
                 reset(); // Clear form values
-                if (onSuccessCallback) {
-                    onSuccessCallback();
-                }
+                window.location.href = '/login';
             }
         } catch (err: any) {
-            // Catches the string thrown by the API service sheet
-            setErrorMessage(err.message);
+            toast.error(err.msg);
         } finally {
             setIsLoading(false);
         }
@@ -48,6 +57,7 @@ export function useRegisterViewModel(onSuccessCallback?: () => void) {
 
     return {
         register,
+        initCheckOwnerExist,
         errors,
         isLoading,
         errorMessage,
