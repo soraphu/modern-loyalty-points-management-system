@@ -92,7 +92,6 @@ export const adminPath: Record<string, EndpointDocFormat> = {
                         role: "AdminRoles",
                         firstname: "string",
                         lastname: "string",
-                        passwordHashed: "string",
                         createdAt: "Date",
                         updatedAt: "Date"
                     }
