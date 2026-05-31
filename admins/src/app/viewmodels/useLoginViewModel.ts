@@ -3,10 +3,12 @@ import { useForm } from 'react-hook-form';
 import { AuthService } from '../api/authService';
 import type { LoginFormValues } from '../models/authTypes';
 import { consoleLogOnDev } from '@/config/constant';
+import { useAuth } from '@/config/authProvider';
 
 export function useLoginViewModel() {
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const { setLogin } = useAuth();
 
     // Native React Hook Form configuration without Zod dependencies
     const {
@@ -27,11 +29,12 @@ export function useLoginViewModel() {
 
             const res: any = await AuthService.login(values);
 
-            if (res.success) {
-                const accessToken = res.data.access_token;
-                consoleLogOnDev(`AccessToken : ${accessToken}`);
-                // window.location.href = '/home';
-            }
+            const accessToken = res.data.access_token;
+            const admin = res.data.admin;
+            consoleLogOnDev(`AccessToken : ${accessToken}`);
+
+            setLogin(admin, accessToken);
+            window.location.href = '/home';
         } catch (err: any) {
             setErrorMessage(err.msg);
         } finally {
