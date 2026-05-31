@@ -38,6 +38,7 @@ export async function adminLoginController(request: FastifyRequest, reply: Fasti
             msg: 'Login successfully.',
             data: {
                 access_token: accessToken,
+                admin: admin
             }
         });
 
