@@ -7,20 +7,17 @@ export function useHomeViewModel() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Setting browser tab title metadata
-        document.title = 'ADMIN OF DEEPOINTS';
-
         // Simulate reading current user profile session data
         setTimeout(() => {
             setCurrentUser({
                 id: 'usr_9921',
-                username: 'johndoe_admin',
-                firstname: 'John',
-                lastname: 'Doe',
-                role: 'OWNER', // 👈 Change to 'MANAGER' or 'OWNER' to test dynamic button renderings!
+                username: 'soraphu',
+                firstname: 'Soraphu',
+                lastname: 'Thongjun',
+                role: 'OWNER'
             });
             setIsLoading(false);
-        }, 400);
+        }, 1000);
     }, []);
 
     // Role verification helper algorithm
@@ -37,7 +34,7 @@ export function useHomeViewModel() {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('access_token');
+        // localStorage.removeItem('access_token');
         window.location.href = '/login';
     };
 
@@ -47,4 +44,4 @@ export function useHomeViewModel() {
         checkPermission,
         handleLogout
     };
-}
+} //useHomeViewModel

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AuthService } from '../api/authService';
 import type { LoginFormValues } from '../models/authTypes';
-import { toast } from 'sonner';
 import { consoleLogOnDev } from '@/config/constant';
 
 export function useLoginViewModel() {

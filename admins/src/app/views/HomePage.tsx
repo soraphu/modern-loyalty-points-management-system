@@ -1,14 +1,12 @@
 import { useHomeViewModel } from '../viewmodels/useHomeViewModel';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Loader2, QrCode, Ticket, Gift, Users, ShieldCogCorner, History, LogOut, User, ShieldUser, FileClock, type LucideProps } from 'lucide-react';
+import { Loader2, Ticket, Gift, Users, ShieldCogCorner, History, LogOut, User, ShieldUser, FileClock } from 'lucide-react';
+import { NavigateButtonUI } from '@/components/parts/navigate_button_ui';
+import GenerateQrDialog from './GenerateQrDialog';
 
 export default function HomePage() {
     const { currentUser, isLoading, checkPermission, handleLogout } = useHomeViewModel();
-
-    const staffColorSideClassName = 'group-hover:text-blue-400 group-active:text-blue-400';
-    const managerColorSideClassName = 'group-hover:text-amber-400 group-active:text-amber-400';
-    const ownerColorSideClassName = 'group-hover:text-red-400 group-active:text-red-400';
 
     if (isLoading || !currentUser) {
         return (
@@ -16,31 +14,6 @@ export default function HomePage() {
                 <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
             </div>
         );
-    }
-
-    const ActionButton = ({ Icon, iconOnHover, title }: { Icon: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>, iconOnHover: string, title: string }) => {
-        return (
-            <button className='bg-app-foreground cursor-pointer w-full items-center px-6 py-4 border-b border-zinc-800/60 text-left hover:bg-zinc-700 active:bg-zinc-600 transition-colors group'>
-                <div className='transition-transform duration-300 group-hover:translate-x-2 flex flex-row gap-4' >
-                    <Icon className={`h-6 w-6 text-zinc-400 transition-colors ${iconOnHover}`} />
-                    <span className="text-base font-semibold text-zinc-100">{title}</span>
-                </div>
-            </button>
-        )
-    }
-
-    const RoleTitle = () => {
-        const role = currentUser.role;
-        if (role === 'STAFF') return (
-            <span className="underline decoration-green-400 text-green-400 underline-offset-2">{role}</span>
-        )
-        if (role === 'MANAGER') return (
-            <span className="underline  decoration-blue-300 text-blue-300 underline-offset-2">{role}</span>
-        )
-        if (role === 'OWNER') return (
-            <span className="underline decoration-orange-400 text-orange-400 underline-offset-2">{role}</span>
-        )
-
     }
 
     return (
@@ -73,7 +46,7 @@ export default function HomePage() {
                         </h1>
                     </button>
                     <p className="text-xs font-bold uppercase tracking-widest text-blue-100">
-                        ROLE : <RoleTitle />
+                        ROLE : {currentUser.role}
                     </p>
                 </div>
 
@@ -113,10 +86,10 @@ export default function HomePage() {
             <main className="flex-1 w-full max-w-2xl mx-auto px-4 py-6">
                 <div className="flex flex-col border border-zinc-900 bg-zinc-900/40 rounded-xl overflow-hidden shadow-xl ">
 
-                    <ActionButton Icon={QrCode} iconOnHover={staffColorSideClassName} title='Generate Code' />
-                    <ActionButton Icon={Ticket} iconOnHover={staffColorSideClassName} title='Find Voucher' />
-                    <ActionButton Icon={Gift} iconOnHover={staffColorSideClassName} title='All Rewards' />
-                    <ActionButton Icon={FileClock} iconOnHover={staffColorSideClassName} title='Executed Transactions' />
+                    <GenerateQrDialog />
+                    <NavigateButtonUI Icon={Ticket} title='Find Voucher' useColor='STAFF' />
+                    <NavigateButtonUI Icon={Gift} title='All Rewards' useColor='STAFF' />
+                    <NavigateButtonUI Icon={FileClock} title='Executed Transactions' useColor='STAFF' />
 
                     {/* ==========================================
                         CONDITIONAL SEPARATORS AND HIGHER PRIVILEGED BUTTONS
@@ -124,18 +97,17 @@ export default function HomePage() {
                     {checkPermission('MANAGER') && (
                         <>
                             <hr />
-                            <ActionButton Icon={History} iconOnHover={managerColorSideClassName} title='All Transactions' />
-                            <ActionButton Icon={Users} iconOnHover={managerColorSideClassName} title='Manage Customers' />
+                            <NavigateButtonUI Icon={History} useColor='MANAGER' title='All Transactions' />
+                            <NavigateButtonUI Icon={Users} useColor='MANAGER' title='Manage Customers' />
                         </>
                     )}
 
                     {checkPermission('OWNER') && (
                         <>
                             <hr />
-                            <ActionButton Icon={ShieldCogCorner} iconOnHover={ownerColorSideClassName} title='Manage Admins' />
+                            <NavigateButtonUI Icon={ShieldCogCorner} useColor='OWNER' title='Manage Admins' />
                         </>
                     )}
-
                 </div>
             </main>
         </div>
