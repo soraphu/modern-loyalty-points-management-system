@@ -6,6 +6,7 @@ import { ApiResponse } from '../utils/apiResponse';
 import { AdminRoles } from '../generated/prisma/enums';
 import crypto from 'crypto';
 import { Logger } from '../utils/logger';
+import { FastifyReply } from 'fastify/types/reply';
 
 export interface CustomerTokenPayload {
     id: string;
@@ -21,6 +22,7 @@ export class Auth {
     private static readonly ACC_TOKEN_EXPIRY = '15m';
     private static readonly REFRESH_TOKEN_EXPIRY = 30; // in days
 
+
     private static generateAlphanumericCode(): string {
         const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         let code = '';
@@ -31,6 +33,16 @@ export class Auth {
         }
 
         return code;
+    }
+
+    public static setRefreshTokenCookie = (reply: FastifyReply, newRefreshToken: string) => {
+        reply.setCookie('ARFT', newRefreshToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 30 * 24 * 60 * 60 // 30 days in seconds
+        });
     }
 
     public static async returnCustomerPoints(userId: string, pointsAmount: number) {
@@ -88,7 +100,7 @@ export class Auth {
         });
     }// end
 
-    public static async handleAdminLogin(username: string, passwordRaw: string) {
+    public static async handleVerifyAdminLogin(username: string, passwordRaw: string) {
         try {
             // Find the admin by unique username
             const admin = await prisma.admin.findUnique({

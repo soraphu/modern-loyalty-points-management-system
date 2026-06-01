@@ -27,7 +27,7 @@ export async function adminLoginController(request: FastifyRequest, reply: Fasti
 
         Validation.requiredFields(reqBody, ['username', 'password']);
 
-        const admin: any = await Auth.handleAdminLogin(reqBody.username, reqBody.password);
+        const admin: any = await Auth.handleVerifyAdminLogin(reqBody.username, reqBody.password);
         const { id, role, username } = admin;
         const JwtPayload: AdminTokenPayload = { id, role, username }
 
@@ -37,13 +37,7 @@ export async function adminLoginController(request: FastifyRequest, reply: Fasti
         // persist refresh token for revocation/validation
         await Auth.saveHashedRefreshToken(id, refreshToken);
 
-        reply.setCookie('ARFT', refreshToken, {
-            httpOnly: true,
-            secure: CONFIG.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: '/',
-            maxAge: 30 * 24 * 60 * 60 //30 days in seconds
-        });
+        Auth.setRefreshTokenCookie(reply, refreshToken);
 
         logs.info('Admin: ', admin);
 
@@ -89,13 +83,7 @@ export async function adminRefreshTokenController(request: FastifyRequest, reply
         const newRefreshToken = Auth.generateRefreshToken();
         await Auth.saveHashedRefreshToken(adminId, newRefreshToken);
 
-        reply.setCookie('ARFT', newRefreshToken, {
-            httpOnly: true,
-            secure: CONFIG.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: '/',
-            maxAge: 30 * 24 * 60 * 60 // 30 days in seconds
-        });
+        Auth.setRefreshTokenCookie(reply, newRefreshToken);
 
         const res = ApiResponse.success({
             statusCode: 200,
