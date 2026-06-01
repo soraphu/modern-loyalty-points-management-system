@@ -269,10 +269,6 @@ export class Auth {
             });
 
             if (!session) {
-                logs.error('Refresh token not found', {
-                    hashedToken,
-                    plainToken
-                })
                 throw ApiResponse.authTokenInvalid('No matching refresh token found. Please login again.');
             }
 
