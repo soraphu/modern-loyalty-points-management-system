@@ -1,5 +1,5 @@
 import { apiClient } from './apiClient';
-import { useAuth } from './authProvider';
+import { setupAuthHeader, useAuth } from './authProvider';
 import { API_PATH, consoleLogOnDev, filterErrorMessage } from './constant';
 
 // Type definition for any API request function passed as a parameter
@@ -16,14 +16,6 @@ export default function AuthAction() {
         });
     }
 
-    function setupAuthHeader(token: string | null) {
-        if (token) {
-            apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        } else {
-            delete apiClient.defaults.headers.common['Authorization'];
-        }
-    }
-
     async function action<T>(action: AuthenticatedAction<T>): Promise<T> {
         const accessToken = getAccessToken();
 
@@ -34,8 +26,7 @@ export default function AuthAction() {
 
             if (!refreshSuccessful) {
                 consoleLogOnDev("Logout!!! no refresh token or expired.");
-                throw new Error('NO ACCESS TOKEN');
-                // handleLogout();
+                handleLogout();
             }
         }
 
