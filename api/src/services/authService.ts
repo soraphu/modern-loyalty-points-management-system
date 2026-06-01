@@ -269,19 +269,19 @@ export class Auth {
             });
 
             if (!session) {
-                throw ApiResponse.authTokenInvalid();
+                throw ApiResponse.authTokenInvalid('No matching refresh token found. Please login again.');
             }
 
             // 3. Check expiration
             if (new Date() > session.expiresAt) {
                 await prisma.refreshToken.delete({ where: { id: session.id } }).catch(() => { });
-                throw ApiResponse.authTokenInvalid();
+                throw ApiResponse.authTokenInvalid('Refresh token has expired. Please login again.');
             }
 
             return session.adminId;
         } catch (error: any) {
             if (error.statusCode) throw error;
-            throw ApiResponse.authTokenInvalid();
+            throw ApiResponse.internalServerError('An unexpected error occurred while verifying the refresh token.');
         }
     }
 

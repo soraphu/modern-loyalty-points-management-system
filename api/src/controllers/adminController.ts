@@ -64,9 +64,8 @@ export async function adminRefreshTokenController(request: FastifyRequest, reply
     const plainRefreshToken = request.cookies.ARFT;
 
     try {
-
         if (!plainRefreshToken) {
-            throw ApiResponse.fail({ statusCode: 400, msg: 'Refresh token required.', error_code: 'MISSING_REFRESH_TOKEN' });
+            throw ApiResponse.fail({ statusCode: 400, msg: 'No refresh token or token required.', error_code: 'MISSING_REFRESH_TOKEN' });
         }
 
         const adminId = await Auth.verifyRefreshTokenAndGetAdminId(plainRefreshToken);
