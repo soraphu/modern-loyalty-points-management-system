@@ -35,7 +35,7 @@ export const AuthService = {
         }
     },
 
-    async login(payload: LoginFormValues) {
+    async handleLogin(payload: LoginFormValues) {
         try {
             const response = await apiClient.post<LoginResponse>(API_PATH.login, payload);
 

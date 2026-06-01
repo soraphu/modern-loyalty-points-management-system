@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 export function useLoginViewModel() {
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const { setLogin } = useAuth();
+    const { setCurrentAdmin, setAccessToken } = useAuth();
     const navigate = useNavigate();
 
     // Native React Hook Form configuration without Zod dependencies
@@ -29,14 +29,15 @@ export function useLoginViewModel() {
             setIsLoading(true);
             setErrorMessage(null);
 
-            const res: any = await AuthService.login(values);
+            const res: any = await AuthService.handleLogin(values);
 
             const accessToken = res.data.access_token;
             const admin = res.data.admin;
             consoleLogOnDev(`AccessToken : ${accessToken}`);
             consoleLogOnDev(`Admin : ${JSON.stringify(admin)}`);
 
-            setLogin(admin, accessToken);
+            setCurrentAdmin(admin);
+            setAccessToken(accessToken);
             navigate('/home');
         } catch (err: any) {
             setErrorMessage(err.msg);

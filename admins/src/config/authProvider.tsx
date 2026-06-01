@@ -1,5 +1,8 @@
 import type { AdminRole } from '@/app/models/adminTypes';
 import { createContext, useContext, useState, useRef, useCallback, type ReactNode } from 'react';
+import { apiClient } from './apiClient';
+import { API_PATH } from './constant';
+import { toast } from 'sonner';
 
 // 1. Define the TypeScript interfaces
 export interface AdminElements {
@@ -14,9 +17,10 @@ export interface AdminElements {
 interface AuthContextType {
     admin: AdminElements | null;
     isAuthenticated: boolean;
-    setLogin: (userData: AdminElements, accessToken: string) => void;
-    setLogout: () => void;
+    setCurrentAdmin: (adminData: AdminElements) => void;
+    handleLogout: () => void;
     getAccessToken: () => string | null;
+    setAccessToken: (accessToken: string) => void;
 }
 
 interface AuthProviderProps {
@@ -32,15 +36,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const tokenRef = useRef<string | null>(null);
 
     // Log the user in and save the token silently in the ref
-    const setLogin = useCallback((userData: AdminElements, accessToken: string) => {
+    const setCurrentAdmin = useCallback((adminData: AdminElements) => {
+        setAdmin(adminData); // Triggers single re-render to switch UI to Auth state
+    }, []);
+
+    const setAccessToken = useCallback((accessToken: string) => {
         tokenRef.current = accessToken;
-        setAdmin(userData); // Triggers single re-render to switch UI to Auth state
     }, []);
 
     // Log the user out and clean memory
-    const setLogout = useCallback(() => {
-        tokenRef.current = null;
-        setAdmin(null);
+    const handleLogout = useCallback(async () => {
+        try {
+            await apiClient.post(API_PATH.logout, {});
+            tokenRef.current = null;
+            setAdmin(null);
+            window.location.href = '/login';
+        } catch (error) {
+            toast.error('Logout failed. Please try again.');
+        }
     }, []);
 
     // Safe method for API abstraction layers to fetch the string securely
@@ -51,11 +64,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const isAuthenticated = !!admin;
 
     return (
-        <AuthContext.Provider value={{ admin, isAuthenticated, setLogin, setLogout, getAccessToken }}>
+        <AuthContext.Provider value={{ admin, isAuthenticated, setCurrentAdmin, handleLogout, getAccessToken, setAccessToken }}>
             {children}
         </ AuthContext.Provider >
     );
-}
+}//AuthProvider
 
 // 4. Custom Hook with built-in Type Guard checking
 export function useAuth(): AuthContextType {

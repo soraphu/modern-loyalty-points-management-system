@@ -1,4 +1,4 @@
-import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
+import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import axios from 'axios';
 
 export const apiClient: AxiosInstance = axios.create({
@@ -11,18 +11,6 @@ export const apiClient: AxiosInstance = axios.create({
         'Content-Type': 'application/json',
         'Accept': 'application/json',
     },
-});
-
-apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-    // Look into data tier (localStorage, context session) for a valid login token
-    const token = localStorage.getItem('access_token');
-
-    // If a token exists, inject it securely into the HTTP Authorization header frame
-    if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    return config;
 });
 
 // apiClient.interceptors.response.use(
