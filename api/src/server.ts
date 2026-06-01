@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import fastifyEnv from '@fastify/env';
 import fastifyJwt from '@fastify/jwt';
+import fastifyCookie from '@fastify/cookie';
 import { Logger } from './utils/logger';
 import { ApiResponse } from './utils/apiResponse';
 import { customerRoutes } from './routes/customerRoutes';
@@ -59,8 +60,7 @@ const startServer = async () => {
             methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 
             // CRITICAL: Must include 'authorization' to allow your Axios Interceptor token through
-            allowedHeaders: ['Content-Type', 'Authorization'],
-
+            allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
             credentials: true, // Allows cross-origin cookies or auth headers to pass
         });
 
@@ -70,6 +70,9 @@ const startServer = async () => {
         fastify.register(fastifyJwt, {
             secret: CONFIG.JWT_SECRET
         });
+
+        // register cookie support for HttpOnly refresh tokens
+        await fastify.register(fastifyCookie);
 
         await fastify.register(adminRoutes, { prefix: `${apiPrefix}/admin` });
         await fastify.register(customerRoutes, { prefix: `${apiPrefix}/customer` });

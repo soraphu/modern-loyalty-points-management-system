@@ -85,8 +85,8 @@ export class ApiResponse {
      * Semantic Error: 404 Not Found
      * Triggered when a database record or specific asset does not exist
      */
-    static resourceNotFound(msg = 'The requested resource could not be found'): ReponseFailedType {
-        return this.fail({ msg, statusCode: 404, error_code: "ACC_TOKEN_MISSING" });
+    static resourceNotFound({ msg = 'The requested resource could not be found', error_code = 'NOT_FOUND' }): ReponseFailedType {
+        return this.fail({ msg, statusCode: 404, error_code });
     }
 
     /**

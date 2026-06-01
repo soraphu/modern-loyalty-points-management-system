@@ -5,7 +5,7 @@ export const CONFIG = {
     JWT_SECRET: process.env.JWT_SECRET || 'super-secret-dee-points-key-xx',
     API_PREFIX: '/api/v1',
     API_DEFAULT_LIMIT: 20,
-
+    NODE_ENV: process.env.NODE_ENV || 'development',
     SALT_ROUNDS: 10,
 };
 

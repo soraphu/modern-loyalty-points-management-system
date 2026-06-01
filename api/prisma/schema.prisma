@@ -54,7 +54,8 @@ model Admin {
   createdAt      DateTime   @default(now()) @map("created_at") @db.Timestamptz
   updatedAt      DateTime   @default(now()) @map("updated_at") @db.Timestamptz
 
-  qrCodes QrCode[]
+  qrCodes       QrCode[]
+  refreshTokens RefreshToken[]
 
   @@map("admins")
 }
@@ -126,4 +127,17 @@ model Voucher {
   reward Reward @relation(fields: [rewardId], references: [id], onDelete: Restrict)
 
   @@map("vouchers")
+}
+
+model RefreshToken {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  adminId     String   @unique @map("admin_id") @db.Uuid
+  hashedToken String   @unique @map("hashed_token")
+  revoked     Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  expiresAt   DateTime @map("expires_at") @db.Timestamptz
+
+  admin Admin @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
 }

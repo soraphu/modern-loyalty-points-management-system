@@ -232,4 +232,85 @@ export class Auth {
         }
     }
 
+    /**
+     * Issue a refresh token with longer expiry
+     */
+    public static generateRefreshToken(): string {
+        return crypto.randomBytes(64).toString('hex');
+    }
+
+    /**
+     * Verify and decode incoming refresh token
+     */
+    public static async verifyRefreshTokenAndGetAdminId(plainToken: string): Promise<string> {
+        try {
+            // 1. Hash the incoming plain token from the client to match your database records
+            const hashedToken = crypto.createHash('sha256').update(plainToken).digest('hex');
+
+            // 2. Look up the HASHED token in the database
+            const session = await prisma.refreshToken.findUnique({
+                where: { hashedToken }
+            });
+
+            if (!session) {
+                throw ApiResponse.authTokenInvalid();
+            }
+
+            // 3. Check expiration
+            if (new Date() > session.expiresAt) {
+                await prisma.refreshToken.delete({ where: { id: session.id } }).catch(() => { });
+                throw ApiResponse.authTokenInvalid();
+            }
+
+            return session.adminId;
+        } catch (error: any) {
+            if (error.statusCode) throw error;
+            throw ApiResponse.authTokenInvalid();
+        }
+    }
+
+    /**
+     * Persist a refresh token record to database for future revocation/validation
+     */
+    public static async saveRefreshToken(adminId: string, token: string) {
+        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+        try {
+            // Derive expiry from token `exp` claim
+            const decoded: any = fastify.jwt.decode(hashedToken);
+            const expiresAt = decoded ? new Date(decoded.exp * 1000) : null;
+
+            if (!expiresAt) throw new Error('Decoded token missing exp claim');
+
+            // Use upsert to handle the "Insert or Update" logic seamlessly
+            return await prisma.refreshToken.upsert({
+                // 1. Where to look for a duplicate condition
+                where: {
+                    adminId: adminId,
+                },
+                create: {
+                    adminId,
+                    hashedToken,
+                    expiresAt,
+                    createdAt: new Date(),
+                },
+                update: {
+                    hashedToken,
+                    expiresAt: expiresAt,
+                },
+            });
+        } catch (error) {
+            console.error("Error executing token upsert operational matrix:", error);
+            throw ApiResponse.internalServerError('Unable to save refresh token an unexpected internal server error occurred.');
+        }
+    }
+
+    public static async revokeRefreshToken(token: string) {
+        try {
+            return await prisma.refreshToken.update({ where: { hashedToken: token }, data: { revoked: true } });
+        } catch (error) {
+            throw ApiResponse.internalServerError('Unable to revoke refresh token an unexpected internal server error occurred.');
+        }
+    }
+
 }//end class

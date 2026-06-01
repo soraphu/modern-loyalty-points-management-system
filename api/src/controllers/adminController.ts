@@ -4,6 +4,8 @@ import { Validation } from '../utils/validation';
 import { OwnerService } from '../services/ownerService';
 import { ApiResponse } from '../utils/apiResponse';
 import { Auth } from '../services/authService';
+import { CONFIG } from '../config/constants';
+import { fastify } from '../server';
 import { AdminRoles } from '../generated/prisma/enums';
 import { StaffService } from '../services/staffService';
 import { ManagerService } from '../services/managerService';
@@ -30,6 +32,18 @@ export async function adminLoginController(request: FastifyRequest, reply: Fasti
         const JwtPayload: AdminTokenPayload = { id, role, username }
 
         const accessToken = Auth.generateAccessToken(JwtPayload);
+        const refreshToken = Auth.generateRefreshToken();
+
+        // persist refresh token for revocation/validation
+        await Auth.saveRefreshToken(id, refreshToken);
+
+        reply.setCookie('ARFT', refreshToken, {
+            httpOnly: true,
+            secure: CONFIG.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 30 * 24 * 60 * 60 //30 days in seconds
+        });
 
         logs.info('Admin: ', admin);
 
@@ -40,6 +54,53 @@ export async function adminLoginController(request: FastifyRequest, reply: Fasti
                 access_token: accessToken,
                 admin: admin
             }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
+    }
+}//end
+
+export async function adminRefreshTokenController(request: FastifyRequest, reply: FastifyReply) {
+    const plainRefreshToken = request.cookies.ARFT;
+
+    try {
+
+        if (!plainRefreshToken) {
+            throw ApiResponse.fail({ statusCode: 400, msg: 'Refresh token required.', error_code: 'MISSING_REFRESH_TOKEN' });
+        }
+
+        const adminId = await Auth.verifyRefreshTokenAndGetAdminId(plainRefreshToken);
+        logs.info('Decoded refresh token: ', adminId);
+
+        const accessTokenPayload = await prisma.admin.findUnique({ where: { id: adminId }, select: { id: true, role: true, username: true } });
+
+        if (!accessTokenPayload) throw ApiResponse.resourceNotFound({ msg: 'Admin not found', error_code: 'ADMIN_NOT_FOUND' });
+
+        // generate new access token
+        const newAccessToken = Auth.generateAccessToken(accessTokenPayload);
+
+        // rotate refresh token: issue new one, save and revoke old
+        const newRefreshToken = Auth.generateRefreshToken();
+        await Auth.saveRefreshToken(adminId, newRefreshToken);
+
+        reply.setCookie('ARFT', newRefreshToken, {
+            httpOnly: true,
+            secure: CONFIG.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 30 * 24 * 60 * 60 // 30 days in seconds
+        });
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: 'Refresh token accepted.',
+            data: { access_token: newAccessToken }
         });
 
         return reply.status(res.statusCode).send(res.payload);
