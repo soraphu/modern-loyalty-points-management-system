@@ -35,7 +35,7 @@ export async function adminLoginController(request: FastifyRequest, reply: Fasti
         const refreshToken = Auth.generateRefreshToken();
 
         // persist refresh token for revocation/validation
-        await Auth.saveRefreshToken(id, refreshToken);
+        await Auth.saveHashedRefreshToken(id, refreshToken);
 
         reply.setCookie('ARFT', refreshToken, {
             httpOnly: true,
@@ -87,7 +87,7 @@ export async function adminRefreshTokenController(request: FastifyRequest, reply
 
         // rotate refresh token: issue new one, save and revoke old
         const newRefreshToken = Auth.generateRefreshToken();
-        await Auth.saveRefreshToken(adminId, newRefreshToken);
+        await Auth.saveHashedRefreshToken(adminId, newRefreshToken);
 
         reply.setCookie('ARFT', newRefreshToken, {
             httpOnly: true,

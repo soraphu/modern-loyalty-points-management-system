@@ -5,6 +5,7 @@ import { prisma } from '../config/database';
 import { ApiResponse } from '../utils/apiResponse';
 import { AdminRoles } from '../generated/prisma/enums';
 import crypto from 'crypto';
+import { Logger } from '../utils/logger';
 
 export interface CustomerTokenPayload {
     id: string;
@@ -14,8 +15,11 @@ export interface CustomerTokenPayload {
     role: 'customer';
 }
 
+const logs = new Logger('AuthService');
+
 export class Auth {
-    private static readonly TOKEN_EXPIRY = '7d';
+    private static readonly ACC_TOKEN_EXPIRY = '15m';
+    private static readonly REFRESH_TOKEN_EXPIRY = 30; // in days
 
     private static generateAlphanumericCode(): string {
         const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -126,7 +130,7 @@ export class Auth {
      */
     public static generateAccessToken(payload: object): string {
         return fastify.jwt.sign(payload, {
-            expiresIn: this.TOKEN_EXPIRY,
+            expiresIn: this.ACC_TOKEN_EXPIRY,
         });
     }// end
 
@@ -272,15 +276,13 @@ export class Auth {
     /**
      * Persist a refresh token record to database for future revocation/validation
      */
-    public static async saveRefreshToken(adminId: string, token: string) {
+    public static async saveHashedRefreshToken(adminId: string, token: string) {
         const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
         try {
             // Derive expiry from token `exp` claim
-            const decoded: any = fastify.jwt.decode(hashedToken);
-            const expiresAt = decoded ? new Date(decoded.exp * 1000) : null;
-
-            if (!expiresAt) throw new Error('Decoded token missing exp claim');
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + this.REFRESH_TOKEN_EXPIRY);
 
             // Use upsert to handle the "Insert or Update" logic seamlessly
             return await prisma.refreshToken.upsert({
@@ -292,15 +294,14 @@ export class Auth {
                     adminId,
                     hashedToken,
                     expiresAt,
-                    createdAt: new Date(),
                 },
                 update: {
                     hashedToken,
-                    expiresAt: expiresAt,
+                    expiresAt,
                 },
             });
         } catch (error) {
-            console.error("Error executing token upsert operational matrix:", error);
+            logs.error('Error saving refresh token:', error);
             throw ApiResponse.internalServerError('Unable to save refresh token an unexpected internal server error occurred.');
         }
     }
