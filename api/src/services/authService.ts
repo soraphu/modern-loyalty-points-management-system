@@ -38,8 +38,8 @@ export class Auth {
     public static setRefreshTokenCookie = (reply: FastifyReply, newRefreshToken: string) => {
         reply.setCookie('ARFT', newRefreshToken, {
             httpOnly: true,
-            secure: true,
-            sameSite: 'none',
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             path: '/',
             maxAge: 30 * 24 * 60 * 60 // 30 days in seconds
         });

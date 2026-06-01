@@ -61,6 +61,7 @@ export async function adminLoginController(request: FastifyRequest, reply: Fasti
 }//end
 
 export async function adminRefreshTokenController(request: FastifyRequest, reply: FastifyReply) {
+    logs.info('Fucking request: ');
     const plainRefreshToken = request.cookies.ARFT;
 
     try {
@@ -69,20 +70,16 @@ export async function adminRefreshTokenController(request: FastifyRequest, reply
         }
 
         const adminId = await Auth.verifyRefreshTokenAndGetAdminId(plainRefreshToken);
-        logs.info('Decoded refresh token: ', adminId);
+        logs.info('Admin id: ', adminId);
 
         const accessTokenPayload = await prisma.admin.findUnique({ where: { id: adminId }, select: { id: true, role: true, username: true } });
 
         if (!accessTokenPayload) throw ApiResponse.resourceNotFound({ msg: 'Admin not found', error_code: 'ADMIN_NOT_FOUND' });
 
-        // generate new access token
+        // Expand refresh token life time.
         const newAccessToken = Auth.generateAccessToken(accessTokenPayload);
-
-        // rotate refresh token: issue new one, save and revoke old
-        const newRefreshToken = Auth.generateRefreshToken();
-        await Auth.saveHashedRefreshToken(adminId, newRefreshToken);
-
-        Auth.setRefreshTokenCookie(reply, newRefreshToken);
+        await Auth.saveHashedRefreshToken(adminId, plainRefreshToken);
+        Auth.setRefreshTokenCookie(reply, plainRefreshToken);
 
         const res = ApiResponse.success({
             statusCode: 200,
@@ -92,7 +89,7 @@ export async function adminRefreshTokenController(request: FastifyRequest, reply
 
         return reply.status(res.statusCode).send(res.payload);
     } catch (error: any) {
-        logs.error(error);
+        logs.error('error', error);
         let serverError = error;
         if (!serverError.payload) serverError = ApiResponse.internalServerError();
 
