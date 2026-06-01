@@ -150,7 +150,7 @@ export class Auth {
      * Decodes and verifies an incoming JWT access token.
      * Throws an error if the token is invalid, tampered with, or expired.
      */
-    public static verifyAndDecodeToken<T extends object>(token: string): T {
+    public static verifyAndDecodeAccessToken<T extends object>(token: string): T {
         try {
             return fastify.jwt.verify<T>(token);
         } catch (error: any) {
@@ -318,11 +318,11 @@ export class Auth {
         }
     }
 
-    public static async revokeRefreshToken(token: string) {
+    public static async revokeRefreshToken(adminId: string) {
         try {
-            return await prisma.refreshToken.update({ where: { hashedToken: token }, data: { revoked: true } });
+            return await prisma.refreshToken.deleteMany({ where: { adminId } });
         } catch (error) {
-            throw ApiResponse.internalServerError('Unable to revoke refresh token an unexpected internal server error occurred.');
+            logs.error('Error revoking refresh token:', error);
         }
     }
 

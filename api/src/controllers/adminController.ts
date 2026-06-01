@@ -60,8 +60,33 @@ export async function adminLoginController(request: FastifyRequest, reply: Fasti
     }
 }//end
 
+export async function adminLogoutController(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodedPayload = Auth.verifyAndDecodeAccessToken<AdminTokenPayload>(accessToken);
+        logs.info('Decode Payload: ', decodedPayload);
+
+        await Auth.revokeRefreshToken(decodedPayload.id);
+
+        Auth.setRefreshTokenCookie(reply, ''); // Clear the refresh token cookie
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: 'Logout successful.',
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
+    }
+}//end
+
 export async function adminRefreshTokenController(request: FastifyRequest, reply: FastifyReply) {
-    logs.info('Fucking request: ');
     const plainRefreshToken = request.cookies.ARFT;
 
     try {
@@ -79,7 +104,7 @@ export async function adminRefreshTokenController(request: FastifyRequest, reply
         // Expand refresh token life time.
         const newAccessToken = Auth.generateAccessToken(accessTokenPayload);
         await Auth.saveHashedRefreshToken(adminId, plainRefreshToken);
-        Auth.setRefreshTokenCookie(reply, plainRefreshToken);
+        Auth.setRefreshTokenCookie(reply, 'plainRefreshToken');
 
         const res = ApiResponse.success({
             statusCode: 200,
@@ -101,7 +126,7 @@ export async function adminGetTokenPayloadController(request: FastifyRequest, re
     try {
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodedPayload = Auth.verifyAndDecodeToken<AdminTokenPayload>(accessToken);
+        const decodedPayload = Auth.verifyAndDecodeAccessToken<AdminTokenPayload>(accessToken);
         logs.info('Decode Payload: ', decodedPayload);
 
         const res = ApiResponse.success({
@@ -124,7 +149,7 @@ export async function adminGetProfileController(request: FastifyRequest, reply: 
     try {
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodedPayload = Auth.verifyAndDecodeToken<AdminTokenPayload>(accessToken);
+        const decodedPayload = Auth.verifyAndDecodeAccessToken<AdminTokenPayload>(accessToken);
         logs.info('Decode Payload: ', decodedPayload);
 
         const adminProfile = await Auth.getAdminProfile(decodedPayload.id);
@@ -154,7 +179,7 @@ export async function generatePointsTokenController(request: FastifyRequest, rep
 
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload: any = Auth.verifyAndDecodeToken<AdminTokenPayload>(accessToken);
+        const decodePayload: any = Auth.verifyAndDecodeAccessToken<AdminTokenPayload>(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
         const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });
@@ -186,7 +211,7 @@ export async function queryTargetVoucherController(request: FastifyRequest, repl
     try {
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        const decodePayload: any = Auth.verifyAndDecodeAccessToken(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
         const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });
@@ -217,7 +242,7 @@ export async function settleVoucherController(request: FastifyRequest, reply: Fa
     try {
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        const decodePayload: any = Auth.verifyAndDecodeAccessToken(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
         const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });
@@ -292,7 +317,7 @@ export async function fetchRewardsController(request: FastifyRequest, reply: Fas
     try {
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        const decodePayload: any = Auth.verifyAndDecodeAccessToken(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
         await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });
@@ -322,7 +347,7 @@ export async function cancelVoucherController(request: FastifyRequest, reply: Fa
     try {
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        const decodePayload: any = Auth.verifyAndDecodeAccessToken(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
         const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });
@@ -357,7 +382,7 @@ export async function createRewardController(request: FastifyRequest, reply: Fas
 
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        const decodePayload: any = Auth.verifyAndDecodeAccessToken(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
         await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'MANAGER' });
@@ -387,7 +412,7 @@ export async function deleteRewardController(request: FastifyRequest, reply: Fas
     try {
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        const decodePayload: any = Auth.verifyAndDecodeAccessToken(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
         await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'MANAGER' });
@@ -420,7 +445,7 @@ export async function adjustRewardStateController(request: FastifyRequest, reply
 
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        const decodePayload: any = Auth.verifyAndDecodeAccessToken(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
         await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'MANAGER' });
@@ -448,7 +473,7 @@ export async function fetchCustomersController(request: FastifyRequest, reply: F
     try {
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        const decodePayload: any = Auth.verifyAndDecodeAccessToken(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
         await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'MANAGER' });
@@ -483,7 +508,7 @@ export async function manualPointsOverrideController(request: FastifyRequest, re
 
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        const decodePayload: any = Auth.verifyAndDecodeAccessToken(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
         await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'MANAGER' });
@@ -515,7 +540,7 @@ export async function fetchAdminDirectoryController(request: FastifyRequest, rep
     try {
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload = Auth.verifyAndDecodeToken<AdminTokenPayload>(accessToken);
+        const decodePayload = Auth.verifyAndDecodeAccessToken<AdminTokenPayload>(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
         const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'OWNER' });
@@ -546,7 +571,7 @@ export async function createAdminController(request: FastifyRequest, reply: Fast
     try {
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload = Auth.verifyAndDecodeToken<AdminTokenPayload>(accessToken);
+        const decodePayload = Auth.verifyAndDecodeAccessToken<AdminTokenPayload>(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
         const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'OWNER' });
@@ -601,7 +626,7 @@ export async function modifyAdminRoleController(request: FastifyRequest, reply: 
 
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        const decodePayload: any = Auth.verifyAndDecodeAccessToken(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
         const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'OWNER' });
@@ -636,7 +661,7 @@ export async function forcePasswordResetController(request: FastifyRequest, repl
 
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload = Auth.verifyAndDecodeToken<AdminTokenPayload>(accessToken);
+        const decodePayload = Auth.verifyAndDecodeAccessToken<AdminTokenPayload>(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
         const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'OWNER' });
@@ -667,7 +692,7 @@ export async function deleteAdminController(request: FastifyRequest, reply: Fast
     try {
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload = Auth.verifyAndDecodeToken<AdminTokenPayload>(accessToken);
+        const decodePayload = Auth.verifyAndDecodeAccessToken<AdminTokenPayload>(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
         const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'OWNER' });

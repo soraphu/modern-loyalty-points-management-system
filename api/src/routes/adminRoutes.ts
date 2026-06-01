@@ -21,7 +21,8 @@ import {
     adminGetTokenPayloadController,
     registerOwnerController,
     isOwnerExistController,
-    adminRefreshTokenController
+    adminRefreshTokenController,
+    adminLogoutController
 } from '../controllers/adminController';
 
 export async function adminRoutes(fastify: FastifyInstance) {
@@ -38,6 +39,8 @@ export async function adminRoutes(fastify: FastifyInstance) {
     // Exchange refresh token for new access token
     // POST -> /api/v1/admin/refresh
     fastify.get('/auth/refresh', adminRefreshTokenController);
+
+    fastify.post('/logout', adminLogoutController);
 
     // Get Admin Payload
     fastify.get('/payload', adminGetTokenPayloadController);

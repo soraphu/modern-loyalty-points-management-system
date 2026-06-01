@@ -49,7 +49,7 @@ export async function earnPointsController(request: FastifyRequest, reply: Fasti
         const accessToken: string = Validation.requireAuthHeader(request);
         logs.success('AccessToken: ', accessToken);
 
-        const decodePayload = Auth.verifyAndDecodeToken<CustomerPayload>(accessToken);
+        const decodePayload = Auth.verifyAndDecodeAccessToken<CustomerPayload>(accessToken);
 
         Validation.requiredFields(jsonBody, ['code_string']);
 
@@ -71,7 +71,7 @@ export async function fetchTransactionsController(request: FastifyRequest, reply
     try {
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload = Auth.verifyAndDecodeToken<CustomerPayload>(accessToken);
+        const decodePayload = Auth.verifyAndDecodeAccessToken<CustomerPayload>(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
         const customerTransactions = await CustomerService.fetchCustomerTransactions(decodePayload.id);
@@ -96,7 +96,7 @@ export async function fetchRewardsController(request: FastifyRequest, reply: Fas
     try {
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload: any = Auth.verifyAndDecodeToken(accessToken);
+        const decodePayload: any = Auth.verifyAndDecodeAccessToken(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
         const rewards = await CustomerService.fetchAvailableRewards();
@@ -123,7 +123,7 @@ export async function redeemRewardController(request: FastifyRequest, reply: Fas
 
         const accessToken = Validation.requireAuthHeader(request);
 
-        const decodePayload = Auth.verifyAndDecodeToken<CustomerPayload>(accessToken);
+        const decodePayload = Auth.verifyAndDecodeAccessToken<CustomerPayload>(accessToken);
 
         const voucher = await CustomerService.redeemReward(decodePayload.id, rewardId);
 
