@@ -1,30 +1,23 @@
 import { useState, useEffect } from 'react';
-import type { UserProfile, UserRole } from '../models/homeTypes';
+import type { AdminRole } from '../models/adminTypes';
+import { useAuth, type AdminElements } from '@/config/authProvider';
 
 export function useHomeViewModel() {
     // Mocking the active user session. In production, this can come from your Auth Context!
-    const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+    const [currentUser, setCurrentUser] = useState<AdminElements | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const { admin } = useAuth();
 
     useEffect(() => {
-        // Simulate reading current user profile session data
-        setTimeout(() => {
-            setCurrentUser({
-                id: 'usr_9921',
-                username: 'soraphu',
-                firstname: 'Soraphu',
-                lastname: 'Thongjun',
-                role: 'OWNER'
-            });
-            setIsLoading(false);
-        }, 1000);
+        setCurrentUser(admin);
+        setIsLoading(false);
     }, []);
 
     // Role verification helper algorithm
-    const checkPermission = (requiredRole: UserRole): boolean => {
+    const checkPermission = (requiredRole: AdminRole): boolean => {
         if (!currentUser) return false;
 
-        const roleHierarchy: Record<UserRole, number> = {
+        const roleHierarchy: Record<AdminRole, number> = {
             'STAFF': 1,
             'MANAGER': 2,
             'OWNER': 3
@@ -41,6 +34,7 @@ export function useHomeViewModel() {
     return {
         currentUser,
         isLoading,
+        admin,
         checkPermission,
         handleLogout
     };

@@ -1,17 +1,20 @@
+import type { AdminRole } from '@/app/models/adminTypes';
 import { createContext, useContext, useState, useRef, useCallback, type ReactNode } from 'react';
 
 // 1. Define the TypeScript interfaces
-export interface AdminType {
+export interface AdminElements {
     id: string;
-    name: string;
-    email: string;
-    role: string;
+    username: string;
+    firstname: string;
+    lastname: string;
+    role: AdminRole;
+    avatarUrl?: string;
 }
 
 interface AuthContextType {
-    admin: AdminType | null;
+    admin: AdminElements | null;
     isAuthenticated: boolean;
-    setLogin: (userData: AdminType, accessToken: string) => void;
+    setLogin: (userData: AdminElements, accessToken: string) => void;
     setLogout: () => void;
     getAccessToken: () => string | null;
 }
@@ -25,11 +28,11 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 // 3. Create the Provider Component
 export function AuthProvider({ children }: AuthProviderProps) {
-    const [admin, setAdmin] = useState<AdminType | null>(null);
+    const [admin, setAdmin] = useState<AdminElements | null>(null);
     const tokenRef = useRef<string | null>(null);
 
     // Log the user in and save the token silently in the ref
-    const setLogin = useCallback((userData: AdminType, accessToken: string) => {
+    const setLogin = useCallback((userData: AdminElements, accessToken: string) => {
         tokenRef.current = accessToken;
         setAdmin(userData); // Triggers single re-render to switch UI to Auth state
     }, []);

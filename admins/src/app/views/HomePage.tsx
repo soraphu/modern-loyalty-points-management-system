@@ -6,9 +6,9 @@ import { NavigateButtonUI } from '@/components/parts/navigate_button_ui';
 import GenerateQrDialog from './GenerateQrDialog';
 
 export default function HomePage() {
-    const { currentUser, isLoading, checkPermission, handleLogout } = useHomeViewModel();
+    const { admin, isLoading, checkPermission, handleLogout } = useHomeViewModel();
 
-    if (isLoading || !currentUser) {
+    if (isLoading || !admin) {
         return (
             <div className="flex min-h-screen items-center justify-center bg-zinc-950 text-zinc-50">
                 <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
@@ -35,7 +35,7 @@ export default function HomePage() {
                         </button>
                     </div>
                     <p className="text-xs font-bold uppercase tracking-widest text-blue-100">
-                        ROLE : <span className="underline decoration-white underline-offset-2">{currentUser.role}</span>
+                        ROLE : <span className="underline decoration-white underline-offset-2">{admin.role}</span>
                     </p>
                 </div>
 
@@ -46,7 +46,7 @@ export default function HomePage() {
                         </h1>
                     </button>
                     <p className="text-xs font-bold uppercase tracking-widest text-blue-100">
-                        ROLE : {currentUser.role}
+                        ROLE : {admin.role}
                     </p>
                 </div>
 
@@ -54,9 +54,9 @@ export default function HomePage() {
                 <DropdownMenu>
                     <DropdownMenuTrigger className="focus:outline-none">
                         <Avatar className="h-11 w-11 border-2 border-blue-400 hover:opacity-90 transition-opacity cursor-pointer shadow-md">
-                            <AvatarImage src={currentUser.avatarUrl} alt={currentUser.username} />
+                            <AvatarImage src={admin.avatarUrl} alt={admin.username} />
                             <AvatarFallback className="bg-zinc-800 text-zinc-200 font-semibold uppercase">
-                                {currentUser.firstname[0]}{currentUser.lastname[0]}
+                                {admin.firstname[0]}{admin.lastname[0]}
                             </AvatarFallback>
                         </Avatar>
                     </DropdownMenuTrigger>
@@ -64,8 +64,8 @@ export default function HomePage() {
                     <DropdownMenuContent align="end" className="w-56 bg-app-foreground border-zinc-800 text-zinc-200">
                         <DropdownMenuLabel className="font-normal">
                             <div className="flex flex-col space-y-1">
-                                <p className="text-sm font-medium leading-none text-white">{currentUser.firstname} {currentUser.lastname}</p>
-                                <p className="text-xs leading-none text-zinc-400">@{currentUser.username}</p>
+                                <p className="text-sm font-medium leading-none text-white">{admin.firstname} {admin.lastname}</p>
+                                <p className="text-xs leading-none text-zinc-400">@{admin.username}</p>
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator className="bg-zinc-600" />
