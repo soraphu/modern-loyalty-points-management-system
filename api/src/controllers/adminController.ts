@@ -62,12 +62,14 @@ export async function adminLoginController(request: FastifyRequest, reply: Fasti
 
 export async function adminLogoutController(request: FastifyRequest, reply: FastifyReply) {
     try {
-        const accessToken = Validation.requireAuthHeader(request);
+        try {
+            const accessToken = Validation.requireAuthHeader(request);
+            const decodedPayload = Auth.verifyAndDecodeAccessToken<AdminTokenPayload>(accessToken);
+            logs.info('Decode Payload: ', decodedPayload);
 
-        const decodedPayload = Auth.verifyAndDecodeAccessToken<AdminTokenPayload>(accessToken);
-        logs.info('Decode Payload: ', decodedPayload);
-
-        await Auth.revokeRefreshToken(decodedPayload.id);
+            await Auth.revokeRefreshToken(decodedPayload.id);
+        } catch (error) {
+        }
 
         Auth.setRefreshTokenCookie(reply, ''); // Clear the refresh token cookie
 
@@ -104,7 +106,7 @@ export async function adminRefreshTokenController(request: FastifyRequest, reply
         // Expand refresh token life time.
         const newAccessToken = Auth.generateAccessToken(accessTokenPayload);
         await Auth.saveHashedRefreshToken(adminId, plainRefreshToken);
-        Auth.setRefreshTokenCookie(reply, 'plainRefreshToken');
+        Auth.setRefreshTokenCookie(reply, plainRefreshToken);
 
         const res = ApiResponse.success({
             statusCode: 200,

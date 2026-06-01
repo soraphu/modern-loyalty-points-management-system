@@ -2,6 +2,7 @@ import type { AdminRole } from '@/app/models/adminTypes';
 import { createContext, useContext, useState, useRef, useCallback, type ReactNode } from 'react';
 import { apiClient } from './apiClient';
 import { API_PATH, consoleLogOnDev } from './constant';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 // 1. Define the TypeScript interfaces
@@ -43,7 +44,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const [admin, setAdmin] = useState<AdminElements | null>(null);
     const tokenRef = useRef<string | null>(null);
 
-
     // Log the user in and save the token silently in the ref
     const setCurrentAdmin = useCallback((adminData: AdminElements) => {
         setAdmin(adminData); // Triggers single re-render to switch UI to Auth state
@@ -57,14 +57,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const handleLogout = useCallback(async () => {
         try {
             setupAuthHeader(tokenRef.current);
-            await apiClient.post(API_PATH.logout, {});
+            await apiClient.post('/logout', {});
 
+        } catch (error: any) {
+            consoleLogOnDev(error.response);
+            toast.error('Logout failed. Please try again before leaving the page.');
+        } finally {
             tokenRef.current = null;
             setAdmin(null);
             window.location.href = '/login';
-        } catch (error: any) {
-            consoleLogOnDev(error.response);
-            toast.error('Logout failed. Please try again.');
         }
     }, []);
 
