@@ -90,7 +90,7 @@ export class Validation {
         }
 
         if (!authHeader.startsWith('Bearer ')) {
-            throw ApiResponse.authTokenInvalid();
+            throw ApiResponse.authTokenMissing();
         }
 
         // Returns the clean token string in case the controller needs it
