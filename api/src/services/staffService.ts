@@ -10,6 +10,7 @@ import { Validation } from '../utils/validation';
 const logs = new Logger('StaffService');
 
 export class StaffService {
+    private static pointsTokenExpiresInMinute = 15;
 
     /**
      * Ref: Gen Points Token.yml (POST {{baseURL}}{{ApiURL}}/admin/points-token)
@@ -21,7 +22,7 @@ export class StaffService {
 
             // Set an expiration timeframe (e.g., valid for 24 hours)
             const expiresAt = new Date();
-            expiresAt.setHours(expiresAt.getHours() + 24);
+            expiresAt.setMinutes(expiresAt.getMinutes() + this.pointsTokenExpiresInMinute);
 
             const uniqueHashedCodeString = await Auth.hashToken(uniqueCodeString);
 
