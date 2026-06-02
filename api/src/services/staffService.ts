@@ -177,4 +177,87 @@ export class StaffService {
             throw ApiResponse.internalServerError('Unable to retrieve available store rewards, an unexpected internal server error occurred.');
         }
     }
+
+    /**
+     * Fetch all transactions in the system
+     * MANAGER role can fetch all transactions
+     */
+    public static async fetchAllTransactions() {
+        try {
+            return await prisma.transaction.findMany({
+                select: {
+                    id: true,
+                    userId: true,
+                    adminId: true,
+                    referenceId: true,
+                    pointsAmount: true,
+                    type: true,
+                    createdAt: true,
+                    user: {
+                        select: {
+                            id: true,
+                            lineId: true,
+                            lineDisplayName: true,
+                            linePictureUrl: true
+                        }
+                    },
+                    admin: {
+                        select: {
+                            id: true,
+                            username: true
+                        }
+                    }
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                }
+            });
+        } catch (error: any) {
+            if (error.payload) throw error;
+            throw ApiResponse.internalServerError('Unable to fetch all transactions, an unexpected internal server error occurred.');
+        }
+    }
+
+    /**
+     * Fetch transactions created by a specific admin (staff member)
+     * STAFF role can fetch their own transactions
+     */
+    public static async fetchAdminTransactions(adminId: string) {
+        try {
+            return await prisma.transaction.findMany({
+                where: {
+                    adminId: adminId
+                },
+                select: {
+                    id: true,
+                    userId: true,
+                    adminId: true,
+                    referenceId: true,
+                    pointsAmount: true,
+                    type: true,
+                    createdAt: true,
+                    user: {
+                        select: {
+                            id: true,
+                            lineId: true,
+                            lineDisplayName: true,
+                            linePictureUrl: true
+                        }
+                    },
+                    admin: {
+                        select: {
+                            id: true,
+                            username: true
+                        }
+                    }
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                }
+            });
+        } catch (error: any) {
+            if (error.payload) throw error;
+            throw ApiResponse.internalServerError('Unable to fetch transactions, an unexpected internal server error occurred.');
+        }
+    }
 }

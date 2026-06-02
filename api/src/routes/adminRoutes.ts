@@ -22,7 +22,9 @@ import {
     registerOwnerController,
     isOwnerExistController,
     adminRefreshTokenController,
-    adminLogoutController
+    adminLogoutController,
+    fetchAllTransactionsController,
+    fetchMyTransactionsController
 } from '../controllers/adminController';
 
 export async function adminRoutes(fastify: FastifyInstance) {
@@ -105,4 +107,12 @@ export async function adminRoutes(fastify: FastifyInstance) {
     // Revoke/Delete Administrative Console Account
     // DELETE -> /api/v1/admin/admins/:admin_id
     fastify.delete('/admins/:admin_id', deleteAdminController);
+
+    // Fetch All Transactions (MANAGER access)
+    // GET -> /api/v1/admin/transactions
+    fastify.get('/transactions', fetchAllTransactionsController);
+
+    // Fetch My Transactions (STAFF access)
+    // GET -> /api/v1/admin/my-transactions
+    fastify.get('/my-transactions', fetchMyTransactionsController);
 }//end

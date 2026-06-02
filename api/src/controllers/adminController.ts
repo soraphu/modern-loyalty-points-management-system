@@ -717,3 +717,61 @@ export async function deleteAdminController(request: FastifyRequest, reply: Fast
     }
 
 }//end
+
+//========= TRANSACTIONS
+
+export async function fetchAllTransactionsController(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodePayload: any = Auth.verifyAndDecodeAccessToken<AdminTokenPayload>(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'MANAGER' });
+
+        const transactions = await StaffService.fetchAllTransactions();
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: 'Fetch all transactions successful.',
+            data: { transactions: transactions }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
+
+    }
+}//end
+
+export async function fetchMyTransactionsController(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodePayload: any = Auth.verifyAndDecodeAccessToken<AdminTokenPayload>(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });
+
+        const transactions = await StaffService.fetchAdminTransactions(decodePayload.id);
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: 'Fetch my transactions successful.',
+            data: { transactions: transactions }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
+
+    }
+}//end
