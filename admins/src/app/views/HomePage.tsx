@@ -5,6 +5,7 @@ import { Loader2, Gift, Users, ShieldCogCorner, History, LogOut, User, ShieldUse
 import { NavigateButtonUI } from '@/components/parts/navigate_button_ui';
 import GenerateQrDialog from './GenerateQrDialog';
 import FindVoucherDialog from './FindVoucherDialog';
+import { Link } from 'react-router-dom';
 
 export default function HomePage() {
     const { admin, isLoading, checkPermission, handleLogout } = useHomeViewModel();
@@ -89,7 +90,9 @@ export default function HomePage() {
 
                     <GenerateQrDialog />
                     <FindVoucherDialog />
-                    <NavigateButtonUI Icon={Gift} title='All Rewards' useColor='STAFF' />
+                    <Link to='/rewards' >
+                        <NavigateButtonUI Icon={Gift} title='All Rewards' useColor='STAFF' />
+                    </Link>
                     <NavigateButtonUI Icon={FileClock} title='Executed Transactions' useColor='STAFF' />
 
                     {/* ==========================================

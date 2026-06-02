@@ -54,7 +54,7 @@ export default function AuthAction() {
             }
 
             // Pass through any standard business-logic exceptions (e.g., 400 Bad Request)
-            throw new Error(filterErrorMessage(error).error_code);
+            throw error;
         }
     }//end
 
