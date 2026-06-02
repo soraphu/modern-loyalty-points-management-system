@@ -35,7 +35,7 @@ export class StaffService {
                 },
             });
 
-            return uniqueHashedCodeString;
+            return uniqueCodeString;
         } catch (error: any) {
             throw ApiResponse.internalServerError('Unable to generate points token, an unexpected internal server error occurred.');
         }
