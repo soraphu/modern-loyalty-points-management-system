@@ -122,7 +122,7 @@ export class StaffService {
     /**
      * Settle Voucher (Will now auto-refund if the voucher is expired)
      */
-    public static async settleVoucher(voucherCode: string) {
+    public static async settleVoucher(voucherCode: string, adminId: string) {
         try {
             return await prisma.$transaction(async (tx) => {
                 const voucher = await Validation.getValidatedVoucher(tx, voucherCode);
@@ -135,6 +135,7 @@ export class StaffService {
                 const transaction = await tx.transaction.create({
                     data: {
                         userId: voucher.userId,
+                        adminId,
                         referenceId: voucher.id,
                         pointsAmount: -voucher.reward.pointsCost,
                         type: TransactionType.REDEEM
@@ -145,7 +146,8 @@ export class StaffService {
                         referenceId: true,
                         pointsAmount: true,
                         type: true,
-                        createdAt: true
+                        createdAt: true,
+                        adminId: true
                     }
                 });
 

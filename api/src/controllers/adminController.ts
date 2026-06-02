@@ -245,10 +245,10 @@ export async function settleVoucherController(request: FastifyRequest, reply: Fa
         const decodePayload: any = Auth.verifyAndDecodeAccessToken(accessToken);
         logs.info('Decode Payload: ', decodePayload);
 
-        const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });
+        const admin = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });
         logs.info('Admin: ', admin);
 
-        const settledInfo = await StaffService.settleVoucher(voucherCode);
+        const settledInfo = await StaffService.settleVoucher(voucherCode, decodePayload.id);
 
         const res = ApiResponse.success({
             statusCode: 200,

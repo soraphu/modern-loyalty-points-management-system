@@ -146,6 +146,7 @@ export class CustomerService {
                         referenceId: qrCodeRecord.id,
                         pointsAmount: qrCodeRecord.pointValue,
                         type: 'EARN',
+                        adminId: qrCodeRecord.adminId
                     },
                 });
 
