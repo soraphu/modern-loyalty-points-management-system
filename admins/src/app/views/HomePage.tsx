@@ -93,6 +93,7 @@ export default function HomePage() {
                     <Link to='/rewards' >
                         <NavigateButtonUI Icon={Gift} title='All Rewards' useColor='STAFF' />
                     </Link>
+
                     <NavigateButtonUI Icon={FileClock} title='Executed Transactions' useColor='STAFF' />
 
                     {/* ==========================================
@@ -101,7 +102,9 @@ export default function HomePage() {
                     {checkPermission('MANAGER') && (
                         <>
                             <hr />
-                            <NavigateButtonUI Icon={History} useColor='MANAGER' title='All Transactions' />
+                            <Link to='/transactions' >
+                                <NavigateButtonUI Icon={History} useColor='MANAGER' title='All Transactions' />
+                            </Link>
                             <NavigateButtonUI Icon={Users} useColor='MANAGER' title='Manage Customers' />
                         </>
                     )}

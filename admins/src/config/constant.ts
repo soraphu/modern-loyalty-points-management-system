@@ -53,5 +53,6 @@ export const API_PATH = {
     profile: '/profile',
     logout: '/logout',
     generatePointsToken: '/points-token',
-    getVoucher: '/vouchers'
+    getVoucher: '/vouchers',
+    getTransactions: ''
 }
