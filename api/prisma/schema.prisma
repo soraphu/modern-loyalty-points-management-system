@@ -56,6 +56,7 @@ model Admin {
 
   qrCodes       QrCode[]
   refreshTokens RefreshToken[]
+  transactions  Transaction[]
 
   @@map("admins")
 }
@@ -104,12 +105,14 @@ model Reward {
 model Transaction {
   id           String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId       String          @map("user_id") @db.Uuid
+  adminId      String          @map("admin_id") @db.Uuid
   referenceId  String          @map("reference_id") @db.Uuid
   pointsAmount Int             @map("points_amount")
   type         TransactionType
   createdAt    DateTime        @default(now()) @map("created_at") @db.Timestamptz
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  admin Admin @relation(fields: [adminId], references: [id], onDelete: Restrict)
 
   @@map("transactions")
 }

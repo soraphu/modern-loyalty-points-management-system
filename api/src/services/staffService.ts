@@ -50,7 +50,7 @@ export class StaffService {
     public static async fetchVouchersByCode(voucherCode: string) {
         try {
             // Locates vouchers matching the specific code payload, including nested rewards
-            return await prisma.voucher.findUnique({
+            const voucher = await prisma.voucher.findUnique({
                 where: {
                     voucherCode: voucherCode
                 },
@@ -81,6 +81,10 @@ export class StaffService {
                     }
                 }
             });
+
+            if (!voucher) throw ApiResponse.resourceNotFound({ msg: 'Voucher with this code not found.', error_code: 'VOUCHER_NOT_FOUND' });
+
+            return voucher;
         } catch (error: any) {
             throw ApiResponse.internalServerError('Unable to fetch vouchers data records, an unexpected internal server error occurred.');
         }
