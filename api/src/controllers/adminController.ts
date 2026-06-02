@@ -4,8 +4,6 @@ import { Validation } from '../utils/validation';
 import { OwnerService } from '../services/ownerService';
 import { ApiResponse } from '../utils/apiResponse';
 import { Auth } from '../services/authService';
-import { CONFIG } from '../config/constants';
-import { fastify } from '../server';
 import { AdminRoles } from '../generated/prisma/enums';
 import { StaffService } from '../services/staffService';
 import { ManagerService } from '../services/managerService';

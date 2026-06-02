@@ -172,6 +172,10 @@ export class Auth {
         return await bcrypt.compare(password, hash);
     }// end
 
+    public static async hashToken(plainTextToken: string) {
+        return crypto.createHash('sha256').update(plainTextToken).digest('hex');
+    }
+
     public static async getAdminProfile(adminId: string) {
         try {
             return await prisma.admin.findUnique({
@@ -261,7 +265,7 @@ export class Auth {
     public static async verifyRefreshTokenAndGetAdminId(plainToken: string): Promise<string> {
         try {
             // 1. Hash the incoming plain token from the client to match your database records
-            const hashedToken = crypto.createHash('sha256').update(plainToken).digest('hex');
+            const hashedToken = await this.hashToken(plainToken);
 
             // 2. Look up the HASHED token in the database
             const session = await prisma.refreshToken.findUnique({
@@ -289,7 +293,7 @@ export class Auth {
      * Persist a refresh token record to database for future revocation/validation
      */
     public static async saveHashedRefreshToken(adminId: string, token: string) {
-        const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+        const hashedToken = await this.hashToken(token);
 
         try {
             // Derive expiry from token `exp` claim

@@ -75,13 +75,13 @@ model User {
 }
 
 model QrCode {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  adminId    String   @map("admin_id") @db.Uuid
-  codeString String   @unique @map("code_string") @db.VarChar(255)
-  pointValue Int      @map("point_value")
-  used       Boolean  @default(false)
-  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
-  expiresAt  DateTime @map("expires_at") @db.Timestamptz
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  adminId          String   @map("admin_id") @db.Uuid
+  hashedCodeString String   @unique @map("hashed_code_string") @db.VarChar(255)
+  pointValue       Int      @map("point_value")
+  used             Boolean  @default(false)
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+  expiresAt        DateTime @map("expires_at") @db.Timestamptz
 
   admin Admin @relation(fields: [adminId], references: [id], onDelete: Restrict)
 

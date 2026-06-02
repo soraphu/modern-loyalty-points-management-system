@@ -92,12 +92,14 @@ export class CustomerService {
      * updates customer balances, and commits the ledger transaction.
      */
     public static async earnPoints(userId: string, codeString: string) {
+        const hashedCodeString = await Auth.hashToken(codeString);
+
         try {
             // Run an isolated interactive database transaction block to guarantee atomic balance handling
             return await prisma.$transaction(async (tx) => {
                 // Find the QR code profile
                 const qrCodeRecord = await tx.qrCode.findUnique({
-                    where: { codeString: codeString },
+                    where: { hashedCodeString },
                 });
 
                 if (!qrCodeRecord) {
@@ -133,7 +135,7 @@ export class CustomerService {
 
                 // Flag the unique QR row as spent
                 await tx.qrCode.update({
-                    where: { codeString: codeString },
+                    where: { hashedCodeString },
                     data: { used: true },
                 });
 

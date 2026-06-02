@@ -23,20 +23,19 @@ export class StaffService {
             const expiresAt = new Date();
             expiresAt.setHours(expiresAt.getHours() + 24);
 
-            const qrCode = await prisma.qrCode.create({
+            const uniqueHashedCodeString = await Auth.hashToken(uniqueCodeString);
+
+            await prisma.qrCode.create({
                 data: {
                     adminId: adminId,
-                    codeString: uniqueCodeString,
+                    hashedCodeString: uniqueHashedCodeString,
                     pointValue: points,
                     used: false,
                     expiresAt: expiresAt
                 },
-                select: {
-                    codeString: true
-                }
             });
 
-            return qrCode.codeString;
+            return uniqueHashedCodeString;
         } catch (error: any) {
             throw ApiResponse.internalServerError('Unable to generate points token, an unexpected internal server error occurred.');
         }
