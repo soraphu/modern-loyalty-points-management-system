@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import type { GenerateQrRequest, GenerateQrResponse } from '../models/qrTypes';
+import type { GenerateQrCodeData } from '../models/qrTypes';
+import { ApiActionService } from '../api/apiActionService';
+import AuthAction from '@/config/authAction';
 
 export function useGenerateQrViewModel(onSuccess?: () => void) {
     const [isLoading, setIsLoading] = useState(false);
-    const [qrResult, setQrResult] = useState<GenerateQrResponse | null>(null);
+    const [qrResult, setQrResult] = useState<GenerateQrCodeData | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const { action } = AuthAction();
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm<{ points: string }>({
         defaultValues: { points: '' }
@@ -16,26 +19,21 @@ export function useGenerateQrViewModel(onSuccess?: () => void) {
             setIsLoading(true);
             setErrorMessage(null);
 
-            const numPoints = parseInt(values.points, 10);
-            if (isNaN(numPoints) || numPoints <= 0) {
-                throw new Error("Points must be a positive number.");
-            }
+            const resData: any = await action(async () => ApiActionService.generatePointsToken(values.points));
 
-            // Simulated network call to your Fastify/Express backend engine
-            await new Promise((resolve) => setTimeout(resolve, 1200));
+            const earnPointsUrl = `${import.meta.env.VITE_CUSTOMER_SIDE_URL}?code_string=${resData.data.codeString}`;
 
-            // Mocking a successful response containing a temporary QR code payload matrix
-            const mockResponse: GenerateQrResponse = {
-                success: true,
-                qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=deepoints_tx_${Date.now()}_amt_${numPoints}`,
-                token: `tok_${Math.random().toString(36).substring(7)}`,
-                expiresInSeconds: 60,
+            const qrCodeData: GenerateQrCodeData = {
+                qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${earnPointsUrl}`,
+                expiresInMinutes: resData.data.expiresMinutes,
             };
 
-            setQrResult(mockResponse);
+            setQrResult(qrCodeData);
             if (onSuccess) onSuccess();
         } catch (err: any) {
-            setErrorMessage(err.message || "Failed to finalize system QR generation.");
+            console.log(err);
+
+            setErrorMessage(err.msg);
         } finally {
             setIsLoading(false);
         }

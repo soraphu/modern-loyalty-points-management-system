@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { AuthService } from '../api/authService';
+import { ApiAuthService } from '../api/apiAuthService';
 import type { RegisterFormValues } from '../models/authTypes';
 import { toast } from 'sonner';
 import { consoleLogOnDev } from '@/config/constant';
@@ -31,7 +31,7 @@ export function useRegisterViewModel() {
 
     async function initCheckOwnerExist() {
         try {
-            await AuthService.checkOwnerExist();
+            await ApiAuthService.checkOwnerExist();
         } catch (error) {
             window.location.href = '/login';
         }
@@ -43,7 +43,7 @@ export function useRegisterViewModel() {
             setErrorMessage(null);
             setSuccessMessage(null);
 
-            const res: any = await AuthService.register(values);
+            const res: any = await ApiAuthService.register(values);
 
             consoleLogOnDev(res);
 

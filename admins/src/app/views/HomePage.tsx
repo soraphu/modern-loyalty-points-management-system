@@ -1,9 +1,10 @@
 import { useHomeViewModel } from '../viewmodels/useHomeViewModel';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Loader2, Ticket, Gift, Users, ShieldCogCorner, History, LogOut, User, ShieldUser, FileClock } from 'lucide-react';
+import { Loader2, Gift, Users, ShieldCogCorner, History, LogOut, User, ShieldUser, FileClock } from 'lucide-react';
 import { NavigateButtonUI } from '@/components/parts/navigate_button_ui';
 import GenerateQrDialog from './GenerateQrDialog';
+import FindVoucherDialog from './FindVoucherDialog';
 
 export default function HomePage() {
     const { admin, isLoading, checkPermission, handleLogout } = useHomeViewModel();
@@ -87,7 +88,7 @@ export default function HomePage() {
                 <div className="flex flex-col border border-zinc-900 bg-zinc-900/40 rounded-xl overflow-hidden shadow-xl ">
 
                     <GenerateQrDialog />
-                    <NavigateButtonUI Icon={Ticket} title='Find Voucher' useColor='STAFF' />
+                    <FindVoucherDialog />
                     <NavigateButtonUI Icon={Gift} title='All Rewards' useColor='STAFF' />
                     <NavigateButtonUI Icon={FileClock} title='Executed Transactions' useColor='STAFF' />
 

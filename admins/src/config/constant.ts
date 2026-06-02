@@ -1,3 +1,8 @@
+interface errorFilteredReturn {
+    error_code: string;
+    msg: string;
+}
+
 const isDevMode = import.meta.env.VITE_ISDEV_MODE === 'true';
 
 export const consoleLogOnDev = (data: any) => {
@@ -10,8 +15,18 @@ export const consoleWarnOnDev = (data: any) => {
 
 export const waitFor = (ms: any) => new Promise(resolve => setTimeout(resolve, ms));
 
-export const filterErrorMessage = (err: any) => {
-    if (err.response) {
+export const filterErrorMessage = (err: any): errorFilteredReturn => {
+
+    if (err.response && err.response.data.message) {
+        consoleWarnOnDev("RESPONSE: ");
+        consoleWarnOnDev(err.response);
+        return {
+            error_code: err.response.data.errorCode,
+            msg: err.response.data.message
+        };
+    }
+
+    if (err.response.data.msg) {
 
         consoleWarnOnDev("RESPONSE: ");
         consoleWarnOnDev(err.response);
@@ -21,7 +36,7 @@ export const filterErrorMessage = (err: any) => {
         };
     }
 
-    consoleWarnOnDev("NOT RESPONSE: ");
+    consoleWarnOnDev("SERVER NOT RESPONSE: ");
     consoleWarnOnDev(err);
     return {
         error_code: "SERVER_NOT_RESPONSE",
@@ -36,5 +51,7 @@ export const API_PATH = {
     checkOwnerExist: '/is-owner-exist',
     refreshToken: '/auth/refresh',
     profile: '/profile',
-    logout: '/logout'
+    logout: '/logout',
+    generatePointsToken: '/points-token',
+    getVoucher: '/vouchers'
 }

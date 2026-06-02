@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { AuthService } from '../api/authService';
+import { ApiAuthService } from '../api/apiAuthService';
 import type { LoginFormValues } from '../models/authTypes';
 import { consoleLogOnDev } from '@/config/constant';
 import { useAuth } from '@/config/authProvider';
@@ -29,7 +29,7 @@ export function useLoginViewModel() {
             setIsLoading(true);
             setErrorMessage(null);
 
-            const res: any = await AuthService.handleLogin(values);
+            const res: any = await ApiAuthService.handleLogin(values);
 
             const accessToken = res.data.access_token;
             const admin = res.data.admin;

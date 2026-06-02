@@ -4,7 +4,7 @@ import type { LoginFormValues, LoginResponse } from '../models/authTypes';
 import { API_PATH, filterErrorMessage } from '@/config/constant';
 import { toast } from 'sonner';
 
-export const AuthService = {
+export const ApiAuthService = {
     async register(payload: RegisterFormValues): Promise<RegisterResponse> {
         try {
             const response = await apiClient.post<RegisterResponse>(API_PATH.register, payload);
@@ -31,7 +31,7 @@ export const AuthService = {
                 return toast.error(finalErrorMsg.msg);
             }
 
-            throw new Error(finalErrorMsg.msg);
+            throw finalErrorMsg;
         }
     },
 

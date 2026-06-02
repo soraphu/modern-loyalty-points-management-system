@@ -3,9 +3,7 @@ export interface GenerateQrRequest {
     generatedBy: string; // Admin/Staff ID
 }
 
-export interface GenerateQrResponse {
-    success: boolean;
+export interface GenerateQrCodeData {
     qrCodeUrl: string; // The URL string or base64 data injected into the QR view frame
-    token: string;
-    expiresInSeconds: number;
+    expiresInMinutes: number;
 }

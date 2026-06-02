@@ -97,7 +97,7 @@ export default function GenerateQrDialog() {
                             <p className="text-sm font-medium text-zinc-200">Ready for Customer Scan</p>
                             <p className="text-xs text-zinc-500 flex items-center justify-center gap-1.5">
                                 <RefreshCw className="h-3 w-3 animate-spin duration-10000" />
-                                Token automatically expires in <span className="text-zinc-400 font-bold">{qrResult.expiresInSeconds}s</span>
+                                Token automatically expires in <span className="text-zinc-400 font-bold">{qrResult.expiresInMinutes}m</span>
                             </p>
                         </div>
 
@@ -115,4 +115,4 @@ export default function GenerateQrDialog() {
             </DialogContent>
         </Dialog>
     );
-}
+} // GenerateQrDialog
