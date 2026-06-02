@@ -1,25 +1,27 @@
 import { useState, useEffect } from 'react';
-import type { TransactionItem } from '../models/transactionTypes';
-import { apiClient } from '@/config/apiClient';
-import { API_PATH } from '@/config/constant';
+import { apiClient } from '@/config/apiClient'; // Real custom axios config wrapper
+import { API_PATH, filterErrorMessage } from '@/config/constant';
+import type { TransactionItem, TransactionsResponse } from '../models/transactionTypes';
+import AuthAction from '@/config/authAction';
 
 export function useTransactionsViewModel() {
     const [transactions, setTransactions] = useState<TransactionItem[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>('');
-    const [typeFilter, setTypeFilter] = useState<'ALL' | 'EARN' | 'REDEEM'>('ALL');
+    const [typeFilter, setTypeFilter] = useState<'ALL' | 'EARN' | 'REDEEM' | 'CANCEL'>('ALL');
+    const { action } = AuthAction();
 
     const fetchTransactions = async () => {
         setIsLoading(true);
         setError(null);
         try {
-            // const res = await apiClient.get(API_PATH.);
+            const res = await action(async () => await apiClient.get<TransactionsResponse>(API_PATH.getAllTransactions));
 
-            // setTransactions(res);
-
+            setTransactions(res.data.data.transactions);
         } catch (err: any) {
-            setError(err?.message || 'Failed to fetch transaction logs.');
+            const cleanMsg = filterErrorMessage(err);
+            setError(cleanMsg.msg);
         } finally {
             setIsLoading(false);
         }
@@ -29,16 +31,18 @@ export function useTransactionsViewModel() {
         fetchTransactions();
     }, []);
 
-    // Compute filters reactively based on input changes
+    // Compute filters based on real schema layout properties
     const filteredTransactions = transactions.filter((tx) => {
-        const matchesSearch =
-            tx.customerName.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
-            tx.id.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
-            tx.adminUsername.toLowerCase().includes(searchQuery.toLowerCase().trim());
+        const searchString = searchQuery.toLowerCase().trim();
 
-        if (typeFilter === 'EARN') return matchesSearch && tx.type === 'EARN_POINTS';
-        if (typeFilter === 'REDEEM') return matchesSearch && tx.type === 'REDEEM_VOUCHER';
-        return matchesSearch;
+        const matchesSearch =
+            tx.id.toLowerCase().includes(searchString) ||
+            tx.referenceId.toLowerCase().includes(searchString) ||
+            tx.user.lineDisplayName.toLowerCase().includes(searchString) ||
+            tx.admin.username.toLowerCase().includes(searchString);
+
+        if (typeFilter === 'ALL') return matchesSearch;
+        return matchesSearch && tx.type === typeFilter;
     });
 
     return {
@@ -51,4 +55,4 @@ export function useTransactionsViewModel() {
         setTypeFilter,
         refreshLogs: fetchTransactions
     };
-}//Use transactions.
+}

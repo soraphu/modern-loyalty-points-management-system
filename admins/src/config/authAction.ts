@@ -17,36 +17,41 @@ export default function AuthAction() {
     }
 
     async function action<T>(action: AuthenticatedAction<T>): Promise<T> {
-        const accessToken = getAccessToken();
+        let tempAccessToken = getAccessToken();
 
         // STEP 1: CHECK IF ACCESS TOKEN IS EMPTY
-        if (!accessToken) {
+        if (!tempAccessToken) {
             consoleLogOnDev("Access token missing. Initializing proactive refresh handshake...");
-            const refreshSuccessful = await attemptTokenRefresh();
+            tempAccessToken = await attemptTokenRefresh();
 
-            if (!refreshSuccessful) {
+            if (!tempAccessToken) {
                 consoleLogOnDev("Logout!!! no refresh token or expired.");
                 handleLogout();
             }
+            consoleLogOnDev("Refresh token success.");
         }
 
         try {
             consoleLogOnDev("Try auth action...");
-            setupAuthHeader(accessToken);
-            // STEP 2: EXECUTE THE PRIMARY ACTION
-            return await action();
+            setupAuthHeader(tempAccessToken);
+
+            const res = await action();
+
+            consoleLogOnDev("Auth action successfully.");
+            return res;
         } catch (error: any) {
 
-            // STEP 3: FALLBACK INTERCEPTOR FOR EXPIRED TOKENS MID-TRANSACTION
-            // Catch a 401 Unauthorized payload if the token expired right during transit
+            consoleLogOnDev("Auth action failed.");
             if (error.response?.status === 401) {
                 consoleLogOnDev("Access token rejected by server. Initiating emergency refresh...");
 
-                const refreshSuccessful = await attemptTokenRefresh();
-                if (refreshSuccessful) {
-                    // Retry the exact original action parameter once more with the fresh token
-                    setupAuthHeader(accessToken);
-                    return await action();
+                tempAccessToken = await attemptTokenRefresh();
+                if (tempAccessToken) {
+                    setupAuthHeader(tempAccessToken);
+                    const res = await action();
+
+                    consoleLogOnDev("Auth action last try successfully.");
+                    return res;
                 } else {
                     consoleLogOnDev("Logout no refresh token or refresh failed after action.");
                     handleLogout();
@@ -58,20 +63,20 @@ export default function AuthAction() {
         }
     }//end
 
-    async function attemptTokenRefresh(): Promise<boolean> {
+    async function attemptTokenRefresh() {
         try {
             // Call your backend's refresh route layout
             const res = await apiClient.get(API_PATH.refreshToken);
 
             const accesstoken = res.data.data.access_token;
             setAccessToken(accesstoken);
-            consoleLogOnDev("Token rotation executed successfully.");
-            return true;
+            consoleLogOnDev("Token rotation executed successfully, try auth action again.");
+            return accesstoken;
         } catch (error: any) {
             const filteredError = filterErrorMessage(error);
             consoleLogOnDev("Token refresh attempt failed.");
             consoleLogOnDev(filteredError);
-            return false;
+            return;
         }
     }
 

@@ -54,5 +54,7 @@ export const API_PATH = {
     logout: '/logout',
     generatePointsToken: '/points-token',
     getVoucher: '/vouchers',
-    getTransactions: ''
+    getAllTransactions: '/transactions',
+    getOwnTransactions: '/my-transactions',
+
 }

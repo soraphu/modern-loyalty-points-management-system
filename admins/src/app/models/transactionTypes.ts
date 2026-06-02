@@ -1,16 +1,27 @@
-export type TransactionType = 'EARN_POINTS' | 'REDEEM_VOUCHER' | 'CANCEL_VOUCHER';
+export type TransactionType = 'EARN' | 'REDEEM';
+
+export interface TransactionUser {
+    id: string;
+    lineId: string;
+    lineDisplayName: string;
+    linePictureUrl: string;
+}
+
+export interface TransactionAdmin {
+    id: string;
+    username: string;
+}
 
 export interface TransactionItem {
     id: string;
+    userId: string;
     adminId: string;
-    customerId: string;
-    customerName: string;
-    lineDisplayName: string;
-    type: TransactionType;
+    referenceId: string;
     pointsAmount: number;
-    referenceDetail: string; // e.g., "Scanned QR Code" or "Redeemed TEST_REDEEM"
+    type: TransactionType;
     createdAt: string;
-    adminUsername: string;
+    user: TransactionUser;
+    admin: TransactionAdmin;
 }
 
 export interface TransactionsResponse {
@@ -18,6 +29,5 @@ export interface TransactionsResponse {
     msg: string;
     data: {
         transactions: TransactionItem[];
-        totalCount: number;
     };
 }
