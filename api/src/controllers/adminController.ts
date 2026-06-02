@@ -185,13 +185,13 @@ export async function generatePointsTokenController(request: FastifyRequest, rep
         const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });
         logs.info('Admin: ', admin);
 
-        const codeString = await StaffService.generatePointsToken(admin.id, jsonBody.points);
-        logs.success('Code String: ', codeString);
+        const pointsTokenData = await StaffService.generatePointsToken(admin.id, jsonBody.points);
+        logs.success('Code String: ', pointsTokenData);
 
         const res = ApiResponse.success({
             statusCode: 201,
             msg: 'Generate points token success.',
-            data: { code_string: codeString }
+            data: pointsTokenData
         });
 
         return reply.status(res.statusCode).send(res.payload);

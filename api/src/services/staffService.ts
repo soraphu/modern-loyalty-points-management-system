@@ -3,14 +3,13 @@ import { prisma } from '../config/database';
 import { ApiResponse } from '../utils/apiResponse';
 import crypto from 'crypto';
 import { Logger } from '../utils/logger';
-import { CONFIG } from '../config/constants';
 import { Auth } from './authService';
 import { Validation } from '../utils/validation';
 
 const logs = new Logger('StaffService');
 
 export class StaffService {
-    private static pointsTokenExpiresInMinute = 15;
+    private static pointsTokenExpiresInMinute = 5;
 
     /**
      * Ref: Gen Points Token.yml (POST {{baseURL}}{{ApiURL}}/admin/points-token)
@@ -36,7 +35,10 @@ export class StaffService {
                 },
             });
 
-            return uniqueCodeString;
+            return {
+                codeString: uniqueCodeString,
+                expires_minutes: this.pointsTokenExpiresInMinute
+            };
         } catch (error: any) {
             throw ApiResponse.internalServerError('Unable to generate points token, an unexpected internal server error occurred.');
         }
