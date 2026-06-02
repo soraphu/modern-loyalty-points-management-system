@@ -86,6 +86,8 @@ export class StaffService {
 
             return voucher;
         } catch (error: any) {
+            if (error.payload) throw error;
+
             throw ApiResponse.internalServerError('Unable to fetch vouchers data records, an unexpected internal server error occurred.');
         }
     }
