@@ -37,7 +37,7 @@ export class StaffService {
 
             return {
                 codeString: uniqueCodeString,
-                expires_minutes: this.pointsTokenExpiresInMinute
+                expiresMinutes: this.pointsTokenExpiresInMinute
             };
         } catch (error: any) {
             throw ApiResponse.internalServerError('Unable to generate points token, an unexpected internal server error occurred.');
