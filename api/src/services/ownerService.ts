@@ -62,7 +62,7 @@ export class OwnerService {
 
             return await prisma.admin.create({
                 data: {
-                    username: data.username,
+                    username: data.username.toLowerCase().trim(),
                     firstname: data.firstname,
                     lastname: data.lastname,
                     passwordHashed: passwordHashed,

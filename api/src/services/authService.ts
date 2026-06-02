@@ -104,7 +104,7 @@ export class Auth {
         try {
             // Find the admin by unique username
             const admin = await prisma.admin.findUnique({
-                where: { username }
+                where: { username: username.toLowerCase().trim() }
             });
 
             const loginFailResponse = ApiResponse.fail({
