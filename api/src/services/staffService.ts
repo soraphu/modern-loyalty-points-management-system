@@ -61,6 +61,7 @@ export class StaffService {
                     status: true,
                     createdAt: true,
                     expiresAt: true,
+                    voucherCode: true,
                     user: {
                         select: {
                             id: true,
