@@ -33,3 +33,36 @@ export interface VoucherResponse {
         voucher: Voucher;
     };
 }
+
+export interface ExecutedVoucherResponse {
+    success: boolean;
+    msg: string;
+    data: {
+        transaction: {
+            id: string;
+            userId: string;
+            referenceId: string;
+            pointsAmount: number;
+            type: 'REDEEM' | 'CANCEL';
+            createdAt: string;
+            adminId: string;
+        };
+        settled_voucher: {
+            id: string;
+            userId: string;
+            rewardId: string;
+            status: string;
+            voucherCode: string;
+            createdAt: string;
+            expiresAt: string;
+            reward: {
+                id: string;
+                rewardName: string;
+                pointsCost: number;
+                imageUrl: string | null;
+                active: boolean;
+                createdAt: string;
+            };
+        };
+    };
+}

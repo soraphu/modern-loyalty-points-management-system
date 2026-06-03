@@ -71,6 +71,7 @@ export default function AuthAction() {
             const accesstoken = res.data.data.access_token;
             setAccessToken(accesstoken);
             consoleLogOnDev("Token rotation executed successfully, try auth action again.");
+            consoleLogOnDev("AccessToken: " + accesstoken);
             return accesstoken;
         } catch (error: any) {
             const filteredError = filterErrorMessage(error);

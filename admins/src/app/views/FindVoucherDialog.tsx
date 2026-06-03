@@ -151,14 +151,108 @@ export default function FindVoucherDialog() {
                         {/* Action Trigger Pad Footing */}
                         {voucher.status === 'PENDING' && (
                             <div className="w-full p-3 bg-zinc-900/50 border-t border-zinc-900 flex gap-4">
-                                <Button onClick={handleSetteVoucher} variant="destructive" className="flex-1 bg-red-950 hover:bg-red-900/60 text-red-200 border border-red-900/50 font-medium text-xs h-9 gap-1.5 cursor-pointer">
+                                <Button onClick={() => { }} variant="destructive" className="flex-1 bg-red-950 hover:bg-red-900/60 text-red-200 border border-red-900/50 font-medium text-xs h-9 gap-1.5 cursor-pointer">
                                     <Ban className="h-3.5 w-3.5" /> Cancel Code
                                 </Button>
-                                <Button onClick={() => { }} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs h-9 gap-1.5 cursor-pointer">
+                                <Button onClick={handleSetteVoucher} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs h-9 gap-1.5 cursor-pointer">
                                     <CheckCircle2 className="h-3.5 w-3.5" /> Redeem Voucher
                                 </Button>
                             </div>
                         )}
+                    </div>
+                )}
+
+                {executedVoucher && (
+                    <div className="mt-2 space-y-4 animate-in zoom-in-95 duration-200">
+
+                        {/* ==========================================
+                            SUCCESS BANNER CORE HEADER
+                            ========================================== */}
+                        <div className="flex flex-col items-center text-center py-4 space-y-2">
+                            <div className={`p-3 rounded-full border ${executedVoucher.data.transaction.type === 'REDEEM'
+                                ? 'bg-emerald-950/50 border-emerald-800 text-emerald-400'
+                                : 'bg-red-950/50 border-red-800 text-red-400'
+                                }`}>
+                                <CheckCircle2 className="h-8 w-8 animate-bounce" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-black tracking-wide text-white">
+                                    Action Executed Successfully
+                                </h3>
+                                <p className="text-xs text-zinc-400 mt-1 max-w-[280px] mx-auto">
+                                    {executedVoucher.msg}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* ==========================================
+                            TRANSACTION SLIP RECEIPT DETAILS BOX
+                            ========================================== */}
+                        <div className="border border-zinc-900 bg-zinc-900/30 rounded-xl overflow-hidden text-xs">
+                            <div className="p-3 border-b border-zinc-900 bg-zinc-900/40 flex items-center justify-between font-mono text-zinc-400">
+                                <span>RECEIPT: #{executedVoucher.data.transaction.id.split('-')[0].toUpperCase()}</span>
+                                <span className="text-[10px]">
+                                    {new Date(executedVoucher.data.transaction.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                            </div>
+
+                            <div className="p-4 space-y-3">
+                                {/* Reward Scope Summary */}
+                                <div className="flex justify-between items-start border-b border-zinc-900/60 pb-2.5">
+                                    <div>
+                                        <p className="font-bold text-zinc-100">
+                                            {executedVoucher.data.settled_voucher.reward.rewardName}
+                                        </p>
+                                        <p className="text-[10px] text-zinc-500 font-mono mt-0.5">
+                                            CODE: {executedVoucher.data.settled_voucher.voucherCode}
+                                        </p>
+                                    </div>
+                                    <span className={`px-2 py-0.5 font-mono text-[10px] font-bold rounded border ${executedVoucher.data.transaction.type === 'REDEEM'
+                                        ? 'bg-emerald-950 text-emerald-400 border-emerald-900'
+                                        : 'bg-red-950 text-red-400 border-red-900'
+                                        }`}>
+                                        {executedVoucher.data.transaction.type}
+                                    </span>
+                                </div>
+
+                                {/* Audit Fields Map Info Grid */}
+                                <div className="space-y-1.5 font-medium text-zinc-400">
+                                    <div className="flex justify-between">
+                                        <span className="text-zinc-500">Points Applied</span>
+                                        <span className={`font-mono font-bold ${executedVoucher.data.transaction.pointsAmount > 0 ? 'text-emerald-400' : 'text-zinc-300'
+                                            }`}>
+                                            {executedVoucher.data.transaction.pointsAmount} Points
+                                        </span>
+                                    </div>
+
+                                    <div className="flex justify-between">
+                                        <span className="text-zinc-500">System Voucher UUID</span>
+                                        <span className="font-mono text-zinc-500 text-[10px] truncate max-w-[180px]" title={executedVoucher.data.settled_voucher.id}>
+                                            {executedVoucher.data.settled_voucher.id}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex justify-between">
+                                        <span className="text-zinc-500">Operation Timestamp</span>
+                                        <span className="text-zinc-300">
+                                            {new Date(executedVoucher.data.transaction.createdAt).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ==========================================
+                            CLOSE DISMISSAL CONTROL FOOTING
+                            ========================================== */}
+                        {/* <div className="pt-2">
+                            <Button
+                                onClick={toggleDialog} // Triggers the context closing sequence cleanly resetting local states
+                                className="w-full bg-zinc-900 border border-zinc-800 text-zinc-100 hover:bg-zinc-800 font-medium text-sm h-10 cursor-pointer transition-all active:scale-[0.98]"
+                            >
+                                Done & Dismiss
+                            </Button>
+                        </div> */}
                     </div>
                 )}
 

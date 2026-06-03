@@ -17,7 +17,7 @@ export const waitFor = (ms: any) => new Promise(resolve => setTimeout(resolve, m
 
 export const filterErrorMessage = (err: any): errorFilteredReturn => {
 
-    if (err.response && err.response.data.message) {
+    if (err?.response?.data.message) {
         consoleWarnOnDev("RESPONSE: ");
         consoleWarnOnDev(err.response);
         return {
@@ -26,7 +26,7 @@ export const filterErrorMessage = (err: any): errorFilteredReturn => {
         };
     }
 
-    if (err.response.data.msg) {
+    if (err?.response?.data.msg) {
 
         consoleWarnOnDev("RESPONSE: ");
         consoleWarnOnDev(err.response);

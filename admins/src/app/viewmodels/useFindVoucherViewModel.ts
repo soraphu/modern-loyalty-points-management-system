@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Voucher } from '../models/voucherType';
+import type { ExecutedVoucherResponse, Voucher } from '../models/voucherType';
 import { ApiActionService } from '../api/apiActionService';
 import AuthAction from '@/config/authAction';
 import { consoleLogOnDev } from '@/config/constant';
@@ -11,7 +11,7 @@ export function useFindVoucherViewModel() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [voucher, setVoucher] = useState<Voucher | null>(null);
-    const [executedVoucher, setExecutedVoucher] = useState<Voucher | null>(null);
+    const [executedVoucher, setExecutedVoucher] = useState<ExecutedVoucherResponse | null>(null);
     const { action } = AuthAction();
 
     // Clear previous states when toggling the dialog modal view
@@ -56,7 +56,7 @@ export function useFindVoucherViewModel() {
 
             const resData: any = await action(() => ApiActionService.apiSettleVoucher(voucher.voucherCode));
 
-
+            setExecutedVoucher(resData);
         } catch (err: any) {
             consoleLogOnDev(err);
             toast.error(err.msg);
