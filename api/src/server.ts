@@ -57,7 +57,7 @@ const startServer = async () => {
                     cb(new Error('Not allowed by CORS policy'), false);
                 }
             },
-            methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+            methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
 
             // CRITICAL: Must include 'authorization' to allow your Axios Interceptor token through
             allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
