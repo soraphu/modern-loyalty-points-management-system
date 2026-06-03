@@ -96,7 +96,6 @@ export class Auth {
                 voucherCode: uniqueCode,
                 expiresAt: expiryDate
             },
-            select: { reward: true }
         });
     }// end
 
