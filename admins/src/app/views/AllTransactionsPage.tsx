@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Loader2, History, Search, RefreshCw, AlertCircle, ArrowUpRight, ArrowDownLeft, XCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function AllTransactionsPage() {
     const {
@@ -47,12 +48,11 @@ export default function AllTransactionsPage() {
                 {/* HEADER SECTION */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-900 pb-5">
                     <div>
-                        <h1 className="text-xl font-black tracking-wider text-white flex items-center gap-2">
-                            <History className="text-blue-500 h-5 w-5" /> TRANSACTION HISTORY
-                        </h1>
-                        <p className="text-xs text-zinc-400 mt-1">
-                            Real-time audit log tracking point allocations, user profile lookups, and executive actions.
-                        </p>
+                        <Link to='/home' >
+                            <h1 className="text-xl font-black tracking-wider text-white flex items-center gap-2">
+                                <History className="text-blue-500 h-5 w-5" /> TRANSACTION HISTORY
+                            </h1>
+                        </Link>
                     </div>
                     <Button
                         variant="outline"
