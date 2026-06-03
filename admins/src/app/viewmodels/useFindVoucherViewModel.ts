@@ -67,6 +67,11 @@ export function useFindVoucherViewModel() {
 
     //cancelVoucher
 
+    const clearVoucher = async () => {
+        setVoucher(null);
+        setExecutedVoucher(null);
+    }
+
     return {
         handleSetteVoucher,
         isOpen,
@@ -78,5 +83,6 @@ export function useFindVoucherViewModel() {
         voucher,
         handleFetchVoucher,
         executedVoucher,
+        clearVoucher,
     };
 }

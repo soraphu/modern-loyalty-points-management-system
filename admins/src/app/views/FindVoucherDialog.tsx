@@ -1,5 +1,5 @@
 import { useFindVoucherViewModel } from '../viewmodels/useFindVoucherViewModel';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogClose, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -17,7 +17,8 @@ export default function FindVoucherDialog() {
         error,
         voucher,
         handleFetchVoucher,
-        executedVoucher
+        executedVoucher,
+        clearVoucher
     } = useFindVoucherViewModel();
 
     // Helper badge layout styling matching status states
@@ -177,7 +178,7 @@ export default function FindVoucherDialog() {
                             </div>
                             <div>
                                 <h3 className="text-lg font-black tracking-wide text-white">
-                                    Action Executed Successfully
+                                    Executed Successfully
                                 </h3>
                                 <p className="text-xs text-zinc-400 mt-1 max-w-[280px] mx-auto">
                                     {executedVoucher.msg}
@@ -245,14 +246,14 @@ export default function FindVoucherDialog() {
                         {/* ==========================================
                             CLOSE DISMISSAL CONTROL FOOTING
                             ========================================== */}
-                        {/* <div className="pt-2">
-                            <Button
-                                onClick={toggleDialog} // Triggers the context closing sequence cleanly resetting local states
-                                className="w-full bg-zinc-900 border border-zinc-800 text-zinc-100 hover:bg-zinc-800 font-medium text-sm h-10 cursor-pointer transition-all active:scale-[0.98]"
+                        <div className="t-2">
+                            <DialogClose
+                                onClick={clearVoucher}
+                                className="rounded-lg w-full bg-zinc-900 border border-zinc-800 text-zinc-100 hover:bg-zinc-800 font-medium text-sm h-10 cursor-pointer transition-all active:scale-[0.98]"
                             >
                                 Done & Dismiss
-                            </Button>
-                        </div> */}
+                            </DialogClose>
+                        </div>
                     </div>
                 )}
 

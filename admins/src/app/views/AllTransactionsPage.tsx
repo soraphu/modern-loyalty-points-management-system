@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Loader2, History, Search, RefreshCw, AlertCircle, ArrowUpRight, ArrowDownLeft, XCircle } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import NavBar from './NavBar';
 
 export default function AllTransactionsPage() {
@@ -58,11 +57,9 @@ export default function AllTransactionsPage() {
                 {/* HEADER SECTION */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-900 pb-5">
                     <div>
-                        <Link to='/home' >
-                            <h1 className="text-xl font-black tracking-wider text-white flex items-center gap-2">
-                                <History className="text-blue-500 h-5 w-5" /> TRANSACTION HISTORY
-                            </h1>
-                        </Link>
+                        <h1 className="text-xl font-black tracking-wider text-white flex items-center gap-2">
+                            <History className="text-blue-500 h-5 w-5" /> TRANSACTION HISTORY
+                        </h1>
                     </div>
                     <Button
                         variant="outline"
