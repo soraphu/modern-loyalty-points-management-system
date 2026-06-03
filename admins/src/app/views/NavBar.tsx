@@ -14,14 +14,12 @@ const NavBar = () => {
 
             {/* Left Side: Text Brand Metrics */}
             <div className="space-y-0.5 sm:hidden">
-                <div >
-                    <Link to='/home'>
-                        <ShieldUser className='text-app-primary' size={26} />
-                        <h1 className="text-xl font-black tracking-wider text-app-primary">
-                            DEEPOINTS
-                        </h1>
-                    </Link>
-                </div>
+                <Link to='/home' className="flex gap-2">
+                    <ShieldUser className='text-app-primary' size={28} />
+                    <h1 className="text-xl font-black tracking-wider text-app-primary">
+                        DEEPOINTS
+                    </h1>
+                </Link>
                 <p className="text-xs font-bold uppercase tracking-widest text-blue-100">
                     ROLE : <span className="underline decoration-white underline-offset-2">{admin.role}</span>
                 </p>
@@ -66,7 +64,7 @@ const NavBar = () => {
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
-        </header>
+        </header >
     )
 }
 

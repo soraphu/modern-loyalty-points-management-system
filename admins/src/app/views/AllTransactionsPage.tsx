@@ -5,6 +5,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Loader2, History, Search, RefreshCw, AlertCircle, ArrowUpRight, ArrowDownLeft, XCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import NavBar from './NavBar';
 
 export default function AllTransactionsPage() {
     const {
@@ -41,9 +42,18 @@ export default function AllTransactionsPage() {
         }
     };
 
+    const CustomeTabTrigger = ({ value, textContent }: { value: string, textContent: string }) => {
+        return (
+            <TabsTrigger value={value} className="cursor-pointer hover:text-zinc-400 text-zinc-500 data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-xs px-3 flex-1 md:flex-none">{textContent}</TabsTrigger>
+        )
+    }
+
     return (
-        <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-50 antialiased p-4 sm:p-6">
-            <div className="max-w-5xl w-full mx-auto space-y-6">
+
+        <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-50 antialiased ">
+            <NavBar />
+
+            <div className="mt-4 max-w-5xl w-full mx-auto space-y-6 p-4">
 
                 {/* HEADER SECTION */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-zinc-900 pb-5">
@@ -77,10 +87,10 @@ export default function AllTransactionsPage() {
 
                     <Tabs value={typeFilter} onValueChange={(val) => setTypeFilter(val as any)} className="w-full md:w-auto">
                         <TabsList className="bg-zinc-900 border border-zinc-800 p-1 text-zinc-400 w-full md:w-auto">
-                            <TabsTrigger value="ALL" className="data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-xs px-3 flex-1 md:flex-none">All</TabsTrigger>
-                            <TabsTrigger value="EARN" className="data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-xs px-3 flex-1 md:flex-none">Earn</TabsTrigger>
-                            <TabsTrigger value="REDEEM" className="data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-xs px-3 flex-1 md:flex-none">Redeem</TabsTrigger>
-                            <TabsTrigger value="CANCEL" className="data-[state=active]:bg-zinc-800 data-[state=active]:text-white text-xs px-3 flex-1 md:flex-none">Cancel</TabsTrigger>
+                            <CustomeTabTrigger value='ALL' textContent='All' />
+                            <CustomeTabTrigger value='EARN' textContent='Earn' />
+                            <CustomeTabTrigger value='REDEEM' textContent='Redeem' />
+                            <CustomeTabTrigger value='CANCEL' textContent='Cancel' />
                         </TabsList>
                     </Tabs>
                 </div>

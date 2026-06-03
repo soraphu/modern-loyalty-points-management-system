@@ -8,6 +8,7 @@ import { NavigateButtonUI } from '@/components/parts/navigate_button_ui';
 
 export default function FindVoucherDialog() {
     const {
+        handleSetteVoucher,
         isOpen,
         toggleDialog,
         code,
@@ -16,6 +17,7 @@ export default function FindVoucherDialog() {
         error,
         voucher,
         handleFetchVoucher,
+        executedVoucher
     } = useFindVoucherViewModel();
 
     // Helper badge layout styling matching status states
@@ -78,7 +80,7 @@ export default function FindVoucherDialog() {
                 {/* ==========================================
             VOUCHER METRICS DISPLAY CONTAINER
             ========================================== */}
-                {voucher && (
+                {voucher && !executedVoucher && (
                     <div className="mt-4 border border-zinc-900 bg-zinc-900/20 rounded-xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200">
 
                         {/* Header Voucher Title State Banner */}
@@ -149,16 +151,17 @@ export default function FindVoucherDialog() {
                         {/* Action Trigger Pad Footing */}
                         {voucher.status === 'PENDING' && (
                             <div className="w-full p-3 bg-zinc-900/50 border-t border-zinc-900 flex gap-4">
-                                <Button variant="destructive" className="flex-1 bg-red-950 hover:bg-red-900/60 text-red-200 border border-red-900/50 font-medium text-xs h-9 gap-1.5 cursor-pointer">
+                                <Button onClick={handleSetteVoucher} variant="destructive" className="flex-1 bg-red-950 hover:bg-red-900/60 text-red-200 border border-red-900/50 font-medium text-xs h-9 gap-1.5 cursor-pointer">
                                     <Ban className="h-3.5 w-3.5" /> Cancel Code
                                 </Button>
-                                <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs h-9 gap-1.5 cursor-pointer">
+                                <Button onClick={() => { }} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs h-9 gap-1.5 cursor-pointer">
                                     <CheckCircle2 className="h-3.5 w-3.5" /> Redeem Voucher
                                 </Button>
                             </div>
                         )}
                     </div>
                 )}
+
             </DialogContent>
         </Dialog>
     );

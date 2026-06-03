@@ -19,7 +19,7 @@ export function useGenerateQrViewModel(onSuccess?: () => void) {
             setIsLoading(true);
             setErrorMessage(null);
 
-            const resData: any = await action(async () => ApiActionService.generatePointsToken(values.points));
+            const resData: any = await action(async () => ApiActionService.apiGeneratePointsToken(values.points));
 
             const earnPointsUrl = `${import.meta.env.VITE_CUSTOMER_SIDE_URL}?code_string=${resData.data.codeString}`;
 

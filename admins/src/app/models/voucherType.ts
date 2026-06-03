@@ -21,6 +21,7 @@ export interface Voucher {
     status: 'PENDING' | 'CLAIMED' | 'EXPIRED' | 'CANCELLED';
     createdAt: string;
     expiresAt: string;
+    voucherCode: string;
     user: UserPayload;
     reward: RewardPayload;
 }
