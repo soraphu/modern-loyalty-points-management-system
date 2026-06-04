@@ -20,6 +20,7 @@ enum AdminRoles {
   STAFF
   MANAGER
   OWNER
+  SYSTEM
 
   @@map("adminRoles")
 }
@@ -27,6 +28,8 @@ enum AdminRoles {
 enum TransactionType {
   EARN
   REDEEM
+  CANCEL
+  EXPIRED
 
   @@map("transactionType")
 }

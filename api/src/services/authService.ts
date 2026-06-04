@@ -226,7 +226,8 @@ export class Auth {
             const roleHierarchy: Record<AdminRoles, number> = {
                 [AdminRoles.STAFF]: 1,
                 [AdminRoles.MANAGER]: 2,
-                [AdminRoles.OWNER]: 3
+                [AdminRoles.SYSTEM]: 3,
+                [AdminRoles.OWNER]: 4
             };
 
             const adminLiveRank = roleHierarchy[admin.role];
