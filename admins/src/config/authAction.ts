@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { apiClient } from './apiClient';
 import { setupAuthHeader, useAuth } from './authProvider';
 import { API_PATH, consoleLogOnDev, filterErrorMessage } from './constant';
@@ -7,6 +8,7 @@ type AuthenticatedAction<T> = () => Promise<T>;
 
 export default function AuthAction() {
     const { setCurrentAdmin, setAccessToken, getAccessToken, handleLogout } = useAuth();
+    const navigate = useNavigate();
 
     async function fetchAdminProfile() {
         consoleLogOnDev("Fetching admin profile with proactive token management...");
@@ -63,6 +65,24 @@ export default function AuthAction() {
         }
     }//end
 
+    async function navigateHomeOnLoggedIn() {
+        let tempAccessToken = getAccessToken();
+
+        // STEP 1: CHECK IF ACCESS TOKEN IS EMPTY
+        if (!tempAccessToken) {
+            consoleLogOnDev("Access token missing. Initializing proactive refresh handshake...");
+            tempAccessToken = await attemptTokenRefresh();
+
+            if (!tempAccessToken) {
+                consoleLogOnDev("No refresh token, do nothing.");
+                return;
+            }
+        }
+
+        consoleLogOnDev("Refresh token success.");
+        navigate('/home');
+    }//end
+
     async function attemptTokenRefresh() {
         try {
             // Call your backend's refresh route layout
@@ -81,5 +101,5 @@ export default function AuthAction() {
         }
     }
 
-    return { action, fetchAdminProfile };
+    return { action, fetchAdminProfile, navigateHomeOnLoggedIn };
 }

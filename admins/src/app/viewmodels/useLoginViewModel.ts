@@ -1,16 +1,22 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { ApiAuthService } from '../api/apiAuthService';
 import type { LoginFormValues } from '../models/authTypes';
 import { consoleLogOnDev } from '@/config/constant';
 import { useAuth } from '@/config/authProvider';
 import { useNavigate } from 'react-router-dom';
+import AuthAction from '@/config/authAction';
 
 export function useLoginViewModel() {
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const { setCurrentAdmin, setAccessToken } = useAuth();
+    const { navigateHomeOnLoggedIn } = AuthAction();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        navigateHomeOnLoggedIn();
+    }, [])
 
     // Native React Hook Form configuration without Zod dependencies
     const {
