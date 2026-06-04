@@ -24,6 +24,7 @@ export function useGenerateQrViewModel(onSuccess?: () => void) {
             const earnPointsUrl = `${import.meta.env.VITE_CUSTOMER_SIDE_URL}?code_string=${resData.data.codeString}`;
 
             const qrCodeData: GenerateQrCodeData = {
+                value: values.points,
                 qrCodeUrl: `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${earnPointsUrl}`,
                 expiresInMinutes: resData.data.expiresMinutes,
             };

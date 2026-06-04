@@ -94,7 +94,8 @@ export default function GenerateQrDialog() {
 
                         {/* Expired Ticker Countdown Text */}
                         <div className="text-center space-y-1">
-                            <p className="text-sm font-medium text-zinc-200">Ready for Customer Scan</p>
+                            <p className="text-sm font-medium text-zinc-200">Ready for Scan</p>
+                            <p className="text-sm font-medium text-zinc-200">Customer will receive <span className='text-green-400'>{qrResult.value} points</span></p>
                             <p className="text-xs text-zinc-500 flex items-center justify-center gap-1.5">
                                 <RefreshCw className="h-3 w-3 animate-spin duration-10000" />
                                 Token automatically expires in <span className="text-zinc-400 font-bold">{qrResult.expiresInMinutes}m</span>
