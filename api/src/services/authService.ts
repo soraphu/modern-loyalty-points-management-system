@@ -7,6 +7,7 @@ import { AdminRoles } from '../generated/prisma/enums';
 import crypto from 'crypto';
 import { Logger } from '../utils/logger';
 import { FastifyReply } from 'fastify/types/reply';
+import 'dotenv/config';
 
 export interface CustomerTokenPayload {
     id: string;
@@ -19,7 +20,7 @@ export interface CustomerTokenPayload {
 const logs = new Logger('AuthService');
 
 export class Auth {
-    private static readonly ACC_TOKEN_EXPIRY = '15m';
+    private static readonly ACC_TOKEN_EXPIRY = process.env.ACC_TOKEN_EXPIRY || '15m';
     private static readonly REFRESH_TOKEN_EXPIRY = 30; // in days
 
 
