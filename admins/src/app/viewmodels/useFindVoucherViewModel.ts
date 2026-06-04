@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { ExecutedVoucherResponse, Voucher } from '../models/voucherType';
-import { ApiActionService } from '../api/apiActionService';
+import { ApiActionService, type ExecuteVoucherSelection } from '../api/apiActionService';
 import AuthAction from '@/config/authAction';
 import { consoleLogOnDev } from '@/config/constant';
 import { toast } from 'sonner';
@@ -49,12 +49,12 @@ export function useFindVoucherViewModel() {
         }
     };
 
-    const handleSetteVoucher = async () => {
+    const handleExecuteVoucher = async (execute: ExecuteVoucherSelection) => {
 
         try {
             if (!voucher) throw { msg: "Error voucher not found." };
 
-            const resData: any = await action(() => ApiActionService.apiSettleVoucher(voucher.voucherCode));
+            const resData: any = await action(() => ApiActionService.apiExecuteVoucher(voucher.voucherCode, execute));
 
             setExecutedVoucher(resData);
         } catch (err: any) {
@@ -65,15 +65,13 @@ export function useFindVoucherViewModel() {
         }
     }
 
-    //cancelVoucher
-
     const clearVoucher = async () => {
         setVoucher(null);
         setExecutedVoucher(null);
     }
 
     return {
-        handleSetteVoucher,
+        handleExecuteVoucher,
         isOpen,
         toggleDialog,
         code,

@@ -1,8 +1,7 @@
 import type { AdminRole } from '@/app/models/adminTypes';
 import { createContext, useContext, useState, useRef, useCallback, type ReactNode } from 'react';
 import { apiClient } from './apiClient';
-import { API_PATH, consoleLogOnDev } from './constant';
-import { useNavigate } from 'react-router-dom';
+import { consoleLogOnDev } from './constant';
 import { toast } from 'sonner';
 
 // 1. Define the TypeScript interfaces

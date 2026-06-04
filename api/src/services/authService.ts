@@ -22,7 +22,7 @@ const logs = new Logger('AuthService');
 export class Auth {
     private static readonly ACC_TOKEN_EXPIRY = process.env.ACC_TOKEN_EXPIRY || '15m';
     private static readonly REFRESH_TOKEN_EXPIRY = 30; // in days
-
+    private static readonly isProduction: boolean = process.env.NODE_ENV === 'production' || false;
 
     private static generateAlphanumericCode(): string {
         const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -39,8 +39,8 @@ export class Auth {
     public static setRefreshTokenCookie = (reply: FastifyReply, newRefreshToken: string) => {
         reply.setCookie('ARFT', newRefreshToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            secure: this.isProduction,
+            sameSite: this.isProduction ? 'none' : 'lax',
             path: '/',
             maxAge: 30 * 24 * 60 * 60 // 30 days in seconds
         });

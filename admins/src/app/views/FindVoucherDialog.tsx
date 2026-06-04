@@ -8,7 +8,7 @@ import { NavigateButtonUI } from '@/components/parts/navigate_button_ui';
 
 export default function FindVoucherDialog() {
     const {
-        handleSetteVoucher,
+        handleExecuteVoucher,
         isOpen,
         toggleDialog,
         code,
@@ -152,10 +152,10 @@ export default function FindVoucherDialog() {
                         {/* Action Trigger Pad Footing */}
                         {voucher.status === 'PENDING' && (
                             <div className="w-full p-3 bg-zinc-900/50 border-t border-zinc-900 flex gap-4">
-                                <Button onClick={() => { }} variant="destructive" className="flex-1 bg-red-950 hover:bg-red-900/60 text-red-200 border border-red-900/50 font-medium text-xs h-9 gap-1.5 cursor-pointer">
+                                <Button onClick={() => handleExecuteVoucher('CANCEL')} variant="destructive" className="flex-1 bg-red-950 hover:bg-red-900/60 text-red-200 border border-red-900/50 font-medium text-xs h-9 gap-1.5 cursor-pointer">
                                     <Ban className="h-3.5 w-3.5" /> Cancel Code
                                 </Button>
-                                <Button onClick={handleSetteVoucher} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs h-9 gap-1.5 cursor-pointer">
+                                <Button onClick={() => handleExecuteVoucher('SETTLE')} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs h-9 gap-1.5 cursor-pointer">
                                     <CheckCircle2 className="h-3.5 w-3.5" /> Redeem Voucher
                                 </Button>
                             </div>

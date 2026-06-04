@@ -2,6 +2,8 @@ import { apiClient } from "@/config/apiClient";
 import { API_PATH, filterErrorMessage } from "@/config/constant";
 import type { VoucherResponse } from "../models/voucherType";
 
+export type ExecuteVoucherSelection = 'SETTLE' | 'CANCEL';
+
 export const ApiActionService = {
     async apiGeneratePointsToken(points: string) {
         try {
@@ -28,7 +30,8 @@ export const ApiActionService = {
         }
     },
 
-    async apiSettleVoucher(voucherCode: string) {
+
+    async apiExecuteVoucher(voucherCode: string, execute: ExecuteVoucherSelection) {
         try {
             const res = await apiClient.patch(API_PATH.settleVoucher(voucherCode), {});
 
@@ -39,5 +42,5 @@ export const ApiActionService = {
             throw finalErrorMsg;
         }
 
-    }
+    },
 }

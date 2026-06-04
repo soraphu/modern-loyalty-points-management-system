@@ -56,6 +56,7 @@ export const API_PATH = {
     getVoucher: '/vouchers',
     getAllTransactions: '/transactions',
     getOwnTransactions: '/my-transactions',
-    settleVoucher: (voucherCode: string) => { return `/vouchers/${voucherCode}/settle` }
+    settleVoucher: (voucherCode: string) => { return `/vouchers/${voucherCode}/settle` },
+    cancelVoucher: (voucherCode: string) => { return `/vouchers/${voucherCode}/cancel` }
 
 }
