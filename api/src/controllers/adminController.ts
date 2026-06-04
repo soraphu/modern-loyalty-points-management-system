@@ -4,7 +4,7 @@ import { Validation } from '../utils/validation';
 import { OwnerService } from '../services/ownerService';
 import { ApiResponse } from '../utils/apiResponse';
 import { Auth } from '../services/authService';
-import { AdminRoles } from '../generated/prisma/enums';
+import { AdminRoles, VoucherStatus } from '../generated/prisma/enums';
 import { StaffService } from '../services/staffService';
 import { ManagerService } from '../services/managerService';
 import { prisma } from '../config/database';
@@ -236,7 +236,7 @@ export async function queryTargetVoucherController(request: FastifyRequest, repl
     }
 }//end
 
-export async function settleVoucherController(request: FastifyRequest, reply: FastifyReply) {
+export async function executionVoucherController(request: FastifyRequest, reply: FastifyReply, execution: VoucherStatus) {
     const { voucher_code: voucherCode }: any = request.params;
 
     try {
@@ -248,12 +248,12 @@ export async function settleVoucherController(request: FastifyRequest, reply: Fa
         const admin = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });
         logs.info('Admin: ', admin);
 
-        const settledInfo = await StaffService.settleVoucher(voucherCode, decodePayload.id);
+        const executedInfo = await StaffService.executionVoucher({ execution, adminId: admin.id, voucherCode });
 
         const res = ApiResponse.success({
             statusCode: 200,
-            msg: `Settled voucher ${voucherCode} successful.`,
-            data: settledInfo
+            msg: `Voucher #${voucherCode} was ${execution} successful.`,
+            data: executedInfo
         });
 
         return reply.status(res.statusCode).send(res.payload);
@@ -266,37 +266,6 @@ export async function settleVoucherController(request: FastifyRequest, reply: Fa
 
     }
 }//end
-
-export async function cancelVoucherController(request: FastifyRequest, reply: FastifyReply) {
-    const { voucher_code: voucherCode }: any = request.params;
-
-    try {
-        const accessToken = Validation.requireAuthHeader(request);
-
-        const decodePayload: any = Auth.verifyAndDecodeAccessToken(accessToken);
-        logs.info('Decode Payload: ', decodePayload);
-
-        const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });
-        logs.info('Admin: ', admin);
-
-        const cancelledInfo = await StaffService.cancelVoucher(voucherCode);
-
-        const res = ApiResponse.success({
-            statusCode: 200,
-            msg: `Cancelled voucher ${voucherCode} successful.`,
-            data: cancelledInfo
-        });
-
-        return reply.status(res.statusCode).send(res.payload);
-    } catch (error: any) {
-        logs.error(error);
-        let serverError = error;
-        if (!serverError.payload) serverError = ApiResponse.internalServerError();
-
-        return reply.status(serverError.statusCode).send(serverError.payload);
-
-    }
-}
 
 export async function isOwnerExistController(request: FastifyRequest, reply: FastifyReply) {
     try {

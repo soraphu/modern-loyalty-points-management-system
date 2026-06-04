@@ -93,57 +93,34 @@ export class StaffService {
         }
     }
 
-    public static async cancelVoucher(voucherCode: string) {
-        try {
-            return await prisma.$transaction(async (tx) => {
-                await Validation.getValidatedVoucher(tx, voucherCode);
-
-                const cancelledVoucher = await tx.voucher.update({
-                    where: { voucherCode: voucherCode },
-                    data: { status: VoucherStatus.CANCELLED },
-                    include: { reward: true }
-                });
-
-                // Refund points for a normal active cancellation request
-                await Auth.returnCustomerPoints(cancelledVoucher.userId, cancelledVoucher.reward.pointsCost);
-
-                return {
-                    cancelled_voucher: cancelledVoucher,
-                    return_points: {
-                        userId: cancelledVoucher.userId,
-                        returnPoints: cancelledVoucher.reward.pointsCost
-                    }
-                };
-            });
-        } catch (error: any) {
-            if (error.payload) throw error;
-
-            logs.error('[VOUCHER FAULT] cancelVoucher execution failed', error);
-            throw ApiResponse.internalServerError('Unable to complete voucher cancellation.');
-        }
-    }
-
     /**
-     * Settle Voucher (Will now auto-refund if the voucher is expired)
+     * Execute Voucher and create transactions
      */
-    public static async settleVoucher(voucherCode: string, adminId: string) {
+    public static async executionVoucher({ voucherCode, adminId, execution }: { voucherCode: string, adminId: string, execution: VoucherStatus }) {
+        let convertToTransaction: any = execution;
+        if (execution === VoucherStatus.CLAIMED) convertToTransaction = TransactionType.REDEEM;
+        if (execution === VoucherStatus.CANCELLED) convertToTransaction = TransactionType.CANCEL;
+
         try {
             return await prisma.$transaction(async (tx) => {
                 await Validation.getValidatedVoucher(tx, voucherCode);
 
-                const settleVoucher = await tx.voucher.update({
+                const executedVoucher = await tx.voucher.update({
                     where: { voucherCode: voucherCode },
-                    data: { status: VoucherStatus.CLAIMED },
+                    data: { status: execution },
                     include: { reward: true }
                 });
+
+                const pointsCost = executedVoucher.reward.pointsCost;
+                const pointsAmount = execution === 'CLAIMED' ? -pointsCost : pointsCost; //If execute CLAIMED keep -pointsCost.
 
                 const transaction = await tx.transaction.create({
                     data: {
-                        userId: settleVoucher.userId,
+                        userId: executedVoucher.userId,
                         adminId,
-                        referenceId: settleVoucher.id,
-                        pointsAmount: -settleVoucher.reward.pointsCost,
-                        type: TransactionType.REDEEM
+                        referenceId: executedVoucher.id,
+                        pointsAmount,
+                        type: convertToTransaction
                     },
                     select: {
                         id: true,
@@ -156,7 +133,7 @@ export class StaffService {
                     }
                 });
 
-                return { transaction: transaction, settled_voucher: settleVoucher };
+                return { transaction: transaction, executedVoucher };
             });
         } catch (error: any) {
             if (error.payload) throw error;

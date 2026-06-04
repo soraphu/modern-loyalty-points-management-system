@@ -4,7 +4,7 @@ import {
     adminLoginController,
     generatePointsTokenController,
     queryTargetVoucherController,
-    settleVoucherController,
+    executionVoucherController,
     fetchRewardsController,
     createRewardController,
     deleteRewardController,
@@ -16,7 +16,6 @@ import {
     modifyAdminRoleController,
     forcePasswordResetController,
     deleteAdminController,
-    cancelVoucherController,
     adminGetProfileController,
     adminGetTokenPayloadController,
     registerOwnerController,
@@ -26,6 +25,7 @@ import {
     fetchAllTransactionsController,
     fetchMyTransactionsController
 } from '../controllers/adminController';
+import { request } from 'node:http';
 
 export async function adminRoutes(fastify: FastifyInstance) {
 
@@ -60,9 +60,9 @@ export async function adminRoutes(fastify: FastifyInstance) {
 
     // Settle and Redeem Outstanding Voucher
     // PATCH -> /api/v1/admin/vouchers/:voucher_id/settle
-    fastify.patch('/vouchers/:voucher_code/settle', settleVoucherController);
+    fastify.patch('/vouchers/:voucher_code/settle', (request, reply) => executionVoucherController(request, reply, 'CLAIMED'));
 
-    fastify.patch('/vouchers/:voucher_code/cancel', cancelVoucherController);
+    fastify.patch('/vouchers/:voucher_code/cancel', (request, reply) => executionVoucherController(request, reply, 'CANCELLED'));
 
     // Fetch Complete Available Rewards Listing
     // GET -> /api/v1/admin/rewards
