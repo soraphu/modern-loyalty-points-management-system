@@ -202,10 +202,10 @@ export default function FindVoucherDialog() {
                                 <div className="flex justify-between items-start border-b border-zinc-900/60 pb-2.5">
                                     <div>
                                         <p className="font-bold text-zinc-100">
-                                            {executedVoucher.data.settled_voucher.reward.rewardName}
+                                            {executedVoucher.data.executed_voucher.reward.rewardName}
                                         </p>
                                         <p className="text-[10px] text-zinc-500 font-mono mt-0.5">
-                                            CODE: {executedVoucher.data.settled_voucher.voucherCode}
+                                            CODE: {executedVoucher.data.executed_voucher.voucherCode}
                                         </p>
                                     </div>
                                     <span className={`px-2 py-0.5 font-mono text-[10px] font-bold rounded border ${executedVoucher.data.transaction.type === 'REDEEM'
@@ -219,17 +219,20 @@ export default function FindVoucherDialog() {
                                 {/* Audit Fields Map Info Grid */}
                                 <div className="space-y-1.5 font-medium text-zinc-400">
                                     <div className="flex justify-between">
-                                        <span className="text-zinc-500">Points Applied</span>
+                                        <span className="text-zinc-500">{executedVoucher.data.transaction.type === 'REDEEM' ? "Points Applied" : "Restore Points"}</span>
                                         <span className={`font-mono font-bold ${executedVoucher.data.transaction.pointsAmount > 0 ? 'text-emerald-400' : 'text-zinc-300'
                                             }`}>
-                                            {executedVoucher.data.transaction.pointsAmount} Points
+                                            {executedVoucher.data.transaction.type === 'REDEEM' ?
+                                                `${executedVoucher.data.transaction.pointsAmount} Points` :
+                                                `+${executedVoucher.data.transaction.pointsAmount} Points`
+                                            }
                                         </span>
                                     </div>
 
                                     <div className="flex justify-between">
                                         <span className="text-zinc-500">System Voucher UUID</span>
-                                        <span className="font-mono text-zinc-500 text-[10px] truncate max-w-[180px]" title={executedVoucher.data.settled_voucher.id}>
-                                            {executedVoucher.data.settled_voucher.id}
+                                        <span className="font-mono text-zinc-500 text-[10px] truncate max-w-[180px]" title={executedVoucher.data.executed_voucher.id}>
+                                            {executedVoucher.data.executed_voucher.id}
                                         </span>
                                     </div>
 

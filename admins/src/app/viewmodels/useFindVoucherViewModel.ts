@@ -54,7 +54,7 @@ export function useFindVoucherViewModel() {
         try {
             if (!voucher) throw { msg: "Error voucher not found." };
 
-            const resData: any = await action(() => ApiActionService.apiExecuteVoucher(voucher.voucherCode, execute));
+            const resData = await action<ExecutedVoucherResponse>(() => ApiActionService.apiExecuteVoucher(voucher.voucherCode, execute));
 
             setExecutedVoucher(resData);
         } catch (err: any) {

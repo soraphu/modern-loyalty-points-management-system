@@ -33,7 +33,9 @@ export const ApiActionService = {
 
     async apiExecuteVoucher(voucherCode: string, execute: ExecuteVoucherSelection) {
         try {
-            const res = await apiClient.patch(API_PATH.settleVoucher(voucherCode), {});
+            const res = execute === 'SETTLE' ?
+                await apiClient.patch(API_PATH.settleVoucher(voucherCode), {}) :
+                await apiClient.patch(API_PATH.cancelVoucher(voucherCode), {});
 
             return res.data;
         } catch (err) {

@@ -43,11 +43,11 @@ export interface ExecutedVoucherResponse {
             userId: string;
             referenceId: string;
             pointsAmount: number;
-            type: 'REDEEM' | 'CANCEL';
+            type: 'REDEEM' | 'CANCEL' | 'EXPIRED';
             createdAt: string;
             adminId: string;
         };
-        settled_voucher: {
+        executed_voucher: {
             id: string;
             userId: string;
             rewardId: string;
