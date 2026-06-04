@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogClose, Di
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Loader2, Search, Ticket, Calendar, Ban, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Loader2, Search, Ticket, Calendar, Ban, CheckCircle2, AlertCircle, HelpCircle, ArrowLeft } from 'lucide-react';
 import { NavigateButtonUI } from '@/components/parts/navigate_button_ui';
 
 export default function FindVoucherDialog() {
@@ -18,7 +18,8 @@ export default function FindVoucherDialog() {
         voucher,
         handleFetchVoucher,
         executedVoucher,
-        clearVoucher
+        confirmAction,
+        setConfirmAction
     } = useFindVoucherViewModel();
 
     // Helper badge layout styling matching status states
@@ -37,7 +38,7 @@ export default function FindVoucherDialog() {
                 <NavigateButtonUI Icon={Ticket} title='Find Voucher' useColor='STAFF' />
             </DialogTrigger>
 
-            <DialogContent className="sm:max-w-md bg-zinc-950 border-zinc-900 text-zinc-50 shadow-2xl">
+            <DialogContent className="sm:max-w-md bg-zinc-950 border-zinc-900 text-zinc-50 shadow-2xl transition-all duration-300">
                 <DialogHeader>
                     <DialogTitle className="text-xl font-bold flex items-center gap-2">
                         <Ticket className="text-blue-500 h-5 w-5" /> Find Active Voucher
@@ -48,8 +49,8 @@ export default function FindVoucherDialog() {
                 </DialogHeader>
 
                 {/* ==========================================
-            SUBMISSION INPUT FORM
-            ========================================== */}
+                    SUBMISSION INPUT FORM
+                ========================================== */}
                 <form onSubmit={handleFetchVoucher} className="space-y-4 pt-2">
                     <div className="flex gap-2">
                         <Input
@@ -57,12 +58,12 @@ export default function FindVoucherDialog() {
                             onChange={(e) => setCode(e.target.value.slice(0, 6))}
                             placeholder="e.g., 52WNIQ"
                             maxLength={6}
-                            disabled={isLoading}
+                            disabled={isLoading || !!confirmAction}
                             className="bg-zinc-900 border-zinc-800 text-zinc-50 placeholder-zinc-600 tracking-widest font-mono text-center text-lg uppercase focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                         />
                         <Button
                             type="submit"
-                            disabled={isLoading || code.length !== 6}
+                            disabled={isLoading || code.length !== 6 || !!confirmAction}
                             className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 cursor-pointer"
                         >
                             {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
@@ -79,22 +80,20 @@ export default function FindVoucherDialog() {
                 </form>
 
                 {/* ==========================================
-            VOUCHER METRICS DISPLAY CONTAINER
-            ========================================== */}
-                {voucher && !executedVoucher && (
+                    VOUCHER METRICS DISPLAY CONTAINER
+                ========================================== */}
+                {voucher && !executedVoucher && !confirmAction && (
                     <div className="mt-4 border border-zinc-900 bg-zinc-900/20 rounded-xl overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200">
 
                         {/* Header Voucher Title State Banner */}
                         <div className="p-4 border-b border-zinc-900 flex items-center justify-between bg-zinc-900/40 gap-3">
                             <div className="flex items-center gap-3 min-w-0">
-                                {/* 💡 REWARD IMAGE CONDITIONAL SECTION */}
                                 {voucher.reward.imageUrl ? (
                                     <img
                                         src={voucher.reward.imageUrl}
                                         alt={voucher.reward.rewardName}
                                         className="h-12 w-12 rounded-lg object-cover border border-zinc-800 shrink-0 bg-zinc-900"
                                         onError={(e) => {
-                                            // Safe fallback if image string URL exists but fails to download/load
                                             (e.target as HTMLElement).style.display = 'none';
                                         }}
                                     />
@@ -118,7 +117,6 @@ export default function FindVoucherDialog() {
 
                         {/* Content Specifications Body */}
                         <div className="p-4 space-y-4">
-
                             {/* Linked Customer Profile Frame */}
                             <div className="flex items-center gap-3 bg-zinc-900/40 p-3 rounded-lg border border-zinc-900">
                                 <Avatar className="h-10 w-10 border border-zinc-800">
@@ -146,16 +144,22 @@ export default function FindVoucherDialog() {
                                     <p className="text-zinc-300 font-medium">{new Date(voucher.expiresAt).toLocaleDateString()}</p>
                                 </div>
                             </div>
-
                         </div>
 
                         {/* Action Trigger Pad Footing */}
                         {voucher.status === 'PENDING' && (
                             <div className="w-full p-3 bg-zinc-900/50 border-t border-zinc-900 flex gap-4">
-                                <Button onClick={() => handleExecuteVoucher('CANCEL')} variant="destructive" className="flex-1 bg-red-950 hover:bg-red-900/60 text-red-200 border border-red-900/50 font-medium text-xs h-9 gap-1.5 cursor-pointer">
+                                <Button
+                                    onClick={() => setConfirmAction('CANCEL')} // 💡 Open Cancel confirmation
+                                    variant="destructive"
+                                    className="flex-1 bg-red-950 hover:bg-red-900/60 text-red-200 border border-red-900/50 font-medium text-xs h-9 gap-1.5 cursor-pointer"
+                                >
                                     <Ban className="h-3.5 w-3.5" /> Cancel Code
                                 </Button>
-                                <Button onClick={() => handleExecuteVoucher('SETTLE')} className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs h-9 gap-1.5 cursor-pointer">
+                                <Button
+                                    onClick={() => setConfirmAction('SETTLE')} // 💡 Open Settle confirmation
+                                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs h-9 gap-1.5 cursor-pointer"
+                                >
                                     <CheckCircle2 className="h-3.5 w-3.5" /> Redeem Voucher
                                 </Button>
                             </div>
@@ -163,12 +167,71 @@ export default function FindVoucherDialog() {
                     </div>
                 )}
 
+                {/* ==========================================
+                    💡 NEW INTERMEDIARY ACTION CONFIRMATION PANEL
+                ========================================== */}
+                {confirmAction && !executedVoucher && (
+                    <div className="mt-4 border border-zinc-900 bg-zinc-900/10 rounded-xl p-5 space-y-5 animate-in zoom-in-95 duration-200 text-center">
+                        <div className="flex flex-col items-center space-y-3">
+                            <div className={`p-3 rounded-full border ${confirmAction === 'SETTLE'
+                                ? 'bg-emerald-950/40 border-emerald-800 text-emerald-400'
+                                : 'bg-red-950/40 border-red-800 text-red-400'
+                                }`}>
+                                <HelpCircle className="h-6 w-6 animate-pulse" />
+                            </div>
+                            <div>
+                                <h3 className="text-base font-bold text-white">
+                                    {confirmAction === 'SETTLE' ? 'Confirm Voucher Redemption' : 'Confirm Cancellation'}
+                                </h3>
+                                <p className="text-xs text-zinc-400 mt-1 max-w-[280px]">
+                                    {confirmAction === 'SETTLE'
+                                        ? `Are you sure you want to mark this voucher for "${voucher?.reward.rewardName}" as claimed? This action cannot be undone.`
+                                        : `This will void the code and return ${voucher?.reward.pointsCost} points back to ${voucher?.user.lineDisplayName}. Proceed?`
+                                    }
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Actions wrapper */}
+                        <div className="flex gap-3">
+                            <Button
+                                type="button"
+                                disabled={isLoading}
+                                onClick={() => setConfirmAction(null)} // 💡 Go back safely
+                                variant="outline"
+                                className="flex-1 border-zinc-800 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs h-10 gap-1 cursor-pointer"
+                            >
+                                <ArrowLeft className="h-3.5 w-3.5" /> Back
+                            </Button>
+                            <Button
+                                type="button"
+                                disabled={isLoading}
+                                onClick={async () => {
+                                    await handleExecuteVoucher(confirmAction);
+                                    setConfirmAction(null); // Clear stage once executed payload registers
+                                }}
+                                className={`flex-1 text-white font-bold text-xs h-10 gap-1.5 cursor-pointer ${confirmAction === 'SETTLE'
+                                    ? 'bg-emerald-600 hover:bg-emerald-700'
+                                    : 'bg-red-600 hover:bg-red-700'
+                                    }`}
+                            >
+                                {isLoading ? (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                ) : confirmAction === 'SETTLE' ? (
+                                    <> <CheckCircle2 className="h-3.5 w-3.5" /> Confirm Redeem</>
+                                ) : (
+                                    <> <Ban className="h-3.5 w-3.5" /> Confirm Void</>
+                                )}
+                            </Button>
+                        </div>
+                    </div>
+                )}
+
+                {/* ==========================================
+                    SUCCESS BANNER CORE HEADER
+                ========================================== */}
                 {executedVoucher && (
                     <div className="mt-2 space-y-4 animate-in zoom-in-95 duration-200">
-
-                        {/* ==========================================
-                            SUCCESS BANNER CORE HEADER
-                            ========================================== */}
                         <div className="flex flex-col items-center text-center py-4 space-y-2">
                             <div className={`p-3 rounded-full border ${executedVoucher.data.transaction.type === 'REDEEM'
                                 ? 'bg-emerald-950/50 border-emerald-800 text-emerald-400'
@@ -188,7 +251,7 @@ export default function FindVoucherDialog() {
 
                         {/* ==========================================
                             TRANSACTION SLIP RECEIPT DETAILS BOX
-                            ========================================== */}
+                        ========================================== */}
                         <div className="border border-zinc-900 bg-zinc-900/30 rounded-xl overflow-hidden text-xs">
                             <div className="p-3 border-b border-zinc-900 bg-zinc-900/40 flex items-center justify-between font-mono text-zinc-400">
                                 <span>RECEIPT: #{executedVoucher.data.transaction.id.split('-')[0].toUpperCase()}</span>
@@ -198,7 +261,6 @@ export default function FindVoucherDialog() {
                             </div>
 
                             <div className="p-4 space-y-3">
-                                {/* Reward Scope Summary */}
                                 <div className="flex justify-between items-start border-b border-zinc-900/60 pb-2.5">
                                     <div>
                                         <p className="font-bold text-zinc-100">
@@ -216,7 +278,6 @@ export default function FindVoucherDialog() {
                                     </span>
                                 </div>
 
-                                {/* Audit Fields Map Info Grid */}
                                 <div className="space-y-1.5 font-medium text-zinc-400">
                                     <div className="flex justify-between">
                                         <span className="text-zinc-500">{executedVoucher.data.transaction.type === 'REDEEM' ? "Points Applied" : "Restore Points"}</span>
@@ -248,10 +309,10 @@ export default function FindVoucherDialog() {
 
                         {/* ==========================================
                             CLOSE DISMISSAL CONTROL FOOTING
-                            ========================================== */}
-                        <div className="t-2">
+                        ========================================== */}
+                        <div className="pt-2">
                             <DialogClose
-                                onClick={clearVoucher}
+                                onClick={() => setConfirmAction(null)}
                                 className="rounded-lg w-full bg-zinc-900 border border-zinc-800 text-zinc-100 hover:bg-zinc-800 font-medium text-sm h-10 cursor-pointer transition-all active:scale-[0.98]"
                             >
                                 Done & Dismiss
@@ -259,7 +320,6 @@ export default function FindVoucherDialog() {
                         </div>
                     </div>
                 )}
-
             </DialogContent>
         </Dialog>
     );

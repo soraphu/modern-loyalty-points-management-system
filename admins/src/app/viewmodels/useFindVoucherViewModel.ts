@@ -13,6 +13,7 @@ export function useFindVoucherViewModel() {
     const [voucher, setVoucher] = useState<Voucher | null>(null);
     const [executedVoucher, setExecutedVoucher] = useState<ExecutedVoucherResponse | null>(null);
     const { action } = AuthAction();
+    const [confirmAction, setConfirmAction] = useState<'SETTLE' | 'CANCEL' | null>(null);
 
     // Clear previous states when toggling the dialog modal view
     const toggleDialog = (open: boolean) => {
@@ -21,6 +22,7 @@ export function useFindVoucherViewModel() {
             setCode('');
             setError(null);
             setVoucher(null);
+            setExecutedVoucher(null);
         }
     };
 
@@ -50,6 +52,7 @@ export function useFindVoucherViewModel() {
     };
 
     const handleExecuteVoucher = async (execute: ExecuteVoucherSelection) => {
+        setIsLoading(true);
 
         try {
             if (!voucher) throw { msg: "Error voucher not found." };
@@ -65,11 +68,6 @@ export function useFindVoucherViewModel() {
         }
     }
 
-    const clearVoucher = async () => {
-        setVoucher(null);
-        setExecutedVoucher(null);
-    }
-
     return {
         handleExecuteVoucher,
         isOpen,
@@ -81,6 +79,7 @@ export function useFindVoucherViewModel() {
         voucher,
         handleFetchVoucher,
         executedVoucher,
-        clearVoucher,
+        confirmAction,
+        setConfirmAction
     };
 }
