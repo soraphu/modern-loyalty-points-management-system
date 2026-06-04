@@ -133,7 +133,7 @@ export class StaffService {
                     }
                 });
 
-                return { transaction: transaction, executedVoucher };
+                return { transaction: transaction, executed_voucher: executedVoucher };
             });
         } catch (error: any) {
             if (error.payload) throw error;
