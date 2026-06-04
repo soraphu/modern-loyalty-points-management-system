@@ -267,6 +267,37 @@ export async function settleVoucherController(request: FastifyRequest, reply: Fa
     }
 }//end
 
+export async function cancelVoucherController(request: FastifyRequest, reply: FastifyReply) {
+    const { voucher_code: voucherCode }: any = request.params;
+
+    try {
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodePayload: any = Auth.verifyAndDecodeAccessToken(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });
+        logs.info('Admin: ', admin);
+
+        const cancelledInfo = await StaffService.cancelVoucher(voucherCode);
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: `Cancelled voucher ${voucherCode} successful.`,
+            data: cancelledInfo
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
+
+    }
+}
+
 export async function isOwnerExistController(request: FastifyRequest, reply: FastifyReply) {
     try {
         await OwnerService.validateOwnerUniqueness('OWNER');
@@ -341,36 +372,6 @@ export async function fetchRewardsController(request: FastifyRequest, reply: Fas
     }
 }//end
 
-export async function cancelVoucherController(request: FastifyRequest, reply: FastifyReply) {
-    const { voucher_code: voucherCode }: any = request.params;
-
-    try {
-        const accessToken = Validation.requireAuthHeader(request);
-
-        const decodePayload: any = Auth.verifyAndDecodeAccessToken(accessToken);
-        logs.info('Decode Payload: ', decodePayload);
-
-        const admin: any = await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'STAFF' });
-        logs.info('Admin: ', admin);
-
-        const cancelledInfo = await StaffService.cancelVoucher(voucherCode);
-
-        const res = ApiResponse.success({
-            statusCode: 200,
-            msg: `Cancelled voucher ${voucherCode} successful.`,
-            data: cancelledInfo
-        });
-
-        return reply.status(res.statusCode).send(res.payload);
-    } catch (error: any) {
-        logs.error(error);
-        let serverError = error;
-        if (!serverError.payload) serverError = ApiResponse.internalServerError();
-
-        return reply.status(serverError.statusCode).send(serverError.payload);
-
-    }
-}
 
 //========= MANAGER
 
