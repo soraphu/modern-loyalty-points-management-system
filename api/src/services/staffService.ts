@@ -96,21 +96,22 @@ export class StaffService {
     public static async cancelVoucher(voucherCode: string) {
         try {
             return await prisma.$transaction(async (tx) => {
-                const voucher = await Validation.getValidatedVoucher(tx, voucherCode);
+                await Validation.getValidatedVoucher(tx, voucherCode);
 
                 const cancelledVoucher = await tx.voucher.update({
                     where: { voucherCode: voucherCode },
-                    data: { status: VoucherStatus.CANCELLED }
+                    data: { status: VoucherStatus.CANCELLED },
+                    include: { reward: true }
                 });
 
                 // Refund points for a normal active cancellation request
-                await Auth.returnCustomerPoints(voucher.userId, voucher.reward.pointsCost);
+                await Auth.returnCustomerPoints(cancelledVoucher.userId, cancelledVoucher.reward.pointsCost);
 
                 return {
                     cancelled_voucher: cancelledVoucher,
                     return_points: {
-                        userId: voucher.userId,
-                        returnPoints: voucher.reward.pointsCost
+                        userId: cancelledVoucher.userId,
+                        returnPoints: cancelledVoucher.reward.pointsCost
                     }
                 };
             });
@@ -128,19 +129,20 @@ export class StaffService {
     public static async settleVoucher(voucherCode: string, adminId: string) {
         try {
             return await prisma.$transaction(async (tx) => {
-                const voucher = await Validation.getValidatedVoucher(tx, voucherCode);
+                await Validation.getValidatedVoucher(tx, voucherCode);
 
-                await tx.voucher.update({
+                const settleVoucher = await tx.voucher.update({
                     where: { voucherCode: voucherCode },
-                    data: { status: VoucherStatus.CLAIMED }
+                    data: { status: VoucherStatus.CLAIMED },
+                    include: { reward: true }
                 });
 
                 const transaction = await tx.transaction.create({
                     data: {
-                        userId: voucher.userId,
+                        userId: settleVoucher.userId,
                         adminId,
-                        referenceId: voucher.id,
-                        pointsAmount: -voucher.reward.pointsCost,
+                        referenceId: settleVoucher.id,
+                        pointsAmount: -settleVoucher.reward.pointsCost,
                         type: TransactionType.REDEEM
                     },
                     select: {
@@ -154,7 +156,7 @@ export class StaffService {
                     }
                 });
 
-                return { transaction: transaction, settled_voucher: voucher };
+                return { transaction: transaction, settled_voucher: settleVoucher };
             });
         } catch (error: any) {
             if (error.payload) throw error;
