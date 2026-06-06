@@ -27,10 +27,6 @@ export const ApiAuthService = {
         } catch (err) {
             const finalErrorMsg = filterErrorMessage(err);
 
-            if (finalErrorMsg.error_code === 'SERVER_ERROR') {
-                return toast.error(finalErrorMsg.msg);
-            }
-
             throw finalErrorMsg;
         }
     },

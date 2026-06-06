@@ -1,4 +1,4 @@
-import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import type { AxiosInstance, AxiosResponse } from 'axios';
 import axios from 'axios';
 
 export const apiClient: AxiosInstance = axios.create({
@@ -51,3 +51,15 @@ export const apiClient: AxiosInstance = axios.create({
 //         return Promise.reject(error);
 //     }
 // );
+
+//     async register(payload: RegisterFormValues): Promise < RegisterResponse > {
+//     try {
+//         const response = await apiClient.post<RegisterResponse>(API_PATH.register, payload);
+
+//         return response.data;
+//     } catch(err: any) {
+//         const finalErrorMsg = filterErrorMessage(err);
+
+//         throw finalErrorMsg;
+//     }
+// },

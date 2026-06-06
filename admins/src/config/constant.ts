@@ -1,4 +1,4 @@
-interface errorFilteredReturn {
+export interface ErrorFilteredReturn {
     error_code: string;
     msg: string;
 }
@@ -15,7 +15,7 @@ export const consoleWarnOnDev = (data: any) => {
 
 export const waitFor = (ms: any) => new Promise(resolve => setTimeout(resolve, ms));
 
-export const filterErrorMessage = (err: any): errorFilteredReturn => {
+export const filterErrorMessage = (err: any): ErrorFilteredReturn => {
 
     if (err?.response?.data.message) {
         consoleWarnOnDev("RESPONSE: ");

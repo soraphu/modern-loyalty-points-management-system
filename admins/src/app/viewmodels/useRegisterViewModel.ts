@@ -32,7 +32,13 @@ export function useRegisterViewModel() {
     async function initCheckOwnerExist() {
         try {
             await ApiAuthService.checkOwnerExist();
-        } catch (error) {
+
+        } catch (err: any) {
+
+            if (err.error_msg === 'SERVER_ERROR') {
+                return toast.error(err.msg);
+            }
+
             window.location.href = '/login';
         }
     }// init check owner exist.
