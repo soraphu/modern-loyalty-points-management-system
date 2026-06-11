@@ -1,10 +1,18 @@
 import { useState, useEffect } from 'react';
 import liff from '@line/liff';
+import { API_PATH, apiClient } from '@/config/apiClient';
+import { consoleLogOnDev, consoleWarnOnDev } from '@/config/constant';
 
 export interface UserProfileState {
-    displayName: string;
-    pictureUrl?: string;
-    points: number; // Linked directly from your ledger database profile sync
+    user: {
+        id: string;
+        createdAt: Date;
+        lineId: string;
+        lineDisplayName: string;
+        linePictureUrl: string | null;
+        totalPoints: number;
+    },
+    access_token: string;
 }
 
 export function useHomeViewModel() {
@@ -26,17 +34,20 @@ export function useHomeViewModel() {
                     return;
                 }
 
-                const lineProfile = await liff.getProfile();
-                // Mock data fetch simulating your point-ledger API payload match
-                // In production, fetch this point balance using: await apiClient.get('/api/user/points')
-                setProfile({
-                    displayName: lineProfile.displayName,
-                    pictureUrl: lineProfile.pictureUrl,
-                    points: 200, // Matches your image layout specification
+                const lineAccessToken = liff.getAccessToken();
+                consoleLogOnDev("Line Access Token: " + lineAccessToken);
+
+                const res = await apiClient.get(API_PATH.syncLine, {
+                    headers: { Authorization: `Bearer ${lineAccessToken}` }
                 });
+
+                const responseData = res.data;
+                setProfile(responseData.data);
+
+                localStorage.setItem('SAT', responseData.data.access_token);
             } catch (err: any) {
-                console.error("LIFF Core Lifecycle initialization failed:", err);
-                setError(err?.message || 'Failed to authenticate identity token via LINE API.');
+                consoleWarnOnDev(err);
+                setError(err.msg);
             } finally {
                 setIsLoading(false);
             }

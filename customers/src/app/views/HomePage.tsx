@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 
 export default function HomePage() {
     const { profile, isLoading, error, handleLogout } = useHomeViewModel();
-    const cardCN = 'text-white border-0 rounded-[2rem] shadow-md active:scale-[0.97] transition-all cursor-pointer flex flex-col items-center justify-center text-center p-6 min-h-[160px] group text-shadow-sm hover:scale-101  md:text-shadow-md ';
+    const cardCN = 'text-white border-0 rounded-[2rem] shadow-md active:scale-[0.97] transition-all cursor-pointer flex flex-col items-center justify-center text-center p-6 min-h-[160px] group text-shadow-sm hover:scale-101  md:text-shadow-md';
     const cardIconCN = 'p-4 bg-white/10 rounded-2xl group-hover:scale-110 group-hover:-translate-y-2 transition-transform';
 
     // 1. Loading UX Blocker Frame
@@ -41,7 +41,7 @@ export default function HomePage() {
     }
 
     return (
-        <div className="w-screen min-h-screen bg-app-background flex flex-col overflow-hidden font-sans select-none shadow-inner">
+        <div className="w-screen min-h-screen bg-app-background flex flex-col overflow-hidden font-sans shadow-inner">
 
             {/* BRAND HEADER STATE BANNER */}
             <header className="bg-app-foreground p-5 pb-6 border-b border-emerald-500/20 rounded-b-[2rem] shadow-md flex items-center gap-2">
@@ -65,23 +65,23 @@ export default function HomePage() {
                 <div className="flex items-center justify-between bg-app-primary border border-white/20 backdrop-blur-md p-4 rounded-2xl shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="flex items-center gap-3 min-w-0">
                         <Avatar className="h-11 w-11 border-2 border-white/60 shadow-sm shrink-0">
-                            <AvatarImage src={profile.pictureUrl} alt={profile.displayName} />
+                            <AvatarImage src={profile.user.linePictureUrl!} alt={profile.user.lineDisplayName} />
                             <AvatarFallback className="bg-emerald-800 text-emerald-100 text-xs font-black">LINE</AvatarFallback>
                         </Avatar>
                         <div className="min-w-0">
                             <p className="text-[10px] text-black font-black uppercase tracking-wider opacity-40">Customer Profile</p>
-                            <h3 className="text-sm font-black text-black truncate mt-0.5 opacity-50">{profile.displayName}</h3>
+                            <h3 className="text-sm font-black text-black truncate mt-0.5 opacity-50">{profile.user.lineDisplayName}</h3>
                         </div>
                     </div>
 
                     <div className="text-right shrink-0 flex gap-2">
-                        <span className="text-shadow-lg text-sm md:text-lg font-black text-white tracking-tight opacity-90">{profile.points} Points</span>
+                        <span className="text-shadow-lg text-sm md:text-lg font-black text-white tracking-tight opacity-90">{profile.user.totalPoints} Points</span>
                     </div>
                 </div>
             </section>
 
             {/* CORE FEATURE QUAD NAVIGATION GRID */}
-            <main className="flex-1 p-5 grid grid-cols-2 gap-4 items-stretch content-start animate-in fade-in zoom-in-95 delay-150 duration-300">
+            <main className="flex-1 p-5 grid grid-cols-2 gap-4 md:gap-6 md:mt-4 items-stretch content-start animate-in fade-in zoom-in-95 delay-150 duration-300">
 
                 {/* BUTTON A: REWARDS */}
                 <Link to='/' >
