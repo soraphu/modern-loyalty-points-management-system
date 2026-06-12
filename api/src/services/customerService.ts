@@ -4,6 +4,7 @@ import { ApiResponse } from '../utils/apiResponse';
 import { CONFIG } from '../config/constants';
 import { Auth } from './authService';
 import { Logger } from '../utils/logger';
+import { VoucherStatus } from '../generated/prisma/enums';
 
 export interface LineProfileInput {
     userId: string;
@@ -244,4 +245,22 @@ export class CustomerService {
             throw ApiResponse.internalServerError('Unable to redeem an unexpected internal server error occurred.');
         }
     }
+
+    public static async fetchPendingVouchersController(userId: string) {
+        try {
+            return await prisma.voucher.findMany({
+                where: {
+                    userId,
+                    status: VoucherStatus.PENDING
+                },
+                include: { reward: true }
+            })
+        } catch (error: any) {
+            if (error.payload) {
+                throw error;
+            }
+            throw ApiResponse.internalServerError('Unable to fetch pending vouchers an unexpected internal server error occurred.');
+        }
+    }
 }
+

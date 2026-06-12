@@ -141,5 +141,28 @@ export async function redeemRewardController(request: FastifyRequest, reply: Fas
 
         return reply.status(serverError.statusCode).send(serverError.payload);
     }// end
-
 } //end
+
+export async function fetchPendingVouchersController(request: FastifyRequest, reply: FastifyReply) {
+    try {
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodePayload = Auth.verifyAndDecodeAccessToken<CustomerPayload>(accessToken);
+
+        const vouchers = await CustomerService.fetchPendingVouchersController(decodePayload.id);
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: 'Fetch pending vouchers successful.',
+            data: { vouchers: vouchers }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
+    }// end
+}
