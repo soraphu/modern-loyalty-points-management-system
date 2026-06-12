@@ -25,11 +25,9 @@ export function useHomeViewModel() {
             setIsLoading(true);
 
             try {
-                // Replace with your real LINE LIFF registration key string
                 await liff.init({ liffId: '2010103019-RDfhtEOA' });
 
                 if (!liff.isLoggedIn()) {
-                    // Force execution to LINE client single sign-on screen if missing session token
                     liff.login();
                     return;
                 }

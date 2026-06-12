@@ -11,7 +11,7 @@ export default function HomePage() {
     const cardIconCN = 'p-4 bg-white/10 rounded-2xl group-hover:scale-110 group-hover:-translate-y-2 transition-transform';
 
     // 1. Loading UX Blocker Frame
-    if (isLoading) {
+    if (isLoading || !profile) {
         return (
             <div className="w-screen min-h-screen bg-[#8cd4b4] flex flex-col items-center justify-center space-y-4 px-6">
                 <div className="bg-zinc-950/10 p-4 rounded-2xl backdrop-blur-md border border-white/10 flex flex-col items-center space-y-3">
@@ -25,7 +25,7 @@ export default function HomePage() {
     }
 
     // 2. Fatal Authentication Error Fallback UI
-    if (error || !profile) {
+    if (error) {
         return (
             <div className="w-screen min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-6 text-zinc-50">
                 <div className="border border-red-900/50 bg-red-950/20 rounded-2xl p-6 text-center space-y-4 max-w-sm">
