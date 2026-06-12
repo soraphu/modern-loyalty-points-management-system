@@ -31,5 +31,5 @@ export async function customerRoutes(fastify: FastifyInstance) {
     // POST -> /api/v1/customer/rewards/:reward_id/redeem
     fastify.post('/rewards/:reward_id/redeem', redeemRewardController);
 
-    fastify.get('/rewards/pending-vouchers', fetchPendingVouchersController);
+    fastify.get('/pending-vouchers', fetchPendingVouchersController);
 }//end
