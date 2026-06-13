@@ -4,7 +4,7 @@ import QrScannerPage from './app/views/QrScannerPage';
 
 const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
-  { path: '/scanner', element: <QrScannerPage onScanResult={() => { }} /> },
+  { path: '/scanner', element: <QrScannerPage /> },
 ]);
 
 function App() {
