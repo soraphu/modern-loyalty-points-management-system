@@ -10,7 +10,7 @@ export default function HomePage() {
     const cardCN = 'text-white border-0 rounded-[2rem] shadow-md active:scale-[0.97] transition-all cursor-pointer flex flex-col items-center justify-center text-center p-6 min-h-[160px] group text-shadow-sm hover:scale-101  md:text-shadow-md';
     const cardIconCN = 'p-4 bg-white/10 rounded-2xl group-hover:scale-110 group-hover:-translate-y-2 transition-transform';
 
-    // 1. Loading UX Blocker Frame
+    // Loading UX Blocker Frame
     if (isLoading || !profile) {
         return (
             <div className="w-screen min-h-screen bg-[#8cd4b4] flex flex-col items-center justify-center space-y-4 px-6">
@@ -24,7 +24,7 @@ export default function HomePage() {
         );
     }
 
-    // 2. Fatal Authentication Error Fallback UI
+    // Fatal Authentication Error Fallback UI
     if (error) {
         return (
             <div className="w-screen min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-6 text-zinc-50">
@@ -99,7 +99,7 @@ export default function HomePage() {
                 </Link>
 
                 {/* BUTTON B: EARN POINTS */}
-                <Link to='/' >
+                <Link to='/scanner' >
                     <Card
                         onClick={() => console.log('Navigate to QR Scanner View')}
                         className={`bg-[#14cc04] active:bg-[#14b106] ${cardCN}`}

@@ -10,8 +10,8 @@ export const consoleLogOnDev = (data: any) => {
     if (isDevMode) console.log(data);
 }
 
-export const consoleWarnOnDev = (data: any) => {
-    if (isDevMode) console.warn(data);
+export const consoleWarnOnDev = (data: any, meta?: any) => {
+    if (isDevMode) console.warn(data, meta);
 }
 
 export const waitFor = (ms: any) => new Promise(resolve => setTimeout(resolve, ms));
