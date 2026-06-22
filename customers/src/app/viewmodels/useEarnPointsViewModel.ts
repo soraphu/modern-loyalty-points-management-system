@@ -23,7 +23,7 @@ export function useEarnPointsViewModel() {
             return;
         }
 
-        async function submitQrCodeToBackend() {
+        async function processEarnPoints() {
             try {
                 setStatus('LOADING');
 
@@ -39,7 +39,7 @@ export function useEarnPointsViewModel() {
             }
         }
 
-        submitQrCodeToBackend();
+        processEarnPoints();
     }, [codeString]);
 
     return {
