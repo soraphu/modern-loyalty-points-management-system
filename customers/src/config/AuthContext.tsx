@@ -1,18 +1,21 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import liff from '@line/liff';
-import axios from 'axios'; // Used for the token exchange step
+import { API_PATH, apiClient } from './apiClient';
 
+// 💡 Matches your exact backend "user" JSON payload fields
 interface UserProfile {
-    lineUserId: string;
+    id: string;
+    lineId: string;
     lineDisplayName: string;
-    linePictureUrl?: string | null;
+    linePictureUrl: string;
     totalPoints: number;
+    createdAt: string;
 }
 
 interface AuthContextType {
     profile: UserProfile | null;
     isLoading: boolean;
-    getValidToken: () => Promise<string | null>; // 🚀 Returns your secure Server Token instantly
+    getValidToken: () => Promise<string | null>;
     logout: () => void;
     updatePoints: (newPoints: number) => void;
 }
@@ -21,49 +24,36 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [profile, setProfile] = useState<UserProfile | null>(null);
-
-    // 🔒 This state holds your secure Server Access Token in active app RAM memory
     const [serverToken, setServerToken] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Core initialization and refresh-recovery logic sequence
     useEffect(() => {
         async function initAndRecoverSession() {
             try {
-                // 1. Initialize LINE LIFF natively
+                // Initialize LINE LIFF
                 await liff.init({ liffId: import.meta.env.VITE_LIFF_ID });
 
                 if (liff.isLoggedIn()) {
-                    // 2. Grab the native LINE access token from memory
                     const lineToken = liff.getAccessToken();
 
                     if (lineToken) {
-                        // ⚡ 3. EXCHANGE STEP: Send the LINE token to your server to get your Server Token
-                        // 👇 PLACE YOUR REAL BACKEND LOGIN/VERIFY API PATH ROUTE STRING BELOW 👇
-                        const response = await axios.post('https://api.yourdomain.com/v1/auth/line-login', {
-                            line_token: lineToken
+                        const response = await apiClient.get(API_PATH.syncLine, {
+                            headers: { Authorization: `Bearer ${lineToken}` }
                         });
 
-                        // Expecting your backend to return: { server_token: "...", user: { ... } }
-                        const { server_token, user } = response.data;
+                        const { success, data } = response.data;
 
-                        // 4. Hydrate your fast React memory state layers
-                        setServerToken(server_token);
-                        setProfile({
-                            lineUserId: user.lineUserId,
-                            lineDisplayName: user.lineDisplayName,
-                            linePictureUrl: user.linePictureUrl,
-                            totalPoints: user.totalPoints, // Points fetched straight from your database
-                        });
+                        if (success && data) {
+                            setServerToken(data.access_token); // Set JWT token from response
+                            setProfile(data.user);             // Set user object from response
+                        }
                     }
                 } else {
-                    // If the user has completely cleared cookies or is new, prompt LINE login
                     liff.login();
                 }
             } catch (err) {
                 console.error("Session recovery handshake failed:", err);
             } finally {
-                // 5. Turn off the global loading curtain skeleton screen
                 setIsLoading(false);
             }
         }
@@ -71,23 +61,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         initAndRecoverSession();
     }, []);
 
-    // 🛡️ DYNAMIC RUNTIME SERVER TOKEN DELIVERY
-    // Your API client interceptor will execute this function right before every HTTP request.
+    // Returns your server's secure JWT token instantly from active application RAM
     const getValidToken = useCallback(async () => {
         return serverToken;
     }, [serverToken]);
 
-    // Completely wipe out all local app memories and close native session locks
+    // Clean exit teardown sequence
     const logout = useCallback(() => {
         if (liff.isLoggedIn()) {
             liff.logout();
         }
         setServerToken(null);
         setProfile(null);
-        window.location.replace('/'); // Hard boot back to base landing directory
+        window.location.replace('/');
     }, []);
 
-    // Update customer balance interface values instantly (e.g. after successful scans)
+    // Instantly reflect balance changes across dashboard UI sections
     const updatePoints = useCallback((newPoints: number) => {
         setProfile((prev) => {
             if (!prev) return null;
