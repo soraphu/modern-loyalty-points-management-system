@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { API_PATH, apiClient } from '@/config/apiClient';
 import { consoleLogOnDev } from '@/config/constant';
 
-export function useEarnPointsViewModel() {
+export function useEarningPointsViewModel() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 

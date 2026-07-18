@@ -1,10 +1,10 @@
-import { useEarnPointsViewModel } from '../viewmodels/useEarnPointsViewModel';
+import { useEarningPointsViewModel } from '../viewmodels/useEarnPointsViewModel';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2, CheckCircle2, XCircle, Gift } from "lucide-react";
 
-export default function EarnPointsPage() {
-    const { status, errorMessage, earnedPoints, codeString, handleGoHome } = useEarnPointsViewModel();
+export default function EarningPointsPage() {
+    const { status, errorMessage, earnedPoints, codeString, handleGoHome } = useEarningPointsViewModel();
 
     return (
         <div className="w-full md:max-w-md min-h-screen bg-[#8cd4b4] flex flex-col justify-center items-center p-6 mx-auto font-sans select-none">

@@ -1,12 +1,15 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import HomePage from './app/views/HomePage';
 import QrScannerPage from './app/views/QrScannerPage';
-import EarnPointsPage from './app/views/EarnPointsPage';
+import EarningPointsPage from './app/views/EarningPointsPage';
+// import AvailableRewardsPage from './app/views/AvailableRewardsPage';
 
 const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
   { path: '/scanner', element: <QrScannerPage /> },
-  { path: '/earn-points', element: <EarnPointsPage /> },
+  { path: '/earning-points', element: <EarningPointsPage /> },
+  // { path: '/available-rewards', element: <AvailableRewardsPage /> },
+
 ]);
 
 function App() {
