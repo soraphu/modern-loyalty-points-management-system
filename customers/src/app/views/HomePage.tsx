@@ -3,10 +3,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, Gift, QrCode, History, Ticket, LogOut, AlertCircle } from 'lucide-react';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { Link } from 'react-router-dom';
 
 export default function HomePage() {
-    const { profile, isLoading, error, handleLogout } = useHomeViewModel();
+    const { profile, isLoading, error, handleLogout, appearConfirmLogout, setAppearConfirmLogout } = useHomeViewModel();
     const cardCN = 'text-white border-0 rounded-[2rem] shadow-md active:scale-[0.97] transition-all cursor-pointer flex flex-col items-center justify-center text-center p-6 min-h-[160px] group text-shadow-sm hover:scale-101  md:text-shadow-md';
     const cardIconCN = 'p-4 bg-white/10 rounded-2xl group-hover:scale-110 group-hover:-translate-y-2 transition-transform';
 
@@ -50,8 +51,23 @@ export default function HomePage() {
                     <h1 className="text-white text-xs font-black tracking-widest uppercase">Welcome To</h1>
                     <h2 className="text-white text-xl font-black tracking-tight mt-0.5 drop-shadow-sm">DEEPOINTS</h2>
                 </div>
+
+                <ConfirmDialog
+                    isOpen={appearConfirmLogout}
+                    onClose={() => setAppearConfirmLogout(false)}
+                    onConfirm={() => {
+                        handleLogout();
+                        setAppearConfirmLogout(false);
+                    }}
+                    isLoading={isLoading}
+                    title="Confirm Logout"
+                    confirmText='Logout'
+                    cancelText='Close'
+                    variant='destructive'
+                    description="Are you sure you want to logout?"
+                />
                 <Button
-                    onClick={handleLogout}
+                    onClick={() => setAppearConfirmLogout(true)}
                     variant="ghost"
                     className="text-white hover:text-red-500 hover:bg-white/10 rounded-full h-12 w-12 transition-colors cursor-pointer"
                     title="Sign Out"

@@ -18,6 +18,7 @@ export interface UserProfileState {
 export function useHomeViewModel() {
     const [profile, setProfile] = useState<UserProfileState | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [appearConfirmLogout, setAppearConfirmLogout] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -55,8 +56,10 @@ export function useHomeViewModel() {
     }, []);
 
     const handleLogout = () => {
+        setIsLoading(true);
         if (liff.isLoggedIn()) {
             liff.logout();
+            setIsLoading(false);
             window.location.reload();
         }
     };
@@ -65,6 +68,8 @@ export function useHomeViewModel() {
         profile,
         isLoading,
         error,
-        handleLogout
+        handleLogout,
+        appearConfirmLogout,
+        setAppearConfirmLogout
     };
 }

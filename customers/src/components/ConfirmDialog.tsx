@@ -35,7 +35,7 @@ export function ConfirmDialog({
 
     // Dynamic button color selector mapping based on variant choice
     const getConfirmButtonStyles = () => {
-        if (variant === "destructive") return "bg-red-600 hover:bg-red-700 text-white";
+        if (variant === "destructive") return "bg-red-700 hover:bg-red-800 text-white";
         if (variant === "emerald") return "bg-[#14cc04] hover:bg-[#10a404] text-white";
         return "bg-zinc-900 hover:bg-zinc-800 text-white";
     };
@@ -58,7 +58,7 @@ export function ConfirmDialog({
                     <Button
                         onClick={onConfirm}
                         disabled={isLoading}
-                        className={`w-full rounded-2xl py-6 font-bold text-base transition-all active:scale-[0.98] ${getConfirmButtonStyles()}`}
+                        className={`w-full rounded-2xl py-6 font-bold text-base transition-all active:scale-[0.98] cursor-pointer ${getConfirmButtonStyles()}`}
                     >
                         {isLoading ? (
                             <Loader2 className="h-5 w-5 animate-spin mx-auto" />
@@ -72,7 +72,7 @@ export function ConfirmDialog({
                         variant="ghost"
                         onClick={onClose}
                         disabled={isLoading}
-                        className="w-full text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-2xl py-6 font-bold text-base"
+                        className="w-full text-zinc-700 bg-zinc-100 hover:text-zinc-900 hover:bg-zinc-200 rounded-2xl py-6 font-bold text-base cursor-pointer"
                     >
                         {cancelText}
                     </Button>
