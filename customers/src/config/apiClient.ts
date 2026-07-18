@@ -14,11 +14,6 @@ export const API_PATH = {
 // Internal fast-RAM memory variable to store your actual server token
 let memoryServerToken: string | null = null;
 
-// Export an action utility so your AuthProvider can inject the token into Axios memory
-export const setClientServerToken = (token: string | null) => {
-    memoryServerToken = token;
-};
-
 export const apiClient: AxiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1',
     timeout: 60000,
@@ -61,6 +56,7 @@ apiClient.interceptors.request.use(
                     });
 
                     const { success, data } = exchangeResponse.data;
+
                     if (success && data?.access_token) {
                         memoryServerToken = data.access_token;
                         config.headers.Authorization = `Bearer ${memoryServerToken}`;
