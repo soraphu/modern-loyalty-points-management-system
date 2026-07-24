@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 
 export default function HomePage() {
     const { profile, isLoading, error, handleLogout, appearConfirmLogout, setAppearConfirmLogout } = useHomeViewModel();
-    const cardCN = 'text-white border-0 rounded-[2rem] shadow-md active:scale-[0.97] transition-all cursor-pointer flex flex-col items-center justify-center text-center p-6 min-h-[160px] group text-shadow-sm hover:scale-101  md:text-shadow-md';
+    const cardCN = 'h-full text-white border-0 rounded-[2rem] shadow-md active:scale-[0.97] transition-all cursor-pointer flex flex-col items-center justify-center text-center p-6 min-h-[160px] group text-shadow-sm hover:scale-101  md:text-shadow-md';
     const cardIconCN = 'p-4 bg-white/10 rounded-2xl group-hover:scale-110 group-hover:-translate-y-2 transition-transform';
 
     // Loading UX Blocker Frame
@@ -97,7 +97,7 @@ export default function HomePage() {
             </section>
 
             {/* CORE FEATURE QUAD NAVIGATION GRID */}
-            <main className="flex-1 p-5 grid grid-cols-2 gap-4 md:gap-6 md:mt-4 items-stretch content-start animate-in fade-in zoom-in-95 delay-150 duration-300">
+            <main className="flex-1 max-h-140 p-5 grid grid-cols-2 grid-rows-2 gap-4 md:gap-6 md:mt-4 items-stretch content-start animate-in fade-in zoom-in-95 delay-150 duration-300">
 
                 {/* BUTTON A: REWARDS */}
                 <Link to='/' >
@@ -161,7 +161,7 @@ export default function HomePage() {
             </main>
 
             {/* FOOTNOTE DISCLAIMER FOOTER */}
-            <footer className="p-4 text-center">
+            <footer className="fixed bottom-0 justify-items-center w-full z-50 mt-10">
                 <p className="text-[10px] font-mono text-emerald-950/40 uppercase tracking-widest">
                     Powered by Deepoints Architecture • 2026
                 </p>
