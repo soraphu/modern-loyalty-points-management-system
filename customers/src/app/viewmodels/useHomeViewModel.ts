@@ -25,20 +25,15 @@ export function useHomeViewModel() {
         async function initLiff() {
             setIsLoading(true);
 
+            await liff.init({ liffId: '2010103019-RDfhtEOA' });
+
+            if (!liff.isLoggedIn()) {
+                liff.login();
+                return;
+            }
+
             try {
-                await liff.init({ liffId: '2010103019-RDfhtEOA' });
-
-                if (!liff.isLoggedIn()) {
-                    liff.login();
-                    return;
-                }
-
-                const lineAccessToken = liff.getAccessToken();
-                consoleLogOnDev("Line Access Token: " + lineAccessToken);
-
-                const res = await apiClient.get(API_PATH.syncLine, {
-                    headers: { Authorization: `Bearer ${lineAccessToken}` }
-                });
+                const res = await apiClient.get(API_PATH.syncLine);
 
                 const responseData = res.data;
                 setProfile(responseData.data);

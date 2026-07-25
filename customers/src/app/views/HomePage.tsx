@@ -100,7 +100,7 @@ export default function HomePage() {
             <main className="flex-1 max-h-140 p-5 grid grid-cols-2 grid-rows-2 gap-4 md:gap-6 md:mt-4 items-stretch content-start animate-in fade-in zoom-in-95 delay-150 duration-300">
 
                 {/* BUTTON A: REWARDS */}
-                <Link to='/' >
+                <Link to='/available-rewards' >
                     <Card
                         onClick={() => console.log('Navigate to Rewards View')}
                         className={`bg-[#b40404] active:bg-[#9d1515] ${cardCN}`}
