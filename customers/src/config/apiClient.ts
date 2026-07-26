@@ -1,7 +1,7 @@
 import type { AxiosInstance, AxiosResponse } from 'axios';
 import axios from 'axios';
 import liff from '@line/liff';
-import { filterErrorMessage } from './constant';
+import { consoleLogOnDev, consoleWarnOnDev, filterErrorMessage } from './constant';
 
 export const API_PATH = {
     syncLine: '/sync', // 💡 This is your login/exchange endpoint
@@ -11,11 +11,13 @@ export const API_PATH = {
     redemptionRewards: (rewardId: string) => `/rewards/${rewardId}/redeem`,
 };
 
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
+
 // Internal fast-RAM memory variable to store your actual server token
 let memoryServerToken: string | null = null;
 
 export const apiClient: AxiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1',
+    baseURL: baseURL,
     timeout: 60000,
     withCredentials: true,
     headers: {
@@ -47,14 +49,18 @@ apiClient.interceptors.request.use(
         // C. EDGE CASE TRAP: What if lineToken exists, but serverToken is missing?
         // This means the page reloaded or the server token expired. We quietly exchange it on the fly!
         if (liff.isLoggedIn()) {
+            consoleWarnOnDev("Server token missing. Attempting on-the-fly recovery using LINE token...");
             const lineToken = liff.getAccessToken();
+
             if (lineToken) {
                 try {
                     // Quietly hit your sync route to get a brand new wristband right now
-                    const exchangeResponse = await axios.get(API_PATH.syncLine, {
+                    const exchangeResponse = await axios.get(baseURL + API_PATH.syncLine, {
                         headers: { Authorization: `Bearer ${lineToken}` }
                     });
 
+                    consoleLogOnDev("New server token-exchange response:");
+                    consoleLogOnDev(exchangeResponse);
                     const { success, data } = exchangeResponse.data;
 
                     if (success && data?.access_token) {

@@ -1,15 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
-import { API_PATH, apiClient } from '@/config/apiClient';
+import { apiClient, API_PATH } from "@/config/apiClient";
 
-// 📦 MODEL DEFINITION (Inlined directly with the ViewModel)
+// 📦 REAL MODEL DEFINITION (Matching your exact JSON response)
 export interface Reward {
     id: string;
-    title: string;
-    description: string;
-    pointsRequired: number;
-    imageUrl?: string;
-    expiryDate?: string;
-    stock?: number;
+    rewardName: string;
+    pointsCost: number;
+    imageUrl: string | null;
+    active: boolean;
+    createdAt: string;
 }
 
 export function useRewardsViewModel(userPoints: number = 0) {
@@ -17,18 +16,24 @@ export function useRewardsViewModel(userPoints: number = 0) {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Modal & Redemption State Management
+    // Modal & Redemption State
     const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
     const [isRedeeming, setIsRedeeming] = useState<boolean>(false);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
-    // Fetch Available Rewards
+    // Fetch Rewards
     const fetchRewards = useCallback(async () => {
         setIsLoading(true);
         setError(null);
         try {
             const response = await apiClient.get(API_PATH.fetchRewards);
-            setRewards(response.data?.data || response.data || []);
+
+            // 🎯 Extracting nested array matching: response.data.data.rewards
+            if (response.data?.success && response.data?.data?.rewards) {
+                setRewards(response.data.data.rewards);
+            } else {
+                setRewards([]);
+            }
         } catch (err: any) {
             setError(err?.message || "Failed to load rewards. Please try again.");
         } finally {
@@ -40,7 +45,7 @@ export function useRewardsViewModel(userPoints: number = 0) {
         fetchRewards();
     }, [fetchRewards]);
 
-    // Modal Trigger Handlers
+    // Modal Controls
     const handleOpenRedeemModal = (reward: Reward) => {
         setSelectedReward(reward);
         setIsModalOpen(true);
@@ -53,19 +58,17 @@ export function useRewardsViewModel(userPoints: number = 0) {
         }
     };
 
-    // Async Redemption Request
+    // Async Redemption
     const handleConfirmRedeem = async () => {
         if (!selectedReward) return;
 
         setIsRedeeming(true);
         try {
             await apiClient.post(API_PATH.redemptionRewards(selectedReward.id));
-
-            // Refresh list after successful redemption
-            await fetchRewards();
+            await fetchRewards(); // Refresh list after successful redeem
             handleCloseModal();
         } catch (err: any) {
-            alert(err || "Redemption failed.");
+            alert(err?.response?.data?.msg || "Redemption failed.");
         } finally {
             setIsRedeeming(false);
         }

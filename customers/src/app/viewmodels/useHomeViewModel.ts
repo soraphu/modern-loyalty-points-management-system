@@ -38,7 +38,7 @@ export function useHomeViewModel() {
                 const responseData = res.data;
                 setProfile(responseData.data);
 
-                localStorage.setItem('SAT', responseData.data.access_token);
+                consoleLogOnDev("Receive Server Access Token: " + responseData.data.access_token)
             } catch (err: any) {
                 consoleWarnOnDev(err);
                 setError(err.msg);
