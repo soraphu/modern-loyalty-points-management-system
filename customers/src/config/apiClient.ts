@@ -29,7 +29,9 @@ export const apiClient: AxiosInstance = axios.create({
 // 🛡️ DYNAMIC REQUEST INTERCEPTOR
 apiClient.interceptors.request.use(
     async (config) => {
-        // A. If we are hitting the sync endpoint, we MUST use the LINE token to authenticate
+        await liff.init({ liffId: '2010103019-RDfhtEOA' });
+
+        // If we are hitting the sync endpoint, we MUST use the LINE token to authenticate
         if (config.url === API_PATH.syncLine) {
             if (liff.isLoggedIn()) {
                 const lineToken = liff.getAccessToken();
@@ -40,15 +42,20 @@ apiClient.interceptors.request.use(
             return config;
         }
 
-        // B. For ALL other database actions, we use your actual Server Access Token (Wristband)
-        if (memoryServerToken) {
-            config.headers.Authorization = `Bearer ${memoryServerToken}`;
+        if (!liff.isLoggedIn()) {
+            memoryServerToken = null;
             return config;
         }
 
-        // C. EDGE CASE TRAP: What if lineToken exists, but serverToken is missing?
+        // EDGE CASE TRAP: What if lineToken exists, but serverToken is missing?
         // This means the page reloaded or the server token expired. We quietly exchange it on the fly!
         if (liff.isLoggedIn()) {
+
+            if (memoryServerToken) {
+                config.headers.Authorization = `Bearer ${memoryServerToken}`;
+                return config;
+            }
+
             consoleWarnOnDev("Server token missing. Attempting on-the-fly recovery using LINE token...");
             const lineToken = liff.getAccessToken();
 

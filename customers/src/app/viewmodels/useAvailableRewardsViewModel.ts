@@ -11,7 +11,7 @@ export interface Reward {
     createdAt: string;
 }
 
-export function useRewardsViewModel(userPoints: number = 0) {
+export function useAvailableRewardsViewModel(userPoints: number = 0) {
     const [rewards, setRewards] = useState<Reward[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);

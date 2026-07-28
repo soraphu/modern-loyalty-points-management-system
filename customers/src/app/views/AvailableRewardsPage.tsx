@@ -1,4 +1,4 @@
-import { useRewardsViewModel, type Reward } from "../viewmodels/useAvailableRewardsViewModel";
+import { useAvailableRewardsViewModel, type Reward } from "../viewmodels/useAvailableRewardsViewModel";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,7 +22,7 @@ export function AvailableRewardsPage({ userPoints = 10 }: RewardsPageProps) {
         handleOpenRedeemModal,
         handleCloseModal,
         handleConfirmRedeem,
-    } = useRewardsViewModel(userPoints);
+    } = useAvailableRewardsViewModel(userPoints);
 
     return (
         <div className="flex flex-col min-h-screen bg-slate-50/50">
