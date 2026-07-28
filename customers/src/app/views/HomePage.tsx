@@ -5,9 +5,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, Gift, QrCode, History, Ticket, LogOut, AlertCircle } from 'lucide-react';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { Link } from 'react-router-dom';
+import { useAuth } from '@/config/AuthContext';
 
 export default function HomePage() {
-    const { profile, isLoading, error, handleLogout, appearConfirmLogout, setAppearConfirmLogout } = useHomeViewModel();
+    const { isLoading, error, appearConfirmLogout, setAppearConfirmLogout } = useHomeViewModel();
+    const { profile, logout } = useAuth();
     const cardCN = 'h-full text-white border-0 rounded-[2rem] shadow-md active:scale-[0.97] transition-all cursor-pointer flex flex-col items-center justify-center text-center p-6 min-h-[160px] group text-shadow-sm hover:scale-101  md:text-shadow-md';
     const cardIconCN = 'p-4 bg-white/10 rounded-2xl group-hover:scale-110 group-hover:-translate-y-2 transition-transform';
 
@@ -56,7 +58,7 @@ export default function HomePage() {
                     isOpen={appearConfirmLogout}
                     onClose={() => setAppearConfirmLogout(false)}
                     onConfirm={() => {
-                        handleLogout();
+                        logout();
                         setAppearConfirmLogout(false);
                     }}
                     isLoading={isLoading}
@@ -81,17 +83,17 @@ export default function HomePage() {
                 <div className="flex items-center justify-between bg-app-primary border border-white/20 backdrop-blur-md p-4 rounded-2xl shadow-sm animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="flex items-center gap-3 min-w-0">
                         <Avatar className="h-11 w-11 border-2 border-white/60 shadow-sm shrink-0">
-                            <AvatarImage src={profile.user.linePictureUrl!} alt={profile.user.lineDisplayName} />
+                            <AvatarImage src={profile.linePictureUrl!} alt={profile.lineDisplayName} />
                             <AvatarFallback className="bg-emerald-800 text-emerald-100 text-xs font-black">LINE</AvatarFallback>
                         </Avatar>
                         <div className="min-w-0">
                             <p className="text-[10px] text-black font-black uppercase tracking-wider opacity-40">Customer Profile</p>
-                            <h3 className="text-sm font-black text-black truncate mt-0.5 opacity-50">{profile.user.lineDisplayName}</h3>
+                            <h3 className="text-sm font-black text-black truncate mt-0.5 opacity-50">{profile.lineDisplayName}</h3>
                         </div>
                     </div>
 
                     <div className="text-right shrink-0 flex gap-2">
-                        <span className="text-shadow-lg text-sm md:text-lg font-black text-white tracking-tight opacity-90">{profile.user.totalPoints} Points</span>
+                        <span className="text-shadow-lg text-sm md:text-lg font-black text-white tracking-tight opacity-90">{profile.totalPoints} Points</span>
                     </div>
                 </div>
             </section>
