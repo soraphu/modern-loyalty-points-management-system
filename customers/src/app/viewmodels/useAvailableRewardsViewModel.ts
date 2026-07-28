@@ -28,14 +28,9 @@ export function useRewardsViewModel(userPoints: number = 0) {
         try {
             const response = await apiClient.get(API_PATH.fetchRewards);
 
-            // 🎯 Extracting nested array matching: response.data.data.rewards
-            if (response.data?.success && response.data?.data?.rewards) {
-                setRewards(response.data.data.rewards);
-            } else {
-                setRewards([]);
-            }
+            setRewards(response.data.data.rewards);
         } catch (err: any) {
-            setError(err?.message || "Failed to load rewards. Please try again.");
+            setError(err?.msg || "Failed to load rewards. Please try again.");
         } finally {
             setIsLoading(false);
         }
