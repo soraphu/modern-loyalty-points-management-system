@@ -8,13 +8,13 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '@/config/AuthContext';
 
 export default function HomePage() {
-    const { isLoading, error, appearConfirmLogout, setAppearConfirmLogout } = useHomeViewModel();
-    const { profile, logout } = useAuth();
+    const { appearConfirmLogout, setAppearConfirmLogout } = useHomeViewModel();
+    const { profile, logout, authError, authLoading } = useAuth();
     const cardCN = 'h-full text-white border-0 rounded-[2rem] shadow-md active:scale-[0.97] transition-all cursor-pointer flex flex-col items-center justify-center text-center p-6 min-h-[160px] group text-shadow-sm hover:scale-101  md:text-shadow-md';
     const cardIconCN = 'p-4 bg-white/10 rounded-2xl group-hover:scale-110 group-hover:-translate-y-2 transition-transform';
 
     // Loading UX Blocker Frame
-    if (isLoading || !profile) {
+    if (authLoading || !profile) {
         return (
             <div className="w-screen min-h-screen bg-[#8cd4b4] flex flex-col items-center justify-center space-y-4 px-6">
                 <div className="bg-zinc-950/10 p-4 rounded-2xl backdrop-blur-md border border-white/10 flex flex-col items-center space-y-3">
@@ -28,13 +28,13 @@ export default function HomePage() {
     }
 
     // Fatal Authentication Error Fallback UI
-    if (error) {
+    if (authError) {
         return (
             <div className="w-screen min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-6 text-zinc-50">
                 <div className="border border-red-900/50 bg-red-950/20 rounded-2xl p-6 text-center space-y-4 max-w-sm">
                     <AlertCircle className="h-10 w-10 text-red-500 mx-auto animate-pulse" />
                     <h3 className="text-md font-bold tracking-wide">LIFF Initialization Failed</h3>
-                    <p className="text-xs text-zinc-400 leading-relaxed">{error || "User context missing."}</p>
+                    <p className="text-xs text-zinc-400 leading-relaxed">{authError || "User context missing."}</p>
                     <Button onClick={() => window.location.reload()} className="w-full bg-red-600 hover:bg-red-700 text-xs font-bold">
                         Retry Connection
                     </Button>
@@ -61,7 +61,7 @@ export default function HomePage() {
                         logout();
                         setAppearConfirmLogout(false);
                     }}
-                    isLoading={isLoading}
+                    isLoading={authLoading}
                     title="Confirm Logout"
                     confirmText='Logout'
                     cancelText='Close'

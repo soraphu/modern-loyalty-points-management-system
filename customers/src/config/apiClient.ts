@@ -29,8 +29,6 @@ export const apiClient: AxiosInstance = axios.create({
 // 🛡️ DYNAMIC REQUEST INTERCEPTOR
 apiClient.interceptors.request.use(
     async (config) => {
-        await liff.init({ liffId: '2010103019-RDfhtEOA' });
-
         // If we are hitting the sync endpoint, we MUST use the LINE token to authenticate
         if (config.url === API_PATH.syncLine) {
             if (liff.isLoggedIn()) {

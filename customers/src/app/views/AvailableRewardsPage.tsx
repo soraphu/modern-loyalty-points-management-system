@@ -5,12 +5,9 @@ import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Gift, Coins, RefreshCw, AlertCircle } from "lucide-react";
+import { useAuth } from "@/config/AuthContext";
 
-interface RewardsPageProps {
-    userPoints?: number;
-}
-
-export function AvailableRewardsPage({ userPoints = 10 }: RewardsPageProps) {
+export function AvailableRewardsPage() {
     const {
         rewards,
         isLoading,
@@ -22,7 +19,9 @@ export function AvailableRewardsPage({ userPoints = 10 }: RewardsPageProps) {
         handleOpenRedeemModal,
         handleCloseModal,
         handleConfirmRedeem,
-    } = useAvailableRewardsViewModel(userPoints);
+    } = useAvailableRewardsViewModel();
+    const { profile } = useAuth();
+    const userPoints = profile?.totalPoints;
 
     return (
         <div className="flex flex-col min-h-screen bg-slate-50/50">
@@ -85,7 +84,7 @@ export function AvailableRewardsPage({ userPoints = 10 }: RewardsPageProps) {
                 {!isLoading && !error && rewards.length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {rewards.map((reward: Reward) => {
-                            const canAfford = userPoints >= reward.pointsCost;
+                            const canAfford = userPoints ? userPoints >= reward.pointsCost : false;
 
                             return (
                                 <Card key={reward.id} className="flex flex-col justify-between rounded-3xl border-0 shadow-md hover:shadow-lg transition-shadow overflow-hidden bg-white">
