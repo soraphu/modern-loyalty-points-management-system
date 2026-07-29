@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { apiClient, API_PATH } from "@/config/apiClient";
+import { useAuth } from "@/config/AuthContext";
 
 // 📦 REAL MODEL DEFINITION (Matching your exact JSON response)
 export interface Reward {
@@ -15,6 +16,7 @@ export function useAvailableRewardsViewModel() {
     const [rewards, setRewards] = useState<Reward[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const { authLoading } = useAuth();
 
     // Modal & Redemption State
     const [selectedReward, setSelectedReward] = useState<Reward | null>(null);
@@ -37,8 +39,9 @@ export function useAvailableRewardsViewModel() {
     }, []);
 
     useEffect(() => {
+        if (authLoading) return;
         fetchRewards();
-    }, [fetchRewards]);
+    }, [authLoading]);
 
     // Modal Controls
     const handleOpenRedeemModal = (reward: Reward) => {
