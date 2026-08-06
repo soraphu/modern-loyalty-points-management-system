@@ -21,7 +21,7 @@ export default function QrScannerPage() {
             {/* 🧭 TOP NAVIGATION HEADER BAR */}
             <header className="flex items-center justify-center p-4 bg-app-foreground backdrop-blur sticky top-0 z-20">
                 <span className="font-bold text-sm tracking-tight flex gap-2"><QrCode size={20} />QR Scanner</span>
-                <div className="w-10" /> {/* Visual layout spacer to perfectly center the title */}
+                <div className="w-10" />
             </header>
 
             {/* 📺 INTERACTIVE CAMERA CAMERA VIEWER ELEMENT CONTAINER */}

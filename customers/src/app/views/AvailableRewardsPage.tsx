@@ -1,11 +1,13 @@
 import { useAvailableRewardsViewModel, type Reward } from "../viewmodels/useAvailableRewardsViewModel";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Gift, Coins, RefreshCw, AlertCircle } from "lucide-react";
+import { Gift, Coins, RefreshCw, AlertCircle, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/config/AuthContext";
+import GeneralNavbar from "@/components/GeneralNavbar";
 
 export function AvailableRewardsPage() {
     const {
@@ -26,19 +28,7 @@ export function AvailableRewardsPage() {
     return (
         <div className="flex flex-col min-h-screen bg-slate-50/50">
             {/* Header */}
-            <header className="bg-white border-b sticky top-0 z-10 px-4 py-4 shadow-sm">
-                <div className="max-w-4xl mx-auto flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <Gift className="h-6 w-6 text-emerald-600" />
-                        <h1 className="text-xl font-black tracking-tight text-zinc-900">Available Rewards</h1>
-                    </div>
-
-                    <Badge variant="secondary" className="px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border-emerald-200 flex items-center gap-1.5 font-bold">
-                        <Coins className="h-4 w-4" />
-                        <span>{userPoints} Points</span>
-                    </Badge>
-                </div>
-            </header>
+            <GeneralNavbar backgroundColor="bg-red-500" />
 
             {/* Main Container */}
             <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6">
@@ -113,7 +103,7 @@ export function AvailableRewardsPage() {
                                         <Button
                                             onClick={() => handleOpenRedeemModal(reward)}
                                             disabled={!canAfford || !reward.active}
-                                            className={`w-full rounded-2xl py-5 font-bold transition-all active:scale-[0.98] ${canAfford && reward.active
+                                            className={`w-full rounded-2xl py-5 font-bold transition-all active:scale-[0.98] cursor-pointer ${canAfford && reward.active
                                                 ? "bg-emerald-600 hover:bg-emerald-700 text-white"
                                                 : "bg-zinc-100 text-zinc-400 cursor-not-allowed"
                                                 }`}
