@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { consoleLogOnDev } from '@/config/constant';
 import { Loader2, AlertTriangle, CircleChevronLeft, Camera, QrCode } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
+import GeneralNavbar from '@/components/GeneralNavbar';
 
 export default function QrScannerPage() {
     const navigate = useNavigate();
@@ -19,10 +20,7 @@ export default function QrScannerPage() {
         <div className="w-full min-h-screen bg-app-background text-white flex flex-col overflow-hidden font-sans select-none mx-auto">
 
             {/* 🧭 TOP NAVIGATION HEADER BAR */}
-            <header className="flex items-center justify-center p-4 bg-app-foreground backdrop-blur sticky top-0 z-20">
-                <span className="font-bold text-sm tracking-tight flex gap-2"><QrCode size={20} />QR Scanner</span>
-                <div className="w-10" />
-            </header>
+            <GeneralNavbar backgroundColor="bg-app-foreground" title='QR Scanner' logo={<QrCode className='text-white h-6 w-6' />} returnBtn={false} />
 
             {/* 📺 INTERACTIVE CAMERA CAMERA VIEWER ELEMENT CONTAINER */}
             <main className="flex-1 flex flex-col justify-around p-6 relative">

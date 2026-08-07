@@ -1,11 +1,10 @@
 import { useAvailableRewardsViewModel, type Reward } from "../viewmodels/useAvailableRewardsViewModel";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Gift, Coins, RefreshCw, AlertCircle, ArrowLeft } from "lucide-react";
+import { Gift, RefreshCw, AlertCircle } from "lucide-react";
 import { useAuth } from "@/config/AuthContext";
 import GeneralNavbar from "@/components/GeneralNavbar";
 
@@ -28,7 +27,8 @@ export function AvailableRewardsPage() {
     return (
         <div className="flex flex-col min-h-screen bg-slate-50/50">
             {/* Header */}
-            <GeneralNavbar backgroundColor="bg-red-500" />
+            <GeneralNavbar backgroundColor="bg-red-500" title='Available Rewards' logo={<Gift className="text-white h-6 w-6" />} />
+
 
             {/* Main Container */}
             <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6">
