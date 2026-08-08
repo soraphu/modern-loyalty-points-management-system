@@ -20,7 +20,7 @@ export default function QrScannerPage() {
         <div className="w-full min-h-screen bg-app-background text-white flex flex-col overflow-hidden font-sans select-none mx-auto">
 
             {/* 🧭 TOP NAVIGATION HEADER BAR */}
-            <GeneralNavbar backgroundColor="bg-app-foreground" title='QR Scanner' logo={<QrCode className='text-white h-6 w-6' />} returnBtn={false} />
+            <GeneralNavbar backgroundColor="bg-app-foreground" title='QR Scanner' logo={<QrCode className='text-white h-6 w-6' />} returnBtn={false} showPoints={false} />
 
             {/* 📺 INTERACTIVE CAMERA CAMERA VIEWER ELEMENT CONTAINER */}
             <main className="flex-1 flex flex-col justify-around p-6 relative">
