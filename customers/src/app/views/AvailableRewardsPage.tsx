@@ -20,6 +20,8 @@ export function AvailableRewardsPage() {
         handleOpenRedeemModal,
         handleCloseModal,
         handleConfirmRedeem,
+        resultModal,
+        handleCloseResultModal
     } = useAvailableRewardsViewModel();
     const { profile } = useAuth();
     const userPoints = profile?.totalPoints;
@@ -133,6 +135,21 @@ export function AvailableRewardsPage() {
                 description={`This action will deduct ${selectedReward?.pointsCost} point(s) from your balance. Are you sure you want to proceed?`}
                 confirmText="Confirm Redemption"
                 cancelText="Cancel"
+            />
+
+            <ConfirmDialog
+                isOpen={resultModal.isOpen}
+                onClose={() => { }}
+                onConfirm={handleCloseResultModal}
+                variant={resultModal.isSuccess ? "emerald" : "destructive"}
+                title={resultModal.title}
+                description={
+                    resultModal.isSuccess && resultModal.data?.voucher
+                        ? `Voucher Code: ${resultModal.data.voucher.voucherCode}, You have ${profile?.totalPoints} points remaining.`
+                        : resultModal.description
+                }
+                confirmText="OK"
+                showCancelButton={false}
             />
         </div>
     );
