@@ -19,6 +19,7 @@ interface ConfirmDialogProps {
     cancelText?: string;
     variant?: "default" | "destructive" | "emerald"; // Extend variants for your theme colors
     isLoading?: boolean;
+    showCancelButton?: boolean
 }
 
 export function ConfirmDialog({
@@ -31,6 +32,7 @@ export function ConfirmDialog({
     cancelText = "Cancel",
     variant = "default",
     isLoading = false,
+    showCancelButton = true
 }: ConfirmDialogProps) {
 
     // Dynamic button color selector mapping based on variant choice
@@ -68,14 +70,16 @@ export function ConfirmDialog({
                     </Button>
 
                     {/* Dismiss Cancel Button */}
-                    <Button
-                        variant="ghost"
-                        onClick={onClose}
-                        disabled={isLoading}
-                        className="w-full text-zinc-700 bg-zinc-100 hover:text-zinc-900 hover:bg-zinc-200 rounded-2xl py-6 font-bold text-base cursor-pointer"
-                    >
-                        {cancelText}
-                    </Button>
+                    {showCancelButton &&
+                        <Button
+                            variant="ghost"
+                            onClick={onClose}
+                            disabled={isLoading}
+                            className="w-full text-zinc-700 bg-zinc-100 hover:text-zinc-900 hover:bg-zinc-200 rounded-2xl py-6 font-bold text-base cursor-pointer"
+                        >
+                            {cancelText}
+                        </Button>
+                    }
                 </DialogFooter>
 
             </DialogContent>
