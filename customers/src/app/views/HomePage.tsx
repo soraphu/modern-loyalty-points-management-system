@@ -132,7 +132,7 @@ export default function HomePage() {
                 </Link>
 
                 {/* BUTTON C: HISTORY */}
-                <Link to='/' >
+                <Link to='/history' >
                     <Card
                         onClick={() => console.log('Navigate to Point Ledger Logs View')}
                         className={`bg-[#545454] active:bg-[#353535] ${cardCN}`}

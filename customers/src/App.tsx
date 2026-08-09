@@ -3,12 +3,14 @@ import HomePage from './app/views/HomePage';
 import QrScannerPage from './app/views/QrScannerPage';
 import EarningPointsPage from './app/views/EarningPointsPage';
 import { AvailableRewardsPage } from './app/views/AvailableRewardsPage';
+import { HistoryPage } from './app/views/HistoryPage';
 
 const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
   { path: '/scanner', element: <QrScannerPage /> },
   { path: '/earning-points', element: <EarningPointsPage /> },
   { path: '/available-rewards', element: <AvailableRewardsPage /> },
+  { path: '/history', element: <HistoryPage /> },
 ]);
 
 function App() {
