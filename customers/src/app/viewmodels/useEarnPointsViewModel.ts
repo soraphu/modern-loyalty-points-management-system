@@ -34,7 +34,7 @@ export function useEarningPointsViewModel() {
             } catch (error: any) {
                 // Captures your filtered interceptor error string
                 console.log(error);
-                setErrorMessage(error || "This QR code is invalid or has already been used.");
+                setErrorMessage(error.msg || "This QR code is invalid or has already been used.");
                 setStatus('ERROR');
             }
         }
