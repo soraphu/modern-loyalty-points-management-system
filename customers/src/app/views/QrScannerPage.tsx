@@ -12,7 +12,7 @@ export default function QrScannerPage() {
     const { scannerError, isInitializing } = useScannerViewModel({
         onScanSuccess: (result) => {
             consoleLogOnDev(result);
-            navigate("/earn-points?code_string=" + result);
+            navigate("/earning-points?code_string=" + result);
         }
     });
 
