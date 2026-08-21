@@ -298,6 +298,48 @@ const { data, isLoading } = useSomeData();
 
 Define interfaces in `src/app/models/` for every API response consumed by the frontend. Never use `any` for API data.
 
+### RULE-FE-4: Mandatory Use of Shadcn UI Components
+
+ALL UI development across frontend applications (`admins/` and `customers/`) MUST exclusively use Shadcn UI components and Tailwind CSS.
+
+- **FORBIDDEN:** Writing raw HTML elements (e.g., `<button>`, `<input>`, `<dialog>`) or creating custom styled UI components when a Shadcn equivalent exists.
+- **FORBIDDEN:** Introducing unstyled third-party UI libraries or inline CSS styles.
+- **REQUIRED:** Always import components directly from `@/components/ui/` (or the project's configured Shadcn path, e.g., `@/components/ui/button`).
+- **REQUIRED:** If a required Shadcn component is not yet installed in the workspace, run the `npx shadcn@latest add <component-name>` CLI command (or instruct the user to run it) before building the view.
+- **REQUIRED:** Style custom layouts using Tailwind CSS utility classes exclusively.
+
+```tsx
+// ❌ FORBIDDEN — raw HTML, custom styled elements, and inline CSS
+export function CustomForm() {
+  return (
+    <div style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
+      <label className="text-gray-700 font-bold mb-2">Username</label>
+      <input className="border border-gray-300 p-2 rounded" type="text" />
+      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
+        Submit
+      </button>
+    </div>
+  );
+}
+
+// ✅ REQUIRED — Shadcn components and Tailwind CSS
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+export function ShadcnForm() {
+  return (
+    <div className="flex flex-col p-5 space-y-4">
+      <div className="flex flex-col space-y-1.5">
+        <Label htmlFor="username">Username</Label>
+        <Input id="username" placeholder="Enter username" />
+      </div>
+      <Button type="submit">Submit</Button>
+    </div>
+  );
+}
+```
+
 ---
 
 ## 7. Filesystem Rules
