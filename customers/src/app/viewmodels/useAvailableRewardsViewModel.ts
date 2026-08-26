@@ -40,7 +40,7 @@ export function useAvailableRewardsViewModel() {
     const [rewards, setRewards] = useState<Reward[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const { authLoading, profile, setProfile } = useAuth();
+    const { authLoading, setProfile } = useAuth();
 
     // Modal & Redemption State
     const [selectedReward, setSelectedReward] = useState<Reward | null>(null);

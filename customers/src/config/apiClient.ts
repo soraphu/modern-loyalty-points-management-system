@@ -9,6 +9,7 @@ export const API_PATH = {
     earnPoints: '/earn-points',
     fetchRewards: '/rewards',
     redemptionRewards: (rewardId: string) => `/rewards/${rewardId}/redeem`,
+    fetchPendingVouchers: '/pending-vouchers',
 };
 
 const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';

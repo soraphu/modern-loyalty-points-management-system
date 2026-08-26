@@ -147,9 +147,8 @@ export default function HomePage() {
                 </Link>
 
                 {/* BUTTON D: PENDING */}
-                <Link to='/' >
+                <Link to='/pending' >
                     <Card
-                        onClick={() => console.log('Navigate to Unused Active Vouchers List View')}
                         className={`bg-[#dd9e00] active:bg-[#b38000] ${cardCN}`}
                     >
                         <CardContent className="p-0 flex flex-col items-center space-y-3">

@@ -1,5 +1,4 @@
 import {
-    ArrowLeft,
     PlusCircle,
     MinusCircle,
     RotateCcw,
