@@ -22,17 +22,33 @@ export interface TransactionApiResponse {
     };
 }
 
-export function useHistoryViewModel() {
+export interface UseHistoryViewModelReturn {
+    transactions: Transaction[];
+    rawCount: number;
+    isLoading: boolean;
+    isRefreshing: boolean;
+    error: string | null;
+    activeFilter: TransactionType | "ALL";
+    setActiveFilter: React.Dispatch<React.SetStateAction<TransactionType | "ALL">>;
+    refetch: () => Promise<void>;
+    handleRefresh: () => Promise<void>;
+}
+
+export function useHistoryViewModel(): UseHistoryViewModelReturn {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [activeFilter, setActiveFilter] = useState<TransactionType | "ALL">("ALL");
 
     const { authLoading } = useAuth();
 
-    const fetchTransactions = useCallback(async () => {
-        setIsLoading(true);
+    const fetchTransactions = useCallback(async (isManualRefresh: boolean = false) => {
+        if (isManualRefresh) {
+            setIsRefreshing(true);
+        }
         setError(null);
+
         try {
             const response = await apiClient.get<TransactionApiResponse>(
                 API_PATH.fetchTransactions
@@ -44,12 +60,26 @@ export function useHistoryViewModel() {
             );
         } finally {
             setIsLoading(false);
+            if (isManualRefresh) {
+                setIsRefreshing(false);
+            }
         }
     }, []);
 
+    const refetch = useCallback(async () => {
+        if (authLoading) return;
+        await fetchTransactions(false);
+    }, [authLoading, fetchTransactions]);
+
+    const handleRefresh = useCallback(async () => {
+        if (authLoading) return;
+        await fetchTransactions(true);
+    }, [authLoading, fetchTransactions]);
+
     useEffect(() => {
         if (authLoading) return;
-        fetchTransactions();
+
+        void fetchTransactions(false);
     }, [authLoading, fetchTransactions]);
 
     // Client-side filtering logic
@@ -61,10 +91,12 @@ export function useHistoryViewModel() {
     return {
         transactions: filteredTransactions,
         rawCount: transactions.length,
-        isLoading,
+        isLoading: isLoading || authLoading,
+        isRefreshing,
         error,
         activeFilter,
         setActiveFilter,
-        refetch: fetchTransactions,
+        refetch,
+        handleRefresh,
     };
 }

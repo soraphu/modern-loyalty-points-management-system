@@ -4,7 +4,8 @@ import {
     RotateCcw,
     Clock,
     Coins,
-    History
+    History,
+    RefreshCw,
 } from "lucide-react";
 
 import { useHistoryViewModel } from "@/app/viewmodels/useHistoryViewModel";
@@ -55,11 +56,15 @@ export function HistoryPage() {
     const {
         transactions,
         isLoading,
+        isRefreshing,
         error,
         activeFilter,
         setActiveFilter,
+        handleRefresh,
         refetch,
     } = useHistoryViewModel();
+
+    const isRefreshDisabled = isLoading || isRefreshing;
 
     return (
         <div className="min-h-screen bg-slate-50/50 pb-12">
@@ -67,6 +72,25 @@ export function HistoryPage() {
             <GeneralNavbar backgroundColor="bg-[#545454]" logo={<History className="text-white" />} title="History" />
 
             <main className="max-w-xl mx-auto px-4 mt-5 space-y-4">
+                <div className="flex items-center justify-between px-1">
+                    <div>
+                        <h2 className="text-lg font-black text-zinc-900 tracking-tight">Recent Activity</h2>
+                        <p className="text-xs text-zinc-500 font-medium">Track your latest points movement and redemptions.</p>
+                    </div>
+
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleRefresh}
+                        disabled={isRefreshDisabled}
+                        className="rounded-xl border-zinc-200 text-zinc-700 hover:bg-zinc-100 active:scale-90 transition-all focus:outline-none text-xs font-bold gap-1.5 cursor-pointer disabled:opacity-60"
+                        title="Refresh transaction history"
+                    >
+                        <RefreshCw className={`h-3.5 w-3.5 ${isRefreshDisabled ? "animate-spin" : ""}`} />
+                        <span>{isRefreshing ? "Refreshing..." : "Refresh"}</span>
+                    </Button>
+                </div>
+
                 {/* Filter Tabs */}
                 <Tabs
                     defaultValue="ALL"
@@ -118,10 +142,11 @@ export function HistoryPage() {
                     <Card className="rounded-3xl border-rose-200 bg-rose-50/50 p-6 text-center">
                         <p className="text-sm font-semibold text-rose-600 mb-3">{error}</p>
                         <Button
-                            onClick={refetch}
+                            onClick={handleRefresh}
                             variant="outline"
-                            className="rounded-xl border-rose-300 text-rose-700 hover:bg-rose-100"
+                            className="rounded-xl border-rose-300 text-rose-700 hover:bg-rose-100 active:scale-90 transition-all focus:outline-none"
                         >
+                            <RefreshCw className={`h-3.5 w-3.5 mr-1.5 ${isRefreshing ? "animate-spin" : ""}`} />
                             Try Again
                         </Button>
                     </Card>
