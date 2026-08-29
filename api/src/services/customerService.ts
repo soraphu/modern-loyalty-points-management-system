@@ -248,13 +248,39 @@ export class CustomerService {
 
     public static async fetchPendingVouchersController(userId: string) {
         try {
+            const now = new Date();
+
+            const expiredVouchers = await prisma.voucher.findMany({
+                where: {
+                    userId,
+                    status: VoucherStatus.PENDING,
+                    expiresAt: {
+                        lt: now,
+                    },
+                },
+                include: { reward: true },
+            });
+
+            if (expiredVouchers.length > 0) {
+                await prisma.$transaction(async (tx) => {
+                    for (const voucher of expiredVouchers) {
+                        await tx.voucher.update({
+                            where: { id: voucher.id },
+                            data: { status: VoucherStatus.EXPIRED },
+                        });
+
+                        await Auth.returnCustomerPoints(voucher.userId, voucher.reward.pointsCost);
+                    }
+                });
+            }
+
             return await prisma.voucher.findMany({
                 where: {
                     userId,
-                    status: VoucherStatus.PENDING
+                    status: VoucherStatus.PENDING,
                 },
-                include: { reward: true }
-            })
+                include: { reward: true },
+            });
         } catch (error: any) {
             if (error.payload) {
                 throw error;
