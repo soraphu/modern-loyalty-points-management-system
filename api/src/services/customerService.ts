@@ -229,9 +229,8 @@ export class CustomerService {
                     data: { totalPoints: { decrement: reward.pointsCost } },
                 });
 
-                // Calculate expiration cutoff limit (exactly 30 days from now)
                 const expirationTimeline = new Date();
-                expirationTimeline.setDate(expirationTimeline.getDate() + 30);
+                expirationTimeline.setDate(expirationTimeline.getDate() + CONFIG.VOUCHER_EXPIRE_PLUS_DAY);
 
                 const newVoucher = await Auth.createUniqueVoucher(userId, rewardId);
                 logs.info('New Voucher : ', newVoucher);
