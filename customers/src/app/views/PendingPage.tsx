@@ -1,5 +1,5 @@
 import React from 'react';
-import { usePendingViewModel } from '../viewmodels/usePendingViewModel';
+import { usePendingViewModel } from '@/app/viewmodels/usePendingViewModel';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
@@ -155,12 +155,12 @@ export function PendingPage(): React.ReactElement {
 
                             const formattedExpiry = voucher.expiresAt
                                 ? new Date(voucher.expiresAt).toLocaleDateString('en-US', {
-                                      month: 'short',
-                                      day: 'numeric',
-                                      year: 'numeric',
-                                      hour: '2-digit',
-                                      minute: '2-digit',
-                                  })
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                })
                                 : null;
 
                             return (
@@ -339,5 +339,3 @@ export function PendingPage(): React.ReactElement {
         </div>
     );
 }
-
-export default PendingPage;
