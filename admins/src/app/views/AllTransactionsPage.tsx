@@ -4,8 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Loader2, History, Search, RefreshCw, AlertCircle, ArrowUpRight, ArrowDownLeft, XCircle } from 'lucide-react';
-import NavBar from './NavBar';
-
+import { NavigationBar } from '@/components/parts/top_navigate';
 export default function AllTransactionsPage() {
     const {
         transactions,
@@ -50,7 +49,7 @@ export default function AllTransactionsPage() {
     return (
 
         <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-50 antialiased ">
-            <NavBar />
+            <NavigationBar />
 
             <div className="mt-4 max-w-5xl w-full mx-auto space-y-6 p-4">
 

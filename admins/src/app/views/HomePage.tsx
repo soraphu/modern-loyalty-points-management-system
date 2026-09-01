@@ -4,7 +4,7 @@ import { NavigateButtonUI } from '@/components/parts/navigate_button_ui';
 import GenerateQrDialog from './GenerateQrDialog';
 import FindVoucherDialog from './FindVoucherDialog';
 import { Link } from 'react-router-dom';
-import NavBar from './NavBar';
+import { NavigationBar } from '@/components/parts/top_navigate';
 
 export default function HomePage() {
     const { admin, isLoading, checkPermission } = useHomeViewModel();
@@ -23,7 +23,7 @@ export default function HomePage() {
             {/* ==========================================
                 TOP NAVIGATION BAR (SOLID DEEP BLUE LAYER)
                 ========================================== */}
-            <NavBar />
+            <NavigationBar />
 
             {/* ==========================================
                 PAGE BODY LIST BUTTONS
