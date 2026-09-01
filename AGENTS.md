@@ -340,6 +340,12 @@ export function ShadcnForm() {
 }
 ```
 
+### RULE-FE-5: Component Placement Standard (`components/parts`)
+
+All reusable UI/UX component parts—including Modals, Dialogs, Navbars, Headers, Drawers, Floating Action Buttons, and Page-Specific Cards—MUST be created or placed inside `@/components/parts/`. 
+- Pages inside `@/pages` or feature folders should only compose these parts and must NOT host standalone UI dialog/part definitions inline or in local subfolders.
+- Keeps the view layer clean, encourages modularity, and strictly separates page layouts from underlying UI dialog components.
+
 ---
 
 ## 7. Filesystem Rules
