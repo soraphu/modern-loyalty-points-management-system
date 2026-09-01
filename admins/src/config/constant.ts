@@ -57,6 +57,9 @@ export const API_PATH = {
     getAllTransactions: '/transactions',
     getOwnTransactions: '/my-transactions',
     settleVoucher: (voucherCode: string) => { return `/vouchers/${voucherCode}/settle` },
-    cancelVoucher: (voucherCode: string) => { return `/vouchers/${voucherCode}/cancel` }
-
+    cancelVoucher: (voucherCode: string) => { return `/vouchers/${voucherCode}/cancel` },
+    getRewards: '/rewards',
+    createReward: '/rewards',
+    deleteReward: (rewardId: string) => `/rewards/${rewardId}`,
+    adjustRewardState: (rewardId: string) => `/rewards/${rewardId}/state-adjustment`
 }
