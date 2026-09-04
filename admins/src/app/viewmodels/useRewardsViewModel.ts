@@ -88,6 +88,25 @@ export function useRewardsViewModel() {
         }
     };
 
+    const handleAdjustRewardPointsCost = async (id: string, newPointsCost: number) => {
+        if (!hasWritePermission) {
+            alert('Unauthorized: Only Managers and Owners can alter reward points cost.');
+            return;
+        }
+
+        try {
+            const res = await action(async () => await apiClient.patch(API_PATH.adjustRewardPointsCost(id), { points_cost: newPointsCost }));
+            setRewards((prev) =>
+                prev.map((item) => (item.id === id ? { ...item, pointsCost: newPointsCost } : item))
+            );
+            return res.data;
+        } catch (err: any) {
+            const cleanMsg = filterErrorMessage(err);
+            alert(cleanMsg.msg || 'Failed to update reward points cost.');
+            throw cleanMsg;
+        }
+    };
+
     const filteredRewards = rewards.filter((item) => {
         const matchesSearch = item.rewardName.toLowerCase().includes(searchQuery.toLowerCase().trim());
         if (statusFilter === 'ACTIVE') return matchesSearch && item.active;
@@ -107,6 +126,7 @@ export function useRewardsViewModel() {
         handleToggleStatus,
         handleDeleteReward,
         handleCreateReward,
+        handleAdjustRewardPointsCost,
         refreshRewards: fetchRewards,
     };
 }

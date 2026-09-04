@@ -3,9 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Gift, RefreshCw, Trash2, Search, AlertCircle } from 'lucide-react';
+import { Loader2, Gift, RefreshCw, Trash2, Search, AlertCircle, Pencil } from 'lucide-react';
 import { NavigationBar } from '@/components/parts/top_navigate';
 import AddRewardDialog from '@/components/parts/AddRewardDialog';
+import EditRewardPointsDialog from '@/components/parts/EditRewardPointsDialog';
+
 
 export default function RewardsPage() {
     const {
@@ -20,6 +22,7 @@ export default function RewardsPage() {
         handleToggleStatus,
         handleDeleteReward,
         refreshRewards,
+        handleAdjustRewardPointsCost,
     } = useRewardsViewModel();
 
     if (isLoading) {
@@ -123,9 +126,19 @@ export default function RewardsPage() {
                                 </CardHeader>
 
                                 <CardContent className="px-4 pb-4 pt-0">
-                                    <div className="flex items-baseline gap-1 bg-zinc-900/60 rounded-lg p-2.5 border border-zinc-900/80">
-                                        <span className="text-lg font-black text-blue-400 tracking-tight">{item.pointsCost}</span>
-                                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Points</span>
+                                    <div className="flex items-center justify-between bg-zinc-900/60 rounded-lg p-2 border border-zinc-900/80">
+                                        {/* Left Side: Points Span */}
+                                        <div className="flex items-baseline gap-1 pl-1">
+                                            <span className="text-lg font-black text-blue-400 tracking-tight">
+                                                {item.pointsCost}
+                                            </span>
+                                            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
+                                                Points
+                                            </span>
+                                        </div>
+
+                                        {/* Right Side: Edit Info Button */}
+                                        <EditRewardPointsDialog reward={item} onAdjustPointsCost={handleAdjustRewardPointsCost} />
                                     </div>
                                 </CardContent>
 

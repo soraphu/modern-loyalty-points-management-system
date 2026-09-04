@@ -61,5 +61,6 @@ export const API_PATH = {
     getRewards: '/rewards',
     createReward: '/rewards',
     deleteReward: (rewardId: string) => `/rewards/${rewardId}`,
-    adjustRewardState: (rewardId: string) => `/rewards/${rewardId}/state-adjustment`
+    adjustRewardState: (rewardId: string) => `/rewards/${rewardId}/state-adjustment`,
+    adjustRewardPointsCost: (rewardId: string) => `/rewards/${rewardId}/points-adjustment`
 }
