@@ -14,6 +14,12 @@ export function useRewardsViewModel() {
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
+    const [activeAction, setActiveAction] = useState<{
+        title: string;
+        description: string;
+        variant: "destructive" | "amber";
+        onConfirm: () => Promise<void>;
+    } | null>(null);
 
     const hasWritePermission = admin?.role === 'MANAGER' || admin?.role === 'OWNER';
 
@@ -128,5 +134,7 @@ export function useRewardsViewModel() {
         handleCreateReward,
         handleAdjustRewardPointsCost,
         refreshRewards: fetchRewards,
+        activeAction,
+        setActiveAction
     };
 }

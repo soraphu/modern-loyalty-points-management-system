@@ -3,11 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Gift, RefreshCw, Trash2, Search, AlertCircle, Pencil } from 'lucide-react';
+import { Loader2, Gift, RefreshCw, Trash2, Search, AlertCircle } from 'lucide-react';
 import { NavigationBar } from '@/components/parts/top_navigate';
 import AddRewardDialog from '@/components/parts/AddRewardDialog';
 import EditRewardPointsDialog from '@/components/parts/EditRewardPointsDialog';
-
+import { ConfirmDialog } from '@/components/parts/ConfirmDialog';
 
 export default function RewardsPage() {
     const {
@@ -23,6 +23,8 @@ export default function RewardsPage() {
         handleDeleteReward,
         refreshRewards,
         handleAdjustRewardPointsCost,
+        activeAction,
+        setActiveAction
     } = useRewardsViewModel();
 
     if (isLoading) {
@@ -103,6 +105,18 @@ export default function RewardsPage() {
                     </div>
                 )}
 
+                {activeAction && (
+                    <ConfirmDialog
+                        isOpen={!!activeAction}
+                        onClose={() => setActiveAction(null)}
+                        onConfirm={activeAction.onConfirm}
+                        isLoading={isLoading}
+                        title={activeAction.title}
+                        description={activeAction.description}
+                        variant={activeAction.variant}
+                    />
+                )}
+
                 {/* MAIN RENDERING GRID */}
                 {rewards.length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -147,7 +161,17 @@ export default function RewardsPage() {
                                         <>
                                             <Button
                                                 variant="outline"
-                                                onClick={() => handleToggleStatus(item.id, item.active)}
+                                                onClick={() =>
+                                                    setActiveAction({
+                                                        title: item.active ? 'Deactivate Reward' : 'Activate Reward',
+                                                        description: `Are you sure you want to ${item.active ? 'deactivate' : 'activate'} the reward "${item.rewardName}"? This action can be reversed later.`,
+                                                        variant: item.active ? 'destructive' : 'amber',
+                                                        onConfirm: async () => {
+                                                            await handleToggleStatus(item.id, item.active);
+                                                            setActiveAction(null);
+                                                        },
+                                                    })
+                                                }
                                                 className={`flex-1 text-xs h-8 cursor-pointer font-medium ${item.active
                                                     ? 'border-red-950/60 text-red-400 hover:bg-red-950/40'
                                                     : 'border-emerald-950/60 text-emerald-400 hover:bg-emerald-950/40'
