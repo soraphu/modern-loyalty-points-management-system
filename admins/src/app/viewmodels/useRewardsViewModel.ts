@@ -11,6 +11,7 @@ export function useRewardsViewModel() {
 
     const [rewards, setRewards] = useState<RewardItem[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [actionIsProcessing, setActionIsProcessing] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
@@ -46,12 +47,11 @@ export function useRewardsViewModel() {
     }, []);
 
     const handleToggleStatus = async (id: string, currentStatus: boolean) => {
-        if (!hasWritePermission) {
-            alert('Unauthorized: Only Managers and Owners can alter rewards state.');
-            return;
-        }
+        if (!hasWritePermission) return;
 
+        setActionIsProcessing(true);
         try {
+
             await action(async () => await apiClient.patch(API_PATH.adjustRewardState(id), { active: !currentStatus }));
             setRewards((prev) =>
                 prev.map((item) => (item.id === id ? { ...item, active: !currentStatus } : item))
@@ -60,6 +60,8 @@ export function useRewardsViewModel() {
             const cleanMsg = filterErrorMessage(err);
             alert(cleanMsg.msg || 'Failed to update reward status.');
         }
+        setActiveAction(null);
+        setActionIsProcessing(false);
     };
 
     const handleDeleteReward = async (id: string) => {
@@ -123,6 +125,7 @@ export function useRewardsViewModel() {
     return {
         rewards: filteredRewards,
         isLoading,
+        setIsLoading: setIsLoading,
         error,
         searchQuery,
         setSearchQuery,
@@ -135,6 +138,7 @@ export function useRewardsViewModel() {
         handleAdjustRewardPointsCost,
         refreshRewards: fetchRewards,
         activeAction,
-        setActiveAction
+        setActiveAction,
+        actionIsProcessing
     };
 }

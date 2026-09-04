@@ -24,7 +24,8 @@ export default function RewardsPage() {
         refreshRewards,
         handleAdjustRewardPointsCost,
         activeAction,
-        setActiveAction
+        setActiveAction,
+        actionIsProcessing
     } = useRewardsViewModel();
 
     if (isLoading) {
@@ -110,7 +111,7 @@ export default function RewardsPage() {
                         isOpen={!!activeAction}
                         onClose={() => setActiveAction(null)}
                         onConfirm={activeAction.onConfirm}
-                        isLoading={isLoading}
+                        isLoading={actionIsProcessing}
                         title={activeAction.title}
                         description={activeAction.description}
                         variant={activeAction.variant}
@@ -161,16 +162,14 @@ export default function RewardsPage() {
                                         <>
                                             <Button
                                                 variant="outline"
-                                                onClick={() =>
+                                                onClick={() => {
                                                     setActiveAction({
                                                         title: item.active ? 'Deactivate Reward' : 'Activate Reward',
                                                         description: `Are you sure you want to ${item.active ? 'deactivate' : 'activate'} the reward "${item.rewardName}"? This action can be reversed later.`,
                                                         variant: item.active ? 'destructive' : 'amber',
-                                                        onConfirm: async () => {
-                                                            await handleToggleStatus(item.id, item.active);
-                                                            setActiveAction(null);
-                                                        },
-                                                    })
+                                                        onConfirm: async () => await handleToggleStatus(item.id, item.active),
+                                                    });
+                                                }
                                                 }
                                                 className={`flex-1 text-xs h-8 cursor-pointer font-medium ${item.active
                                                     ? 'border-red-950/60 text-red-400 hover:bg-red-950/40'
