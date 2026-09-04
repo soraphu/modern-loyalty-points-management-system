@@ -41,7 +41,7 @@ export default function RewardsPage() {
 
     return (
         <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-50 antialiased">
-            <NavigationBar />
+            <NavigationBar enableReturn={true} />
 
             <div className="mt-4 max-w-6xl w-full mx-auto space-y-6 p-4">
 
