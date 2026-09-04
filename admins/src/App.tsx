@@ -5,12 +5,14 @@ import LoginPage from './app/views/LoginPage';
 import HomePage from './app/views/HomePage';
 import RewardsPage from './app/views/RewardPage';
 import AllTransactionsPage from './app/views/AllTransactionsPage';
+import ExecutedTransactionsPage from './app/views/ExecutedTransactionsPage';
 
 const router = createBrowserRouter([
   { path: '/', element: <RegisterPage /> },
   { path: '/login', element: <LoginPage /> },
   { path: '/home', element: <HomePage /> },
   { path: '/rewards', element: <RewardsPage /> },
+  { path: '/executed-transactions', element: <ExecutedTransactionsPage /> },
   { path: '/transactions', element: <AllTransactionsPage /> },
 ]);
 

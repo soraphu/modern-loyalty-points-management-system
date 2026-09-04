@@ -37,7 +37,9 @@ export default function HomePage() {
                         <NavigateButtonUI Icon={Gift} title='All Rewards' useColor='STAFF' />
                     </Link>
 
-                    <NavigateButtonUI Icon={FileClock} title='Executed Transactions' useColor='STAFF' />
+                    <Link to='/executed-transactions'>
+                        <NavigateButtonUI Icon={FileClock} title='Executed Transactions' useColor='STAFF' />
+                    </Link>
 
                     {/* ==========================================
                         CONDITIONAL SEPARATORS AND HIGHER PRIVILEGED BUTTONS
