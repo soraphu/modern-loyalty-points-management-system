@@ -439,6 +439,39 @@ export async function adjustRewardStateController(request: FastifyRequest, reply
     }
 }//end
 
+export async function adjustRewardPointsCostController(request: FastifyRequest, reply: FastifyReply) {
+    const { points_cost }: any = request.body;
+    const { reward_id: rewardId }: any = request.params;
+
+    try {
+        Validation.requiredFields({ points_cost }, ['points_cost']);
+
+        const accessToken = Validation.requireAuthHeader(request);
+
+        const decodePayload: any = Auth.verifyAndDecodeAccessToken(accessToken);
+        logs.info('Decode Payload: ', decodePayload);
+
+        await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'MANAGER' });
+
+        const updatedReward = await ManagerService.adjustRewardPointsCost(rewardId, Number(points_cost));
+
+        const res = ApiResponse.success({
+            statusCode: 200,
+            msg: `Adjust points cost of reward ${updatedReward.rewardName} to ${updatedReward.pointsCost} successful.`,
+            data: { updated_reward: updatedReward }
+        });
+
+        return reply.status(res.statusCode).send(res.payload);
+    } catch (error: any) {
+        logs.error(error);
+        let serverError = error;
+        if (!serverError.payload) serverError = ApiResponse.internalServerError();
+
+        return reply.status(serverError.statusCode).send(serverError.payload);
+
+    }
+}//end
+
 export async function fetchCustomersController(request: FastifyRequest, reply: FastifyReply) {
     try {
         const accessToken = Validation.requireAuthHeader(request);

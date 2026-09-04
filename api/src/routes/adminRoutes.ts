@@ -9,6 +9,7 @@ import {
     createRewardController,
     deleteRewardController,
     adjustRewardStateController,
+    adjustRewardPointsCostController,
     fetchCustomersController,
     manualPointsOverrideController,
     fetchAdminDirectoryController,
@@ -79,6 +80,10 @@ export async function adminRoutes(fastify: FastifyInstance) {
     // Toggle Active Availability State
     // PATCH -> /api/v1/admin/rewards/:reward_id/state-adjustment
     fastify.patch('/rewards/:reward_id/state-adjustment', adjustRewardStateController);
+
+    // Adjust Points Cost of Reward
+    // PATCH -> /api/v1/admin/rewards/:reward_id/points-adjustment
+    fastify.patch('/rewards/:reward_id/points-adjustment', adjustRewardPointsCostController);
 
     // List Registered Platform Customers
     // GET -> /api/v1/admin/customers

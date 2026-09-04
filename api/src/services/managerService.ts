@@ -122,6 +122,18 @@ export class ManagerService {
      */
     public static async adjustRewardState(rewardId: string, active: boolean) {
         try {
+            const rewardExists = await prisma.reward.findUnique({
+                where: { id: rewardId }
+            });
+
+            if (!rewardExists) {
+                throw ApiResponse.fail({
+                    statusCode: 404,
+                    msg: "Target reward item not found.",
+                    error_code: "REWARD_NOT_FOUND"
+                });
+            }
+
             return await prisma.reward.update({
                 where: { id: rewardId },
                 data: { active: active },
@@ -130,6 +142,49 @@ export class ManagerService {
         } catch (error: any) {
             if (error.payload) throw error;
             throw ApiResponse.internalServerError('Unable to adjust reward state an unexpected internal server error occurred.');
+        }
+    }
+
+    /**
+     * Adjust the points cost of an existing reward item.
+     */
+    public static async adjustRewardPointsCost(rewardId: string, pointsCost: number) {
+        try {
+            if (pointsCost === undefined || pointsCost <= 0) {
+                throw ApiResponse.fail({
+                    statusCode: 400,
+                    msg: "Invalid points cost numerical assignment value provided.",
+                    error_code: "INVALID_POINTS_COST_VALUE"
+                });
+            }
+
+            const rewardExists = await prisma.reward.findUnique({
+                where: { id: rewardId }
+            });
+
+            if (!rewardExists) {
+                throw ApiResponse.fail({
+                    statusCode: 404,
+                    msg: "Target reward item not found.",
+                    error_code: "REWARD_NOT_FOUND"
+                });
+            }
+
+            return await prisma.reward.update({
+                where: { id: rewardId },
+                data: { pointsCost: pointsCost },
+                select: {
+                    id: true,
+                    rewardName: true,
+                    pointsCost: true,
+                    imageUrl: true,
+                    active: true,
+                    createdAt: true
+                }
+            });
+        } catch (error: any) {
+            if (error.payload) throw error;
+            throw ApiResponse.internalServerError('Unable to adjust reward points cost an unexpected internal server error occurred.');
         }
     }
 
