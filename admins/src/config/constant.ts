@@ -60,6 +60,13 @@ export const API_PATH = {
     cancelVoucher: (voucherCode: string) => { return `/vouchers/${voucherCode}/cancel` },
     getRewards: '/rewards',
     createReward: '/rewards',
+    getCustomers: '/customers',
+    adjustCustomerPoints: (userId: string) => `/customers/${userId}/points-adjustment`,
+    getAdmins: '/admins',
+    createAdmin: '/admins',
+    adjustAdminRole: (adminId: string) => `/admins/${adminId}/role-adjustment`,
+    resetAdminPassword: (adminId: string) => `/admins/${adminId}/password-reset`,
+    deleteAdmin: (adminId: string) => `/admins/${adminId}`,
     deleteReward: (rewardId: string) => `/rewards/${rewardId}`,
     adjustRewardState: (rewardId: string) => `/rewards/${rewardId}/state-adjustment`,
     adjustRewardPointsCost: (rewardId: string) => `/rewards/${rewardId}/points-adjustment`

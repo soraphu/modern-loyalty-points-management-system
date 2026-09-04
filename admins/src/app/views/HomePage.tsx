@@ -50,14 +50,14 @@ export default function HomePage() {
                             <Link to='/transactions' >
                                 <NavigateButtonUI Icon={History} useColor='MANAGER' title='All Transactions' />
                             </Link>
-                            <NavigateButtonUI Icon={Users} useColor='MANAGER' title='Manage Customers' />
+                            <Link to='/manage-customers'><NavigateButtonUI Icon={Users} useColor='MANAGER' title='Manage Customers' /></Link>
                         </>
                     )}
 
                     {checkPermission('OWNER') && (
                         <>
                             <hr />
-                            <NavigateButtonUI Icon={ShieldCogCorner} useColor='OWNER' title='Manage Admins' />
+                            <Link to='/manage-admins'><NavigateButtonUI Icon={ShieldCogCorner} useColor='OWNER' title='Manage Admins' /></Link>
                         </>
                     )}
                 </div>
