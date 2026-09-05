@@ -6,6 +6,7 @@ import {
     RefreshCw,
     Search,
     Shield,
+    Trash
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -120,9 +121,9 @@ export default function ManageAdminPage() {
                     isOpen={!!deletingAdmin}
                     onClose={() => setDeletingAdmin(null)}
                     isLoading={viewModel.isMutating}
-                    title="Deactivate admin account"
-                    description={`Remove @${deletingAdmin?.username} from the admin directory? This cannot be undone.`}
-                    confirmText="Deactivate"
+                    title="Delete admin account"
+                    description={`Permanently delete @${deletingAdmin?.username} from the admin directory? This cannot be undone.`}
+                    confirmText="Delete"
                     variant="destructive"
                     onConfirm={async () => {
                         if (deletingAdmin) {
@@ -209,7 +210,8 @@ function AdminRow({
                         onClick={onDelete}
                         className="border-rose-900/50 text-rose-400"
                     >
-                        Deactivate
+                        <Trash className="mr-2 h-4 w-4" />
+                        Delete
                     </Button>
                 </div>
             </td>
