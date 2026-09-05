@@ -179,7 +179,6 @@ function AdminRow({
                         >
                             <option>STAFF</option>
                             <option>MANAGER</option>
-                            <option>OWNER</option>
                         </select>
                 }
             </td>

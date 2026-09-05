@@ -143,13 +143,13 @@ export default function AddAdminDialog({ isLoading, onSubmit }: AddAdminDialogPr
                     <DialogFooter className="sm:col-span-2">
                         <Button
                             type="button"
-                            variant="outline"
+                            variant="secondary"
                             onClick={() => setOpen(false)}
                             disabled={isLoading}
                         >
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={isLoading}>
+                        <Button type="submit" disabled={isLoading} variant={'default'} className='bg-green-400'>
                             {isLoading ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
