@@ -153,7 +153,7 @@ export default function RewardsPage() {
                                         </div>
 
                                         {/* Right Side: Edit Info Button */}
-                                        <EditRewardPointsDialog reward={item} onAdjustPointsCost={handleAdjustRewardPointsCost} />
+                                        {hasWritePermission && <EditRewardPointsDialog reward={item} onAdjustPointsCost={handleAdjustRewardPointsCost} />}
                                     </div>
                                 </CardContent>
 
