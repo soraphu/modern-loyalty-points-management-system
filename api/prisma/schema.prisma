@@ -30,6 +30,7 @@ enum TransactionType {
   REDEEM
   CANCEL
   EXPIRED
+  MANUAL_ADJUSTMENT
 
   @@map("transactionType")
 }

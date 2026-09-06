@@ -2,6 +2,7 @@ import { CONFIG } from '../config/constants';
 import { prisma } from '../config/database'; // Adjust path to your Prisma instance config
 import { ApiResponse } from '../utils/apiResponse'; // Adjust path to your custom global API response utility
 import { Logger } from '../utils/logger';
+import { TransactionType } from '../generated/prisma/enums';
 
 const logs = new Logger('Manager Service');
 
@@ -81,7 +82,7 @@ export class ManagerService {
      * 3. Set or overwrite a target customer's cumulative total points.
      * Matches configuration schema from: Edit Customer Points.yml
      */
-    public static async adjustCustomerPoints(userId: string, newPoints: number) {
+    public static async adjustCustomerPoints(userId: string, newPoints: number, adminId: string) {
         try {
             if (newPoints === undefined || newPoints < 0) {
                 throw ApiResponse.fail({
@@ -91,23 +92,36 @@ export class ManagerService {
                 });
             }
 
-            // Perform check to grab customer context information
-            const customer = await prisma.user.findUnique({
-                where: { id: userId }
-            });
-
-            if (!customer) {
-                throw ApiResponse.fail({
-                    statusCode: 404,
-                    msg: "Customer account context profile not found.",
-                    error_code: "CUSTOMER_NOT_FOUND"
+            return await prisma.$transaction(async (tx) => {
+                const customer = await tx.user.findUnique({
+                    where: { id: userId }
                 });
-            }
 
-            // Update the record total inside the database layer context mapping
-            return await prisma.user.update({
-                where: { id: userId },
-                data: { totalPoints: newPoints }
+                if (!customer) {
+                    throw ApiResponse.fail({
+                        statusCode: 404,
+                        msg: "Customer account context profile not found.",
+                        error_code: "CUSTOMER_NOT_FOUND"
+                    });
+                }
+
+                const pointsAmount = newPoints - customer.totalPoints;
+                const updatedCustomer = await tx.user.update({
+                    where: { id: userId },
+                    data: { totalPoints: newPoints }
+                });
+
+                await tx.transaction.create({
+                    data: {
+                        userId,
+                        adminId,
+                        referenceId: userId,
+                        pointsAmount,
+                        type: TransactionType.MANUAL_ADJUSTMENT
+                    }
+                });
+
+                return updatedCustomer;
             });
 
         } catch (error: any) {

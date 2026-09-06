@@ -516,7 +516,7 @@ export async function manualPointsOverrideController(request: FastifyRequest, re
 
         await Auth.lowestAllowRole({ adminId: decodePayload.id, lowestAllowRole: 'MANAGER' });
 
-        const customer = await ManagerService.adjustCustomerPoints(targetUserId, newPoints);
+        const customer = await ManagerService.adjustCustomerPoints(targetUserId, newPoints, decodePayload.id);
 
         const res = ApiResponse.success({
             statusCode: 200,
