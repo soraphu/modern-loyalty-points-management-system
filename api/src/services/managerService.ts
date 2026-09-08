@@ -111,7 +111,7 @@ export class ManagerService {
                     data: { totalPoints: newPoints }
                 });
 
-                await tx.transaction.create({
+                const newTransaction = await tx.transaction.create({
                     data: {
                         userId,
                         adminId,
@@ -121,7 +121,8 @@ export class ManagerService {
                     }
                 });
 
-                return updatedCustomer;
+                const payload = { customer: updatedCustomer, transaction: newTransaction };
+                return payload;
             });
 
         } catch (error: any) {
