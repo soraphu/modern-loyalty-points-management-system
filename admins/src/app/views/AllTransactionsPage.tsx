@@ -33,6 +33,8 @@ export default function AllTransactionsPage() {
         switch (type) {
             case 'EARN':
                 return { bg: 'bg-emerald-950/80 text-emerald-400 border-emerald-900', icon: <ArrowDownLeft className="h-3 w-3" /> };
+            case 'MANUAL_ADJUSTMENT':
+                return { bg: 'bg-amber-950/80 text-amber-400 border-amber-900', icon: <History className="h-3 w-3" /> };
             case 'CANCEL':
                 return { bg: 'bg-red-950/80 text-red-400 border-red-900', icon: <XCircle className="h-3 w-3" /> };
             default: // REDEEM
@@ -87,6 +89,7 @@ export default function AllTransactionsPage() {
                             <CustomeTabTrigger value='EARN' textContent='Earn' />
                             <CustomeTabTrigger value='REDEEM' textContent='Redeem' />
                             <CustomeTabTrigger value='CANCEL' textContent='Cancel' />
+                            <CustomeTabTrigger value='MANUAL_ADJUSTMENT' textContent='Manual adjustment' />
                         </TabsList>
                     </Tabs>
                 </div>
@@ -171,9 +174,9 @@ export default function AllTransactionsPage() {
                                                 </td>
 
                                                 {/* Real-time points Amount Delta calculation */}
-                                                <td className={`p-4 text-right font-bold text-sm tracking-tight ${tx.type === 'EARN' ? 'text-emerald-400' : 'text-red-400'
+                                                <td className={`p-4 text-right font-bold text-sm tracking-tight ${tx.pointsAmount >= 0 ? 'text-emerald-400' : 'text-red-400'
                                                     }`}>
-                                                    {tx.type === 'EARN' ? '+' : '-'}{tx.pointsAmount}
+                                                    {tx.pointsAmount >= 0 ? '+' : ''}{tx.pointsAmount}
                                                 </td>
                                             </tr>
                                         );

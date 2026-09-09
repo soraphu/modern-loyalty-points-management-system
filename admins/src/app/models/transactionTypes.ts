@@ -1,4 +1,4 @@
-export type TransactionType = 'EARN' | 'REDEEM';
+export type TransactionType = 'EARN' | 'REDEEM' | 'CANCEL' | 'EXPIRED' | 'MANUAL_ADJUSTMENT';
 
 export interface TransactionUser {
     id: string;

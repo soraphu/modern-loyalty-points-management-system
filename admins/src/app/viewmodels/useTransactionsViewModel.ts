@@ -9,7 +9,7 @@ export function useTransactionsViewModel() {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>('');
-    const [typeFilter, setTypeFilter] = useState<'ALL' | 'EARN' | 'REDEEM' | 'CANCEL'>('ALL');
+    const [typeFilter, setTypeFilter] = useState<'ALL' | TransactionItem['type']>('ALL');
     const { action } = AuthAction();
 
     const fetchTransactions = async () => {
