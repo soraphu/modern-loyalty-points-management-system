@@ -3,7 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Loader2, FileClock, Search, RefreshCw, AlertCircle, ArrowUpRight, ArrowDownLeft, XCircle } from 'lucide-react';
+import { Loader2, FileClock, History, Search, RefreshCw, AlertCircle, ArrowUpRight, ArrowDownLeft, XCircle } from 'lucide-react';
 import { NavigationBar } from '@/components/parts/top_navigate';
 
 export default function ExecutedTransactionsPage() {
@@ -34,6 +34,8 @@ export default function ExecutedTransactionsPage() {
         switch (type) {
             case 'EARN':
                 return { bg: 'bg-emerald-950/80 text-emerald-400 border-emerald-900', icon: <ArrowDownLeft className="h-3 w-3" /> };
+            case 'MANUAL_ADJUSTMENT':
+                return { bg: 'bg-amber-950/80 text-amber-400 border-amber-900', icon: <History className="h-3 w-3" /> };
             case 'CANCEL':
                 return { bg: 'bg-red-950/80 text-red-400 border-red-900', icon: <XCircle className="h-3 w-3" /> };
             default: // REDEEM
@@ -77,7 +79,7 @@ export default function ExecutedTransactionsPage() {
                         <Input
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Filter by line name, transaction or reference ID..."
+                            placeholder="Filter by line name, operator, transaction or reference ID..."
                             className="pl-9 bg-zinc-900 border-zinc-800 text-zinc-50 placeholder-zinc-600 focus:border-blue-500 text-sm"
                         />
                     </div>
@@ -88,6 +90,7 @@ export default function ExecutedTransactionsPage() {
                             <CustomeTabTrigger value='EARN' textContent='Earn' />
                             <CustomeTabTrigger value='REDEEM' textContent='Redeem' />
                             <CustomeTabTrigger value='CANCEL' textContent='Cancel' />
+                            <CustomeTabTrigger value='MANUAL_ADJUSTMENT' textContent='Manual' />
                         </TabsList>
                     </Tabs>
                 </div>
@@ -130,6 +133,9 @@ export default function ExecutedTransactionsPage() {
                                                     <div className="font-mono text-zinc-400 text-xs truncate max-w-[140px]" title={tx.id}>
                                                         #{tx.id.split('-')[0]}...
                                                     </div>
+                                                    <div className="text-[10px] text-zinc-500 mt-1">
+                                                        Operator: <span className="text-blue-400 font-medium">@{tx.admin.username}</span>
+                                                    </div>
                                                 </td>
 
                                                 {/* Formatted Date & Time */}
@@ -169,9 +175,9 @@ export default function ExecutedTransactionsPage() {
                                                 </td>
 
                                                 {/* Real-time points Amount Delta calculation */}
-                                                <td className={`p-4 text-right font-bold text-sm tracking-tight ${tx.type === 'EARN' ? 'text-emerald-400' : 'text-red-400'
+                                                <td className={`p-4 text-right font-bold text-sm tracking-tight ${tx.pointsAmount >= 0 ? 'text-emerald-400' : 'text-red-400'
                                                     }`}>
-                                                    {tx.type === 'EARN' ? '+' : '-'}{tx.pointsAmount}
+                                                    {tx.pointsAmount >= 0 ? '+' : ''}{tx.pointsAmount}
                                                 </td>
                                             </tr>
                                         );
