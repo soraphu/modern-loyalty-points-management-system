@@ -89,7 +89,7 @@ export default function AllTransactionsPage() {
                             <CustomeTabTrigger value='EARN' textContent='Earn' />
                             <CustomeTabTrigger value='REDEEM' textContent='Redeem' />
                             <CustomeTabTrigger value='CANCEL' textContent='Cancel' />
-                            <CustomeTabTrigger value='MANUAL_ADJUSTMENT' textContent='Manual adjustment' />
+                            <CustomeTabTrigger value='MANUAL_ADJUSTMENT' textContent='Manual' />
                         </TabsList>
                     </Tabs>
                 </div>
