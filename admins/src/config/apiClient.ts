@@ -1,4 +1,4 @@
-import type { AxiosInstance, AxiosResponse } from 'axios';
+import type { AxiosInstance } from 'axios';
 import axios from 'axios';
 
 export const apiClient: AxiosInstance = axios.create({
@@ -12,54 +12,3 @@ export const apiClient: AxiosInstance = axios.create({
         'Accept': 'application/json',
     },
 });
-
-// apiClient.interceptors.response.use(
-//     (response: AxiosResponse) => {
-//         return response;
-//     },
-//     (error) => {
-//         const { response } = error;
-
-//         if (response) {
-//             switch (response.status) {
-//                 case 401:
-//                     // UNAUTHORIZED: Session cookie is invalid or expired
-//                     console.warn('Session expired or invalid cookie. Redirecting to login...');
-
-//                     // NOTE: JavaScript cannot clean HttpOnly cookies! 
-//                     // You must let the backend clear it during a logout request, or simply redirect:
-//                     if (window.location.pathname !== '/') {
-//                         window.location.href = '/';
-//                     }
-//                     break;
-
-//                 case 403:
-//                     console.error('Access Denied: Insufficient permissions.');
-//                     break;
-
-//                 case 500:
-//                     console.error('Internal Server Error.');
-//                     break;
-
-//                 default:
-//                     break;
-//             }
-//         } else if (error.request) {
-//             console.error('Network Connection Error.');
-//         }
-
-//         return Promise.reject(error);
-//     }
-// );
-
-//     async register(payload: RegisterFormValues): Promise < RegisterResponse > {
-//     try {
-//         const response = await apiClient.post<RegisterResponse>(API_PATH.register, payload);
-
-//         return response.data;
-//     } catch(err: any) {
-//         const finalErrorMsg = filterErrorMessage(err);
-
-//         throw finalErrorMsg;
-//     }
-// },
