@@ -32,7 +32,10 @@ const fastifyOptions = {
     dotenv: true, // Tells Fastify to read local .env file
 };
 
-const allowedOrigins = [
+const allowedOrigins = process.env.PROD === 'true' ? [
+    process.env.ADMIN_URL,
+    process.env.CUSTOMER_URL
+] : [
     'http://localhost:5173',
     'http://localhost:5174',
     'http://127.0.0.1:5173',
