@@ -6,6 +6,7 @@ import { Loader2, Gift, QrCode, History, Ticket, LogOut, AlertCircle } from 'luc
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/config/AuthContext';
+import pointsImg from '@/assets/points.png';
 
 export default function HomePage() {
     const { appearConfirmLogout, setAppearConfirmLogout } = useHomeViewModel();
@@ -48,7 +49,7 @@ export default function HomePage() {
 
             {/* BRAND HEADER STATE BANNER */}
             <header className="bg-app-foreground p-5 pb-6 border-b border-emerald-500/20 rounded-b-[2rem] shadow-md flex items-center gap-2">
-                <img src="../src/assets/points.png" alt="App Image" className='w-14' />
+                <img src={pointsImg} alt="App Image" className='w-14' />
                 <div className="flex-1">
                     <h1 className="text-white text-xs font-black tracking-widest uppercase">Welcome To</h1>
                     <h2 className="text-white text-xl font-black tracking-tight mt-0.5 drop-shadow-sm">DEEPOINTS</h2>
