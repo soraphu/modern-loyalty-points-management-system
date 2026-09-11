@@ -104,7 +104,6 @@ export default function HomePage() {
                 {/* BUTTON A: REWARDS */}
                 <Link to='/available-rewards' >
                     <Card
-                        onClick={() => console.log('Navigate to Rewards View')}
                         className={`bg-[#b40404] active:bg-[#9d1515] ${cardCN}`}
                     >
                         <CardContent className="p-0 flex flex-col items-center space-y-3">
@@ -119,7 +118,6 @@ export default function HomePage() {
                 {/* BUTTON B: EARN POINTS */}
                 <Link to='/scanner' >
                     <Card
-                        onClick={() => console.log('Navigate to QR Scanner View')}
                         className={`bg-[#14cc04] active:bg-[#14b106] ${cardCN}`}
                     >
                         <CardContent className="p-0 flex flex-col items-center space-y-3">
@@ -134,7 +132,6 @@ export default function HomePage() {
                 {/* BUTTON C: HISTORY */}
                 <Link to='/history' >
                     <Card
-                        onClick={() => console.log('Navigate to Point Ledger Logs View')}
                         className={`bg-[#545454] active:bg-[#353535] ${cardCN}`}
                     >
                         <CardContent className="p-0 flex flex-col items-center space-y-3">
