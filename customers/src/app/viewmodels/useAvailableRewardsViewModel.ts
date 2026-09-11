@@ -60,7 +60,10 @@ export function useAvailableRewardsViewModel() {
         setIsLoading(true);
         setError(null);
         try {
+            consoleLogOnDev("Try fetching rewards...");
             const response = await apiClient.get(API_PATH.fetchRewards);
+
+            consoleLogOnDev(response.data);
 
             setRewards(response.data.data.rewards);
         } catch (err: any) {
