@@ -31,6 +31,9 @@ export function usePendingViewModel(): UsePendingViewModelReturn {
             setError(null);
 
             try {
+                consoleLogOnDev("Try fetching pending vouchers...");
+                consoleLogOnDev("URL: " + API_PATH.fetchPendingVouchers);
+
                 const response = await apiClient.get(API_PATH.fetchPendingVouchers);
                 consoleLogOnDev(response.data);
 
