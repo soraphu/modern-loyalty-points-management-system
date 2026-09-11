@@ -30,7 +30,6 @@ export interface UseHistoryViewModelReturn {
     error: string | null;
     activeFilter: TransactionType | "ALL";
     setActiveFilter: React.Dispatch<React.SetStateAction<TransactionType | "ALL">>;
-    refetch: () => Promise<void>;
     handleRefresh: () => Promise<void>;
 }
 
@@ -66,11 +65,6 @@ export function useHistoryViewModel(): UseHistoryViewModelReturn {
         }
     }, []);
 
-    const refetch = useCallback(async () => {
-        if (authLoading) return;
-        await fetchTransactions(false);
-    }, [authLoading, fetchTransactions]);
-
     const handleRefresh = useCallback(async () => {
         if (authLoading) return;
         await fetchTransactions(true);
@@ -96,7 +90,6 @@ export function useHistoryViewModel(): UseHistoryViewModelReturn {
         error,
         activeFilter,
         setActiveFilter,
-        refetch,
         handleRefresh,
     };
 }

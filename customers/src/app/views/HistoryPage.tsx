@@ -61,7 +61,6 @@ export function HistoryPage() {
         activeFilter,
         setActiveFilter,
         handleRefresh,
-        refetch,
     } = useHistoryViewModel();
 
     const isRefreshDisabled = isLoading || isRefreshing;
