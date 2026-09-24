@@ -5,8 +5,8 @@ A modern loyalty points management system for merchants using LINE. Customers ea
 ## **Live Demo :** [**Customer**](https://deepoints-customers-virid.vercel.app) | [**Admin**](https://deepoints-admins-three.vercel.app/) 
 
 ## To login as admin ( ROLE OWNER )
-username : master
-password : 12345678
+  username : master
+  password : 12345678
 
 ### 🚀 Features
 
